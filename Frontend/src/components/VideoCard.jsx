@@ -8,21 +8,23 @@ export default function VideoCard({
   channel,
   dp,
   views,
-  time
+  time,
+  className = "",
+  classNameImg = ""
 }) {
   return (
 
     <Link to={`/video/${id}`} className="block my-5 lg:w-73">
-      <div className="bg-black rounded-lg overflow-hidden cursor-pointer my-5   lg:w-73   relative top-10 ">
+      <div className={`bg-black rounded-lg overflow-hidden cursor-pointer my-5 relative top-10 ${className}`}>
 
 
         <img
           src={thumbnail}
           alt={title}
-          className="lg:h-[175px] object-cover lg:w-full w-[500px] mr-5"
+          className={`w-full h-full object-contain ${classNameImg}`}
         />
 
-        <div className="p-3 flex gap-3">
+        <div className={`p-3 flex gap-3  `}>
           <img
             src={dp}
             alt={`${channel} dp`}

@@ -1,27 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Sidebar, VideoCard } from '../components';
 import play from "../assets/play.svg"
-import axios from 'axios';
+import { useVideo } from '../hooks/useVideos';
+import { useParams } from 'react-router-dom';
 
 export default function Home() {
-  const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    axios.get('/mockVideos.json')
-      .then(res => {
-        const data = res.data;
-        setVideos(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setError('Failed to load videos');
-        setLoading(true);
-      });
-  }, []);
-
+      const{id} = useParams
+      const { video, Videos, loading, error } = useVideo(id)
+  
+  
   if (loading) return <p className="text-white p-4">Loading videos…</p>;
   if (error) return <p className="text-red-500 p-4">{error}</p>;
 
@@ -33,8 +21,8 @@ export default function Home() {
 
       <div className="flex-1 p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4  gap-3 lg:ml-65">
 
-        {videos.length > 0 ? (
-          videos.map(video => (
+        {Videos.length > 0 ? (
+          Videos.map(video => (
             <VideoCard
               key={video.id}
               id={video.id}

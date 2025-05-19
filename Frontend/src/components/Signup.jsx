@@ -5,6 +5,7 @@ import { Button, Input } from './index'
 import { useDispatch } from 'react-redux'
 import { login as loginAction } from '../redux/slices/authSlice'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 
 
 
@@ -16,15 +17,30 @@ function Signup() {
         handleSubmit,
         formState: { errors }
     } = useForm()
+
     const onSubmit = async (data) => {
-        const testUser = {
-            username: data.username,
-            token: 'fake-token-123'
+
+
+        try {
+            if(!data.FullName || !data.Username || !data.Email || !data.password) {
+                alert("All fields are required");
+                return;
+            }
+            const res = await axios.post("/api/users/signup", {
+
+                fullname: data.FullName,
+                username: data.Username,
+                email: data.Email,
+                password: data.password
+            })
+            dispatch(loginAction())
+            navigate('/')
+
+        } catch (error) {
+            alert(err.response?.data?.message || "Signup failed");
 
         }
 
-        dispatch(loginAction(testUser))
-        navigate('/')
     }
 
     return (
@@ -47,9 +63,22 @@ function Signup() {
                     </div>
 
                     <div>
+
+                        <Input
+                            label="Username"
+                            placeholder="Username"
+                            {...register("Username", { required: true })}
+
+                        />
+                        {errors.Username && <p className="text-red-500 text-sm">Name is required</p>}
+
+                    </div>
+
+                    <div>
                         <Input
                             label="Email"
                             placeholder="Enter Email"
+                            type="email"
                             {...register("Email", { required: true })}
                         />
                         {errors.Email && <p className="text-red-500 text-sm">Email id required</p>}
@@ -71,9 +100,9 @@ function Signup() {
                     >
                         Sign Up
                     </Button>
-                    
+
                 </form>
-                    <p className="text-center mt-4">
+                <p className="text-center mt-4">
                     Already have an account?{" "}
                     <Link to="/login" className="text-blue-500 hover:underline">
                         Login

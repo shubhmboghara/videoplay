@@ -1,169 +1,172 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import folder from "../assets/folder.png"
-import { Button, Input, VideoCard } from './index'
-import { HiOutlineThumbUp, HiOutlineThumbDown, HiUsers } from "react-icons/hi";
-import axios from 'axios';
-
-
+import folder from '../assets/folder.png';
+import { Button, VideoCard } from './index';
+import { useVideo } from '../hooks/useVideos';
+import { HiOutlineThumbUp, HiOutlineThumbDown, HiUsers } from 'react-icons/hi';
 
 export default function VideoDetails() {
-    const { id } = useParams();
-    const [video, setVideo] = useState(null);
-    const [suggestvideos, setSuggestvideos] = useState(null)
+  const { id } = useParams();
+  const { video, Videos, loading, error } = useVideo(id);
+  const [showAllComments, setShowAllComments] = useState(false);
 
-    useEffect(() => {
-        axios('/mockVideos.json')
+  if (loading) return <p className="text-white p-4">Loading...</p>;
+  if (error) return <p className="text-red-500 p-4">Error loading video.</p>;
+  if (!video) return null;
 
-            .then((res) => {
-                const data = res.data
-                setSuggestvideos(data)
-                const selected = data.find(v => v.id === id);
-                setVideo(selected);
+  return (
+    <div className="flex bg-black min-h-screen ">
+      <Sidebar className=" w-64 bg-black  overflow-hidden mt-16 "  />
 
-            })
+      <main className="flex-1 p-6 text-white relative lg:right-60 lg:top-23 top-15  rounded-2xl" >
+        <div className="max-w-4xl mx-auto">
+          <iframe
+            src={video.videoUrl}
+            title={video.title}
+            className="w-full lg:h-123  h-60 lg:rounded-lg bg-black   rounded-2xl "
+            allowFullScreen
+          />
 
+          <div className="mt-6 bg-black p-6 rounded-xl">
+            <h1 className="text-2xl font-bold">{video.title}</h1>
 
-    }, [id]);
-
-    if (!video) return <p className="text-white p-4">Loading...</p>;
-
-    return (
-        <>
-            <div className="flex">
-
-                <Sidebar className="relative top-15  " />
-
-                <div className="flex-1">
-                    <div className="p-4 text-white mt- m-20   w-[857.33px] h-[1488px ]  gap-24px ">
-                        <iframe
-                            src={video.videoUrl}
-                            title={video.title}
-                            className="   rounded-[8px]  m-2 mb-2  w-[857.33px] h-[380px]"
-                            allowFullScreen
-                        ></iframe>
-
-                        <div className="border-[1px]    w-[857.33px] mt-5  rounded-[16px] p-[24px] relative  left-2" >
-                            <div className='flex    '>
-                                <h2 className="text-xl font-bold mt-4">{video.title}</h2>
-
-
-                                <span className='relative top-2 left-60  flex  gap-10 border w-30  rounded-lg   '>
-
-                                    <Button>
-                                        <HiOutlineThumbUp size={25} />
-                                    </Button>
-
-                                    <Button>
-                                        <HiOutlineThumbDown size={25} />
-                                    </Button>
-                                </span>
-
-                                <div className="w-24 relative left-65 top-2">
-                                    <Button className="bg-white text-gray-700 w-full py-2 px-3 flex items-center gap-2 rounded">
-                                        <img src={folder} alt="folder" className="w-6 h-6" />
-                                        <span className="text-sm font-medium text-black">Save</span>
-                                    </Button>
-                                </div>
-
-
-
-                            </div>
-
-
-                            <div className='mt-5'>
-                                <img
-                                    src={video.dp}
-                                    alt={` dp`}
-                                    className="h-10 rounded-full flex-shrink-0 top-10 relative"
-                                />
-                            </div>
-                            <p className="text-gray-400 mt-2 relative left-13 bottom-2">{video.channel}</p>
-                            <p className="text-gray-500 text-sm  relative left-12 bottom-2 ">{video.views} • {video.time} ago</p>
-
-                            <Button className='relative  bottom-15 left-173 bg-[#6f50a2] txt-white w-25 h-10 rounded-md p-2'>
-                                <HiUsers size={30} />
-                                <span className='relative bottom-7 left-5'>Follow</span>
-                            </Button>
-
-                            <div className='border-b relative  bottom-12'></div>
-
-                            <div className="">
-                                <p>{video.description}</p>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div className="mt-1 border w-[857.33px]  text-white  rounded-[16px] p-[24px] flex gap-[24px] relative left-25  bottom-15">
-                        <div className="">
-                            <span> counts api : Comments</span>
-
-                            <div>
-
-                                <textarea
-                                    className="text-white bg-transparent border w-[50rem] p-2 rounded resize-none overflow-hidden"
-                                    placeholder="Add a comment"
-                                    rows={2}
-                                />
-                                <Button className="mt-2 bg-[#6f50a2] text-white px-4 py-1 rounded my-2">Post</Button>
-                            </div>
-
-                            <div className="border-b"></div>
-                            <div className="mt-5 ">
-                                {video.comments?.length > 0 ? (
-                                    video.comments.map((comment) => (
-                                        <div key={comment.id} className="mb-4 flex items-start gap-4  border-b p-2 ">
-                                            <img
-                                                src={comment.avatar}
-                                                alt={comment.name}
-                                                className="w-10 h-10 rounded-full"
-                                            />
-                                            <div className='mb-3'>
-                                                <p className="text-sm font-semibold">
-                                                    {comment.name}
-                                                    <span className="text-gray-400 text-xs ml-2">
-                                                        {comment.username} • {comment.time}
-                                                    </span>
-                                                </p>
-                                                <p className="text-gray-300 text-sm">{comment.text}</p>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="text-gray-400">No comments yet.</p>
-                                )}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-
-                </div>
-                <div className="w-[500px] h-[calc(100vh-20px)]  p-4 mt-[42px]  relative right-10  ml-10 ">
-
-                    {suggestvideos?.map((vid) => (
-                        <VideoCard
-
-                            className="w-[400px] w- "
-                            classNameImg="h-full"
-                            id={vid.id}
-                            thumbnail={vid.thumbnail}
-                            title={vid.title}
-                            channel={vid.channel}
-                            dp={vid.dp}
-                            views={vid.views}
-                            time={vid.time}
-                        />
-                    ))}
-
-                </div>
+            <div className="mt-4 flex items-center space-x-4">
+              <Button><HiOutlineThumbUp size={24} /></Button>
+              <Button><HiOutlineThumbDown size={24} /></Button>
+              <Button className="ml-auto bg-white text-gray-800 flex items-center space-x-2 px-3 py-1 rounded">
+                <img src={folder} alt="Save" className="w-5 h-5" />
+                <span className="text-sm font-medium text-gray-800">Save</span>
+              </Button>
             </div>
-        </>
-    );
+
+            <div className="mt-6 flex items-center space-x-4">
+              <img src={video.dp} alt={video.channel} className="w-10 h-10 rounded-full" />
+              <div>
+                <p className="text-gray-300">{video.channel}</p>
+                <p className="text-gray-500 text-sm">{video.views} • {video.time} ago</p>
+              </div>
+              <Button className="ml-auto bg-purple-700 flex items-center space-x-2 px-4 py-2 rounded">
+                <HiUsers size={20} />
+                <span className="font-medium">Follow</span>
+              </Button>
+            </div>
+
+            <p className="mt-6 text-gray-200">{video.description}</p>
+          </div>
+
+          <div className="mt-10 max-w-4xl mx-auto">
+            <div
+              className="flex items-center justify-between cursor-pointer"
+              onClick={() => setShowAllComments(!showAllComments)}
+            >
+              <h2 className="text-xl font-medium">
+                {video.comments?.length || 0} Comments
+              </h2>
+              <span className="text-2xl text-gray-400 lg:hidden">
+                {showAllComments ? '▲' : '▼'}
+              </span>
+            </div>
+
+            {!showAllComments && video.comments?.[0] && (
+              <div
+                className="mt-4 flex items-start gap-3 border-b border-gray-700 pb-4 lg:hidden"
+                onClick={() => setShowAllComments(true)}
+              >
+                <div className="w-8 h-8 flex items-center justify-center rounded-full  text-white font-semibold">
+
+                  <img src={video.comments[0].avatar}
+                    className='rounded-full'
+                    alt="" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">
+                    {video.comments[0].name}
+                    <span className="text-gray-400 text-xs ml-2">
+                      {video.comments[0].username} • {video.comments[0].time}
+                    </span>
+                  </p>
+                  <p className="text-gray-300 text-sm line-clamp-2 mt-1">
+                    {video.comments[0].text}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className={showAllComments ? 'block' : 'hidden lg:block'}>
+              <div className="mt-6">
+                <textarea
+                  className="w-full bg-black border border-gray-700 p-3 rounded-md text-white resize-none overflow-hidden"
+                  rows={2}
+                  placeholder="Add a comment…"
+                />
+                <Button className="mt-2 bg-purple-700 text-white px-4 py-2 rounded">
+                  Post
+                </Button>
+              </div>
+
+
+              <div className="mt-8 space-y-6 ">
+                {video.comments.map((c) => (
+                  <div key={c.id} className="flex items-start gap-4">
+                    <div className="w-10 h-10 flex items-center justify-center rounded-full  text-white font-semibold">
+
+                      <img src={c.avatar} alt={c.name} className='rounded-full' />
+
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">
+                        {c.name}
+                        <span className="text-gray-400 text-xs ml-2">
+                          {c.username} • {c.time}
+                        </span>
+                      </p>
+                      <p className="text-gray-300 text-sm mt-1">{c.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <aside className=" w-100 p-4 space-y-4 bg-black relative lg:hidden  ">
+              {Videos?.length > 0 ? (
+                Videos.map((vid) => (
+                  <VideoCard
+                    key={vid.id}
+                    id={vid.id}
+                    thumbnail={vid.thumbnail}
+                    title={vid.title}
+                    channel={vid.channel}
+                    dp={vid.dp}
+                    views={vid.views}
+                    time={vid.time}
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500">No suggestions yet.</p>
+              )}
+            </aside>
+          </div>
+        </div>
+      </main>
+
+      <aside className="hidden lg:block w-40 p-2 space-y-4 bg-black relative right-55 top-10">
+        {Videos?.length > 0 ? (
+          Videos.map((vid) => (
+            <VideoCard
+              key={vid.id}
+              id={vid.id}
+              thumbnail={vid.thumbnail}
+              title={vid.title}
+              channel={vid.channel}
+              dp={vid.dp}
+              views={vid.views}
+              time={vid.time}
+            />
+          ))
+        ) : (
+          <p className="text-gray-500">No suggestions yet.</p>
+        )}
+      </aside>
+    </div>
+  );
 }

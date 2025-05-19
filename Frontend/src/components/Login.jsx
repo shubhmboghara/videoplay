@@ -5,10 +5,13 @@ import { Button, Input } from './index'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { login as loginAction } from '../redux/slices/authSlice'
+import axios from 'axios'
+import { useState } from 'react'
 
 function Login() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const [error, setError] = useState(null)
     const {
         register,
         handleSubmit,
@@ -16,14 +19,37 @@ function Login() {
     } = useForm()
 
     const onSubmit = async (data) => {
-        const testUser = {
-            username: data.username,
-            token: 'fake-token-123'
+        try {
+            const response = await axios.post('/api/users/login', data, {
+                withCredentials: true
+            })
+
+            const userData = response.data.data.user;
+            const accessToken = response.data.data.accessToken;
+            const refreshToken = response.data.data.refreshToken;
+
+            
+
+            dispatch(loginAction(userData));
+            navigate('/');
+            setError("")
+
+        } catch (err) {
+            console.error("Login failed:", err.response?.data || err.message);
+            localStorage.removeItem('accessToken');
+
+            const msgFromServer = err?.response?.data?.message;
+            console.log("Error message from server:", msgFromServer);
+
+            if (msgFromServer === "User does not exist" || msgFromServer === "Invalid user credentials") {
+                setError(msgFromServer);
+            } else {
+                setError("Something went wrong. Please try again.");
+            }
         }
 
-        dispatch(loginAction(testUser))
-        navigate('/')
-    }
+    };
+
 
     return (
         <div className="text-white flex justify-center items-center min-h-screen">
@@ -34,24 +60,25 @@ function Login() {
                     <div>
 
                         <Input
-                            label="Email"
-                            type="email"
-                            {...register('email', { required: true })}
+                            label="Email or Username"
+                            type="text"
+                            {...register('emailorusername', { required: true })}
                             placeholder="Enter Email"
                         />
-                        {errors.username && <p className="text-red-500 text-sm">Email id  is required</p>}
+                        {errors.emailorusername && <p className="text-red-500 text-sm">Email id or   is required</p>}
                     </div>
 
                     <div>
 
                         <Input
                             label="Password"
-                            {...register('password', { required: true })}
                             type="password"
-                            placeholder="Enter password"
+                            placeholder="Enter Password"
+                            {...register("password", { required: true })}
                         />
-                        {errors.password && <p className="text-red-500 text-sm">Password is required</p>}
+                        {errors.password && <p className="text-red-500 text-sm">password id required</p>}
                     </div>
+                    {error && <p className="text-red-500 text-sm">{error}</p>}
 
                     <Button
                         type="submit"

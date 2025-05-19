@@ -1,21 +1,8 @@
-
-
-export{asyncHandler}
-
-const asyncHandler = (requestHandter) => async (req,res,next) => {
-
-try {
-
-    await  requestHandter(req,res,next)
-    
-} catch (error) {n 
-     res.status(error.code || 5000).json({
-        success:false,
-        message:error.message
-     }) 
-
+const asyncHandler = (requestHandler) => {
+    return (req, res, next) => {
+        Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err))
+    }
 }
 
-}
 
-// 35:40
+export { asyncHandler }

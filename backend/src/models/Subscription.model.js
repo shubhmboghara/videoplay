@@ -8,11 +8,15 @@ const subscriptionschema = new Schema({
         ref: "User"
     },
 
+    // The channel field stores the user (channel) that I have subscribed to, count documents where channel  i subscribed
+
     channel: {
         type: Schema.Types.ObjectId,
         ref: "User"
     }
 
+    // Total subscribers I have  for example if my channel is hubham"
+    // I will count all documents where channel is set to shubham
 
 }, { timestamps: true })
 

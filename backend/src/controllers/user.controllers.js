@@ -476,6 +476,13 @@ const watchHistory = asyncHandler(async (req, res) => {
                                         username: 1,
                                         avatar: 1
                                     }
+                                },
+                                {
+                                    $addFields: {
+                                        onner: {
+                                            $first: "$owner"
+                                        }
+                                    }
                                 }
                             ]
                         }
@@ -484,6 +491,17 @@ const watchHistory = asyncHandler(async (req, res) => {
             }
         }
     ])
+
+     return res
+     .status(200)
+     .json(
+        new ApiError(
+            200,
+            user[0].watcHistory,
+            "watc history  fetched successfully"
+        )
+     )
+
 })
 
 export {
@@ -496,6 +514,7 @@ export {
     updateAccountDetai1s,
     updateAvatar,
     updatecoverImage,
-    getUserChannelProfile
+    getUserChannelProfile,
+    watchHistory
 
 }

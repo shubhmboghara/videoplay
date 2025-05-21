@@ -1,13 +1,15 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/AppError.js"
 import { User } from "../models/user.model.js"
-import uploadOnCloudinary from "../utils/cloudinary.js"
 import ApiResponse from "../utils/ApiResponse.js"
+import cloudinaryUtils from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
 import { lookup } from "dns"
 import { subscribe } from "diagnostics_channel"
 import mongoose, { mongo } from "mongoose"
 import { pipeline } from "stream"
+
+const { uploadOnCloudinary, deleteFromCloudinary } = cloudinaryUtils
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -146,6 +148,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         {
             $set:
             {
+
                 refreshToken: undefined
             }
         },
@@ -492,15 +495,15 @@ const watchHistory = asyncHandler(async (req, res) => {
         }
     ])
 
-     return res
-     .status(200)
-     .json(
-        new ApiError(
-            200,
-            user[0].watcHistory,
-            "watc history  fetched successfully"
+    return res
+        .status(200)
+        .json(
+            new ApiError(
+                200,
+                user[0].watcHistory,
+                "watc history  fetched successfully"
+            )
         )
-     )
 
 })
 

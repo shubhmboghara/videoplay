@@ -24,20 +24,23 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-const deleteFromCloudinary = async (publicId) => {
-    try {
-
-        const result = await cloudinary.uploader.destroy(publicId)
-        return result
-
-
-    } catch (error) {
-        console.error("Cloudinary deletion error:", error);
-        throw new Error("File was not deleted");
-
-
-    }
-
+function publicId(url) {
+    if (!url) return null;
+    // Remove query params
+    url = url.split('?')[0];
+    // Match everything after /upload/ and optional version, before file extension
+    const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-zA-Z0-9]+$/);
+    return matches ? matches[1] : null;
 }
 
-export default {uploadOnCloudinary,deleteFromCloudinary}
+const deleteFromCloudinary = async (publicId) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+    return result;
+  } catch (err) {
+    console.error("Cloudinary deletion error:", err);
+    throw new Error("Deletion failed");
+  }
+};
+
+export default { uploadOnCloudinary, deleteFromCloudinary, publicId }

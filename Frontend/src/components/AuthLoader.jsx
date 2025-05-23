@@ -32,7 +32,6 @@ const AuthLoader = ({ children }) => {
 
                         if (userData) {
                             dispatch(login(userData));
-                            console.log("token is  expresed ")
                         } else {
                             dispatch(logout());
                         }

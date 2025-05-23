@@ -1,4 +1,3 @@
-// src/components/AuthLoader.jsx
 import { useEffect } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -11,8 +10,6 @@ const AuthLoader = ({ children }) => {
         const fetchCurrentUser = async () => {
             try {
                 const res = await axios.get("/api/users/current-user", { withCredentials: true });
-
-
                 const userData = res.data.data;
 
                 if (userData) {
@@ -26,24 +23,31 @@ const AuthLoader = ({ children }) => {
                 if (err.response?.status === 401) {
                     try {
 
-                        await axios.post("/api/users/refresh-token", {}, { withCredentials: true })
-                        const retryRes = await axios.get("/api/users/current-user", { withCredentials: true })
-                        const userData = retryRes.data.data
+                        const refreshRes = await axios.post("/api/users/refresh-token", {}, { withCredentials: true });
 
-                        if (userData) {
-                            dispatch(login(userData));
+                        if (refreshRes.status === 200) {
+                            console.log("Token refreshed successfully");
+
+                            const retryRes = await axios.get("/api/users/current-user", { withCredentials: true });
+                            const userData = retryRes.data.data;
+
+                            if (userData) {
+                                dispatch(login(userData));
+                            } else {
+                                dispatch(logout());
+                            }
                         } else {
+                            console.error("Token refresh failed");
                             dispatch(logout());
                         }
-
-                    } catch (error) {
+                    } catch (refreshError) {
+                        console.error("Token refresh error:", refreshError);
+                        document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                        document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                         dispatch(logout());
-
                     }
-                }
-                else {
+                } else {
                     dispatch(logout());
-
                 }
             }
         };

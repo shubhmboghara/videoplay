@@ -247,13 +247,14 @@ const refreshAccesToken = asyncHandler(async (req, res) => {
             secure: false
         }
 
+
         const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
         return res
             .status(200)
             .cookie("accessToken", accessToken, options)
             .cookie("refreshToken", refreshToken, options)
             .json({
-                message: "Access token refreshed successfully"
+                message: "Access token refreshed successfully",
             });
 
 
@@ -429,6 +430,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 foreignField: "channel",
                 as: "subscribers"
             }
+
+            // totel  subscribers i have so, i count the channel
         },
 
         {
@@ -438,6 +441,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 foreignField: "subscriber",
                 as: "subscribedTo"
             }
+            // totel channel thte i subscriber, so i count thte here  subscriber
         },
 
         {
@@ -485,24 +489,27 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(200, "User  channel fetched succesfully")
+            new ApiResponse(200, channel[0], "User  channel fetched succesfully")
         )
 })
 
 const watchHistory = asyncHandler(async (req, res) => {
 
+    const userId = req.user._id
     const user = await User.aggregate([
         {
             $match: {
-                _id: new mongoose.Types.ObjectId(req, user._id)
+                _id: new mongoose.Types.ObjectId(userId)
             }
         },
         {
             $lookup: {
-                from: "videos",
+                from: "videos", 
                 localField: "watchHistory",
                 foreignField: "_id",
                 as: "watchHistory",
+
+                //  we take id of vdeos when user  watch and  strong in thte watchHistory array 
                 pipeline: [
                     {
                         $lookup: {
@@ -536,9 +543,9 @@ const watchHistory = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiError(
+            new ApiResponse(
                 200,
-                user[0].watcHistory,
+               user[0]?.watchHistory || [],
                 "watc history  fetched successfully"
             )
         )

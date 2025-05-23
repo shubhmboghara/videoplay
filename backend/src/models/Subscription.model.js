@@ -15,7 +15,7 @@ const subscriptionschema = new Schema({
         ref: "User"
     }
 
-    // Total subscribers I have  for example if my channel is hubham"
+    // Total subscribers I have  for example if my channel is shubham"
     // I will count all documents where channel is set to shubham
 
 }, { timestamps: true })

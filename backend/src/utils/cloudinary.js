@@ -26,9 +26,7 @@ const uploadOnCloudinary = async (localFilePath) => {
 
 function publicId(url) {
     if (!url) return null;
-    // Remove query params
     url = url.split('?')[0];
-    // Match everything after /upload/ and optional version, before file extension
     const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-zA-Z0-9]+$/);
     return matches ? matches[1] : null;
 }

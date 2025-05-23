@@ -22,7 +22,7 @@ function Signup() {
 
 
         try {
-            if(!data.FullName || !data.Username || !data.Email || !data.password) {
+            if (!data.FullName || !data.Username || !data.Email || !data.password) {
                 alert("All fields are required");
                 return;
             }
@@ -32,8 +32,14 @@ function Signup() {
                 username: data.Username,
                 email: data.Email,
                 password: data.password
+            }, {
+                withCredentials: true
             })
-            dispatch(loginAction())
+
+            const userData = res.data.data.user
+
+
+            dispatch(loginAction(userData))
             navigate('/')
 
         } catch (error) {

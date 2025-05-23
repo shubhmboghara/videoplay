@@ -9,7 +9,7 @@ import { subscribe } from "diagnostics_channel"
 import mongoose, { mongo } from "mongoose"
 import { pipeline } from "stream"
 
-const { uploadOnCloudinary, deleteFromCloudinary,publicId } = cloudinaryUtils
+const { uploadOnCloudinary, deleteFromCloudinary, publicId } = cloudinaryUtils
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -75,6 +75,46 @@ const registerUser = asyncHandler(async (req, res) => {
     })
 
 
+    if (!user) {
+        throw new ApiError(500, "Something went wrong while registering the user");
+
+    }
+
+    let tokens
+    try {
+        tokens = await generateAccessAndRefreshTokens(user._id)
+
+    } catch (error) {
+        console.error("Auto-login token generation failed after signup:", error);
+
+        return res.status(201)
+            .json(
+                new ApiResponse(201, {
+                    user: {
+                        _id: user._id,
+                        fullname: user.fullname,
+                        username: user.username,
+                        email: user.email,
+                        avatar: user.avatar,
+                        coverImage: user.coverImage,
+
+                    }
+
+                }, "User registered successfully but auto-login failed, please login manually."
+
+                )
+
+            )
+    }
+
+    const options = {
+        httpOnly: true,
+        secure: false
+    }
+
+
+
+
     const createduser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
@@ -83,9 +123,11 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Somthing went wrong  while  registering the user")
     }
 
-    return res.status(201).json(
-        new ApiResponse(200, createduser, "User registering successfully")
-    )
+    return res.status(201)
+        .cookie("accessToken", tokens.accessToken, options)
+        .cookie("refreshToken", tokens.refreshToken, options)
+        .json(new ApiResponse(200, createduser, "User registering successfully")
+        )
 })
 
 
@@ -96,7 +138,7 @@ const loginUser = asyncHandler(async (req, res) => {
     //  2. Verify that the user is registered and the credentials are correct.
     //  3. Generate and return an access token and a refresh token.
     //  4. send cokie
-    //  5.If everything is valid, grant login permission.   (function: generateAccessAndRefreshTokens).
+    //  5.If everything is valid, grant login permission (function: generateAccessAndRefreshTokens)
 
 
 
@@ -208,15 +250,15 @@ const refreshAccesToken = asyncHandler(async (req, res) => {
         const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
         return res
             .status(200)
-            .cookie("accessToken", accessToken,options)
-            .cookie("refreshToken", refreshToken,options)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
             .json({
                 message: "Access token refreshed successfully"
             });
 
 
     } catch (error) {
-        throw new ApiError(401, error?.message || "invalid refresh token ");
+        throw new ApiError(401, error?.message || "invalid refresh token ")
 
     }
 
@@ -248,10 +290,11 @@ const changePassword = asyncHandler(async (req, res) => {
 })
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-    return res
-        .status(200)
-        .json(200, req.user, "currect user fetched successfully")
-
+    return res.status(200).json({
+        status: 200,
+        data: req.user,
+        message: "Current user fetched successfully"
+    })
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -332,7 +375,7 @@ const updatecoverImage = asyncHandler(async (req, res) => {
 
     const USER = await User.findById(req.user?._id)
 
-   if (USER?.coverImage) {
+    if (USER?.coverImage) {
         const id = publicId(USER.coverImage);
         if (id) {
             await deleteFromCloudinary(id);

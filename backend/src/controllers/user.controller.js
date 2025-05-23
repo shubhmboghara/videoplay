@@ -32,7 +32,6 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 }
 
-
 const registerUser = asyncHandler(async (req, res) => {
 
     const { fullname, email, username, password } = req.body
@@ -52,10 +51,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User  with email or username  already exists ")
     }
     const avatarLocalPath = req.files?.avatar[0]?.path
-
-
     const coverImageLocalPath = req.files?.coverImage[0]?.path
-    console.log(coverImageLocalPath)
 
     //    if(!avatarLocalPath){
     //      throw new ApiError(400,"Avatar file is  required")
@@ -129,8 +125,6 @@ const registerUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, createduser, "User registering successfully")
         )
 })
-
-
 
 const loginUser = asyncHandler(async (req, res) => {
 
@@ -503,13 +497,15 @@ const watchHistory = asyncHandler(async (req, res) => {
             }
         },
         {
+            
+            //  we  match id from watchHistory to vidoes d 
             $lookup: {
-                from: "videos", 
+                from: "videos",
                 localField: "watchHistory",
                 foreignField: "_id",
                 as: "watchHistory",
 
-                //  we take id of vdeos when user  watch and  strong in thte watchHistory array 
+                //Inside videos, we have owner (which is a user ID), and in users, we have _id. So we match them and get information like name, avatar, etc."
                 pipeline: [
                     {
                         $lookup: {
@@ -524,10 +520,10 @@ const watchHistory = asyncHandler(async (req, res) => {
                                         username: 1,
                                         avatar: 1
                                     }
-                                },
+                                },  
                                 {
                                     $addFields: {
-                                        onner: {
+                                        owner: {
                                             $first: "$owner"
                                         }
                                     }
@@ -545,7 +541,7 @@ const watchHistory = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-               user[0]?.watchHistory || [],
+                user[0]?.watchHistory || [],
                 "watc history  fetched successfully"
             )
         )

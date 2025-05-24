@@ -2,35 +2,37 @@ import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs"
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_VIDEO,
-    api_key: process.env.CLOUDINARY_API_KEY_VIDEO,
-    api_secret: process.env.CLOUDINARY_API_SECRET_VIDEO
+  cloud_name: process.env.CLOUDINARY_VIDEO,
+  api_key: process.env.CLOUDINARY_API_KEY_VIDEO,
+  api_secret: process.env.CLOUDINARY_API_SECRET_VIDEO
 });
 
 
 
-const uploadOnCloudinary = async (localFilePath) => {
+const uploadOnCloudinary = async (localFilePath,resourceType = "image") => {
 
-    try {
-        if (!localFilePath) return null
+  try {
+    if (!localFilePath) return null
 
-        const res = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto"
-        })
+    const res = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: resourceType,
+    })
 
-        fs.unlinkSync(localFilePath)
-        return res
-    } catch (error) {
-        fs.unlinkSync(localFilePath)
-        return null
+    if (fs.existsSync(localFilePath)) {
+      fs.unlinkSync(localFilePath)
     }
+    return res
+  } catch (error) {
+    fs.unlinkSync(localFilePath)
+    return null
+  }
 }
 
 function publicId(url) {
-    if (!url) return null;
-    url = url.split('?')[0];
-    const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-zA-Z0-9]+$/);
-    return matches ? matches[1] : null;
+  if (!url) return null;
+  url = url.split('?')[0];
+  const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-zA-Z0-9]+$/);
+  return matches ? matches[1] : null;
 }
 
 const deleteFromCloudinary = async (publicId) => {
@@ -43,4 +45,4 @@ const deleteFromCloudinary = async (publicId) => {
   }
 };
 
-export default { uploadOnCloudinary, deleteFromCloudinary, publicId }
+export { uploadOnCloudinary, deleteFromCloudinary, publicId }

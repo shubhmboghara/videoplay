@@ -4,50 +4,53 @@ const VideoSchema = new Schema(
 
     {
         VideoFile: {
-            types: String,
+            type: String,
             required: true
         },
 
         thumbnail: {
-            types: String,
+            type: String,
             required: true
         },
 
         title: {
-            types: String,
+            type: String,
             required: true
         },
 
         description: {
-            types: String,
+            type: String,
             required: true
         },
 
         duration: {
-            types: String,
+            type: Number,
             required: true
         },
 
         views: {
-            type: String,
+            type: Number,
             default: 0
         },
 
-        isPublished:{
-            type:Boolean,
-            default: true            
+        isPublished: {
+            type: Boolean,
+            required: true,
+
         },
 
-        owner:{
+        owner: {
             type: Schema.Types.ObjectId,
-            ref:"User"
+            ref: "User",
+            required: true
+
         }
     },
 
     { timestamps: true }
 )
 
-  VideoSchema.plugin(mongooseAggregatePaginate)
-  
+VideoSchema.plugin(mongooseAggregatePaginate)
+
 
 export const Video = mongoose.model("Video", VideoSchema)

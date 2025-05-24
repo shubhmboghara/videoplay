@@ -13,7 +13,7 @@ import {
     registerUser,
     loginUser,
     logoutUser
-} from "../controllers/user.controllers.js";
+} from "../controllers/user.controller.js"
 
 
 
@@ -47,7 +47,7 @@ router.route("/history").get(VerifyJwt, watchHistory)
 
 router.route("/update-account-detai1s").patch(VerifyJwt, updateAccountDetails)
 router.route("/update-avatar").patch(VerifyJwt, upload.single("avatar"), updateAvatar)
-router.route("/updatecover-image").patch(VerifyJwt,upload.single("coverImage"), updatecoverImage)
+router.route("/updatecover-image").patch(VerifyJwt, upload.single("coverImage"), updatecoverImage)
 
 
 

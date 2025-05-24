@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken"
 
 
-export  const VerifyJwt = asyncHandler(async (req, _, next) => {
+export const VerifyJwt = asyncHandler(async (req, _, next) => {
 
 
 
@@ -24,7 +24,6 @@ export  const VerifyJwt = asyncHandler(async (req, _, next) => {
         }
 
         req.user = user
-
         next()
     } catch (error) {
 

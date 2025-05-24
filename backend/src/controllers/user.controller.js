@@ -2,14 +2,13 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/AppError.js"
 import { User } from "../models/user.model.js"
 import ApiResponse from "../utils/ApiResponse.js"
-import cloudinaryUtils from "../utils/cloudinary.js"
+import { uploadOnCloudinary, deleteFromCloudinary, publicId } from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
 import { lookup } from "dns"
 import { subscribe } from "diagnostics_channel"
 import mongoose, { mongo } from "mongoose"
 import { pipeline } from "stream"
 
-const { uploadOnCloudinary, deleteFromCloudinary, publicId } = cloudinaryUtils
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -490,11 +489,12 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 const watchHistory = asyncHandler(async (req, res) => {
 
     const userId = req.user._id
-    const user = await User.aggregate([
+        const user = await User.aggregate([
         {
             $match: {
                 _id: new mongoose.Types.ObjectId(userId)
             }
+            
         },
         {
             

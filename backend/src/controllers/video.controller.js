@@ -4,7 +4,10 @@ import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/AppError.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
-import { uploadOnCloudinary } from "../utils/cloudinaryvideo.js"
+import { Subscription } from "../models/Subscription.model.js"
+import { uploadOnCloudinary, deleteFromCloudinary, publicId } from "../utils/cloudinaryvideo.js"
+import { pipeline } from "stream"
+import { subscribe } from "diagnostics_channel"
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { query, sortBy = ["views", "createdAt"], sortType = "desc", userId } = req.query
@@ -31,38 +34,34 @@ const getAllVideos = asyncHandler(async (req, res) => {
     } else {
         sortStage[sortBy] = sortDir;
     }
+    const pipeline = [
+        { $match: matchStage },
 
-
-
-
-        const pipeline = [
-            { $match: matchStage },
-
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "owner",
-                    foreignField: "_id",
-                    as: "owner"
-                },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner"
             },
-            { $unwind: "$owner" },
+        },
+        { $unwind: "$owner" },
 
-            {
-                $project: {
-                    thumbnail: 1,
-                    title: 1,
-                    description: 1,
-                    views: 1,
-                    duration: 1,
-                    "owner.username": 1,
-                    "owner.avatar": 1
-                }
-            },
-            { $sort: sortStage }
+        {
+            $project: {
+                thumbnail: 1,
+                title: 1,
+                description: 1,
+                views: 1,
+                duration: 1,
+                "owner.username": 1,
+                "owner.avatar": 1
+            }
+        },
+        { $sort: sortStage }
 
-        ]
-       const videos = await Video.aggregate(pipeline)
+    ]
+    const videos = await Video.aggregate(pipeline)
 
     return res.status(200).json(
         new ApiResponse(200,
@@ -122,26 +121,227 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
     }
 
+
+
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    //TODO: get video by id
-})
+    const { videoId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new ApiError(404, "Invalid video ID");
+    }
+
+    const video = await Video.findById(videoId);
+
+    if (!video) {
+        throw new ApiError(404, "Invalid video id");
+    }
+
+    if (req.user && req.user._id) {
+        const user = await User.findById(req.user._id);
+
+        if (user) {
+            user.watchHistory = user.watchHistory.filter(
+                (id) => id.toString() !== videoId
+            );
+            user.watchHistory.unshift(videoId);
+
+            if (user.watchHistory.length > 40) {
+                user.watchHistory = user.watchHistory.slice(0, 50);
+            }
+
+            await user.save();
+        }
+    }
+
+    await Video.updateOne({ _id: videoId }, { $inc: { views: 1 } });
+
+    const pipeline = [
+        { $match: { _id: new mongoose.Types.ObjectId(videoId) } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "subscriptions",
+                            foreignField: "channel",
+                            localField: "_id",
+                            as: "subscribers",
+                        },
+                    },
+                    {
+                        $addFields: {
+                            subscribers: "$subscribers.subscriber",
+                        },
+                    },
+                    {
+                        $addFields: {
+                            subscriberCount: {
+                                $size: "$subscribers",
+                            },
+                            isSubscribed: req.user ? {
+                                $cond: {
+                                    if: { $in: [req.user._id, "$subscribers"] },
+                                    then: true,
+                                    else: false,
+                                },
+                            } : false,
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 1,
+                            fullName: 1,
+                            userName: 1,
+                            avatar: 1,
+                            subscriberCount: 1,
+                            isSubscribed: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        { $unwind: "$owner" },
+        {
+            $project: {
+                title: 1,
+                description: 1,
+                videoFile: 1,
+                thumbnail: 1,
+                duration: 1,
+                views: 1,
+                createdAt: 1,
+                owner: 1,
+                tags: 1,
+            },
+        },
+    ];
+
+    const result = await Video.aggregate(pipeline);
+
+    if (!result) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    const videoData = result[0];
+    res
+        .status(200)
+        .json(new ApiResponse(200, videoData, "Video found successfully"));
+});
 
 const updateVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
+    const { videoId } = req.params;
+    const title = req.body?.title
+    const description = req.body?.description
+    const thumbnailLocalPath = req.file?.path;
 
-})
+
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new ApiError(400, "Invalid video ID");
+    }
+
+    if (!title && !description && !thumbnailLocalPath) {
+        throw new ApiError(400, "At least one field (title, description, or thumbnail) is required for update");
+    }
+
+    const video = await Video.findById(videoId);
+    if (!video) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    let uploadedThumbnail;
+
+    if (thumbnailLocalPath && video.thumbnail) {
+        const id = publicId(video.thumbnail)
+
+        if (id) {
+            await deleteFromCloudinary(id)
+        }
+
+        uploadedThumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+
+        if (!uploadedThumbnail) {
+            throw new ApiError(500, "Error uploading new thumbnail")
+        }
+    }
+
+    const updatedFields = {}
+    if (title) updatedFields.title = title;
+    if (description) updatedFields.description = description;
+    if (uploadedThumbnail) updatedFields.thumbnail = uploadedThumbnail.secure_url;
+
+    const response = await Video.findByIdAndUpdate(
+        videoId,
+        { $set: updatedFields },
+        { new: true }
+    );
+
+    return res.status(200).json(
+        new ApiResponse(200, response, "Video updated successfully")
+    );
+});
 
 const deleteVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    //TODO: delete video
+    const { videoId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new ApiError(400, "Invalid video ID");
+    }
+
+    const video = await Video.findById(videoId)
+
+    if (!video) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    await deleteFromCloudinary(publicId(video.thumbnail), "image");
+    await deleteFromCloudinary(publicId(video.VideoFile), "video");
+
+
+
+    await Video.findByIdAndDelete(videoId)
+
+    if (!video) {
+        throw new ApiError(404, "Video not found");
+    }
+
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200,
+                "video is deleted successfully"
+            )
+        )
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new ApiError(400, "invalid video id")
+    }
+
+    const video = await Video.findById(videoId)
+
+    if (!video) {
+        throw new ApiError(404, "video not found")
+    }
+
+    video.isPublished = !video.isPublished;
+    await video.save()
+
+    res.status(200)
+        .json(
+            new ApiResponse(200, `Video is now ${video.isPublished ? "Published" : "Unpublished"}`,
+                { isPublished: video.isPublished, }
+            )
+        )
 })
 
 export {

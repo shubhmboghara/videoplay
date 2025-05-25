@@ -28,17 +28,21 @@ const uploadOnCloudinary = async (localFilePath,resourceType = "image") => {
   }
 }
 
-function publicId(url) {
-  if (!url) return null;
-  url = url.split('?')[0];
-  const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-zA-Z0-9]+$/);
-  return matches ? matches[1] : null;
-}
-
-const deleteFromCloudinary = async (publicId) => {
+const publicId = (url) => {
   try {
-    const result = await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
-    return result;
+    const parts = url.split('/');
+    const fileWithExtension = parts[parts.length - 1];
+    const [fileId] = fileWithExtension.split('.');
+    return fileId; 
+  } catch (error) {
+    return null;
+  }
+};
+
+
+const deleteFromCloudinary = async (publicId, type = "image") => {
+  try {
+  return await cloudinary.uploader.destroy(publicId, { resource_type: type });
   } catch (err) {
     console.error("Cloudinary deletion error:", err);
     throw new Error("Deletion failed");

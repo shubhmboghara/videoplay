@@ -4,13 +4,14 @@ import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/AppError.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
-import { Subscription } from "../models/Subscription.model.js"
 import { uploadOnCloudinary, deleteFromCloudinary, publicId } from "../utils/cloudinaryvideo.js"
 import { pipeline } from "stream"
-import { subscribe } from "diagnostics_channel"
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { query, sortBy = ["views", "createdAt"], sortType = "desc", userId } = req.query
+    const { query, sortBy = ["views", "createdAt"], sortType = "desc", userId, page = 1,
+        limit = 10, } = req.query
+
+    const skip = (page - 1) * limit;
 
     const matchStage = { isPublished: true };
     const sortDir = sortType === "asc" ? 1 : -1;
@@ -58,8 +59,9 @@ const getAllVideos = asyncHandler(async (req, res) => {
                 "owner.avatar": 1
             }
         },
-        { $sort: sortStage }
-
+        { $sort: sortStage },
+        { $skip: skip },
+        { $limit: parseInt(limit, 10) },
     ]
     const videos = await Video.aggregate(pipeline)
 
@@ -73,9 +75,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
             "All videos fetched successfully"
         )
     )
-
-
-
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
@@ -120,9 +119,6 @@ const publishAVideo = asyncHandler(async (req, res) => {
         throw new ApiError(500, error.message || "Internal Server Error");
 
     }
-
-
-
 })
 
 const getVideoById = asyncHandler(async (req, res) => {

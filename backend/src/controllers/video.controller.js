@@ -153,6 +153,8 @@ const getVideoById = asyncHandler(async (req, res) => {
 
     await Video.updateOne({ _id: videoId }, { $inc: { views: 1 } });
 
+    // this is help to  incdersa view 
+
     const pipeline = [
         { $match: { _id: new mongoose.Types.ObjectId(videoId) } },
         {
@@ -207,13 +209,12 @@ const getVideoById = asyncHandler(async (req, res) => {
             $project: {
                 title: 1,
                 description: 1,
-                videoFile: 1,
+                VideoFile: 1,
                 thumbnail: 1,
                 duration: 1,
                 views: 1,
                 createdAt: 1,
                 owner: 1,
-                tags: 1,
             },
         },
     ];

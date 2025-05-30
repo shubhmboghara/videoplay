@@ -5,7 +5,7 @@ import { getAllVideos, publishAVideo,updateVideo,deleteVideo,togglePublishStatus
 
 
 
-const router = Router()
+const router = Router() 
 
 router
     .route("/")
@@ -27,7 +27,7 @@ router
     )
 
 router
-  .route("/:videoId")
+  .route("/:videoId") 
     .get(getVideoById)
     .delete(deleteVideo)
     .patch(upload.single("thumbnail"), updateVideo);

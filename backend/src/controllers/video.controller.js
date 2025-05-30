@@ -5,11 +5,22 @@ import { ApiError } from "../utils/AppError.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { uploadOnCloudinary, deleteFromCloudinary, publicId } from "../utils/cloudinaryvideo.js"
-import { pipeline } from "stream"
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime.js";
+
+dayjs.extend(relativeTime);
+
+const timeAgo = (date) => dayjs(date).fromNow();
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { query, sortBy = ["views", "createdAt"], sortType = "desc", userId, page = 1,
-        limit = 10, } = req.query
+    const {
+        query,
+        sortBy = ["views", "createdAt"],
+        sortType = "desc",
+        userId,
+        page = 1,
+        limit = 10,
+    } = req.query;
 
     const skip = (page - 1) * limit;
 
@@ -17,7 +28,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     const sortDir = sortType === "asc" ? 1 : -1;
 
     if (query?.trim()) {
-        matchStage.$text = { $search: query.trim() }
+        matchStage.$text = { $search: query.trim() };
     }
 
     if (userId) {
@@ -27,7 +38,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
         matchStage.owner = new mongoose.Types.ObjectId(userId);
     }
 
-    const sortStage = {}
+    const sortStage = {};
     if (Array.isArray(sortBy)) {
         for (const field of sortBy) {
             sortStage[field] = sortDir;
@@ -35,19 +46,18 @@ const getAllVideos = asyncHandler(async (req, res) => {
     } else {
         sortStage[sortBy] = sortDir;
     }
+
     const pipeline = [
         { $match: matchStage },
-
         {
             $lookup: {
                 from: "users",
                 localField: "owner",
                 foreignField: "_id",
-                as: "owner"
+                as: "owner",
             },
         },
         { $unwind: "$owner" },
-
         {
             $project: {
                 thumbnail: 1,
@@ -55,27 +65,29 @@ const getAllVideos = asyncHandler(async (req, res) => {
                 description: 1,
                 views: 1,
                 duration: 1,
+                VideoFile: 1,
+                createdAt: 1,
                 "owner.username": 1,
-                "owner.avatar": 1
-            }
+                "owner.avatar": 1,
+            },
         },
         { $sort: sortStage },
         { $skip: skip },
         { $limit: parseInt(limit, 10) },
-    ]
-    const videos = await Video.aggregate(pipeline)
+    ];
+
+    const videos = await Video.aggregate(pipeline);
+
+    const videosWithTimeAgo = videos.map((video) => ({
+        ...video,
+        timeAgo: timeAgo(video.createdAt),
+    }));
 
     return res.status(200).json(
-        new ApiResponse(200,
+        new ApiResponse(200, { videos: videosWithTimeAgo }, "All videos fetched successfully")
+    );
+});
 
-            {
-                videos
-            },
-
-            "All videos fetched successfully"
-        )
-    )
-})
 
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description } = req.body
@@ -122,16 +134,33 @@ const publishAVideo = asyncHandler(async (req, res) => {
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
-    const { videoId } = req.params;
+    const { videoId } = req.params
+    const userId = req.user?._id
+
 
     if (!mongoose.Types.ObjectId.isValid(videoId)) {
         throw new ApiError(404, "Invalid video ID");
     }
 
+    await Promise.all([
+        Video.updateOne({ _id: videoId }, { $inc: { views: 1 } }),
+        (async () => {
+            if (userId) {
+                const user = await User.findById(userId);
+                if (user) {
+                    user.watchHistory = user.watchHistory.filter(id => id.toString() !== videoId);
+                    user.watchHistory.unshift(videoId);
+                    if (user.watchHistory.length > 50) user.watchHistory.pop();
+                    await user.save();
+                }
+            }
+        })(),
+    ]);
+
     const video = await Video.findById(videoId);
 
     if (!video) {
-        throw new ApiError(404, "Invalid video id");
+        throw new ApiError(404, "Video not found");
     }
 
     if (req.user && req.user._id) {
@@ -152,8 +181,6 @@ const getVideoById = asyncHandler(async (req, res) => {
     }
 
     await Video.updateOne({ _id: videoId }, { $inc: { views: 1 } });
-
-    // this is help to  incdersa view 
 
     const pipeline = [
         { $match: { _id: new mongoose.Types.ObjectId(videoId) } },
@@ -182,21 +209,24 @@ const getVideoById = asyncHandler(async (req, res) => {
                             subscriberCount: {
                                 $size: "$subscribers",
                             },
-                            isSubscribed: req.user ? {
-                                $cond: {
-                                    if: { $in: [req.user._id, "$subscribers"] },
-                                    then: true,
-                                    else: false,
-                                },
-                            } : false,
+                            isSubscribed: req.user
+                                ? {
+                                    $cond: {
+                                        if: { $in: [req.user._id, "$subscribers"] },
+                                        then: true,
+                                        else: false,
+                                    },
+                                }
+                                : false,
                         },
                     },
                     {
                         $project: {
                             _id: 1,
                             fullName: 1,
-                            userName: 1,
+                            username: 1,
                             avatar: 1,
+                            createdAt: 1,
                             subscriberCount: 1,
                             isSubscribed: 1,
                         },
@@ -215,21 +245,33 @@ const getVideoById = asyncHandler(async (req, res) => {
                 views: 1,
                 createdAt: 1,
                 owner: 1,
+
             },
         },
     ];
 
     const result = await Video.aggregate(pipeline);
 
-    if (!result) {
+    if (!result || result.length === 0) {
         throw new ApiError(404, "Video not found");
     }
 
-    const videoData = result[0];
-    res
-        .status(200)
-        .json(new ApiResponse(200, videoData, "Video found successfully"));
+    let watchHistoryIds = [];
+    if (userId) {
+        const user = await User.findById(userId).select("watchHistory");
+        watchHistoryIds = user?.watchHistory.map(id => id.toString()) || [];
+    }
+
+    const videoData = {
+        ...result[0],
+        timeAgo: timeAgo(result[0].createdAt),
+    };
+
+    res.status(200).json(new ApiResponse(200, 
+        {videoData, watchHistory: watchHistoryIds},
+         "Video found successfully"));
 });
+
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params;

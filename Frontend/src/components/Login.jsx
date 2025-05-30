@@ -52,7 +52,7 @@ function Login() {
 
 
     return (
-        <div className="text-white flex justify-center items-center min-h-screen">
+        <div className=" flex justify-center items-center min-h-screen">
             <div className="bg-gray-800 p-6 rounded shadow-md w-full max-w-sm">
                 <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
 
@@ -82,7 +82,7 @@ function Login() {
 
                     <Button
                         type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
+                        className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded"
                     >
                         Login
                     </Button>

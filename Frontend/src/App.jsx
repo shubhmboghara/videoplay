@@ -6,8 +6,8 @@ import './App.css'
 import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import Home from './pages/Home'
 import Signuppage from './pages/Signup-page'
-import ProtectedRoute from './components/ProtectedRoute'
 import AuthLoader from './components/AuthLoader'
+import { VideoDetails,Sidebar } from './components'
 
 
 
@@ -21,15 +21,21 @@ function App() {
       <div className="min-h-screen flex flex-wrap content-between  items-center ">
         <div className="w-full">
           <Navbar />
+          <div className="mb-20 mt-16">
+            <Sidebar />
+
+          </div>
 
           <main>
 
-              <Routes>
-                <Route path='/' element={<Home />} />
-                <Route path='/login' element={<Loginpage />} />
-                <Route path='signup' element={<Signuppage />} />
-                <Route path="/video/:id" element={<Video />} />
-              </Routes>
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/login' element={<Loginpage />} />
+              <Route path='signup' element={<Signuppage />} />
+              <Route path="/video/:id" element={<Video />} />
+              <Route path="/video/:id" element={<VideoDetails />} />
+
+            </Routes>
 
           </main>
 

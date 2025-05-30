@@ -487,66 +487,54 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 })
 
 const watchHistory = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
 
-    const userId = req.user._id
-        const user = await User.aggregate([
-        {
-            $match: {
-                _id: new mongoose.Types.ObjectId(userId)
-            }
-            
-        },
-        {
-            
-            //  we  match id from watchHistory to vidoes d 
+  const [user] = await User.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+
+    // Populate videos into a new field "watchedVideos"
+    {
+      $lookup: {
+        from: "videos",
+        localField: "watchHistory",    // raw ObjectId array
+        foreignField: "_id",
+        as: "watchedVideos",
+        pipeline: [
+          // (optional) join owner info
+          {
             $lookup: {
-                from: "videos",
-                localField: "watchHistory",
-                foreignField: "_id",
-                as: "watchHistory",
-
-                //Inside videos, we have owner (which is a user ID), and in users, we have _id. So we match them and get information like name, avatar, etc."
-                pipeline: [
-                    {
-                        $lookup: {
-                            from: "users",
-                            localField: "owner",
-                            foreignField: "_id",
-                            as: "owner",
-                            pipeline: [
-                                {
-                                    $project: {
-                                        fullname: 1,
-                                        username: 1,
-                                        avatar: 1
-                                    }
-                                },  
-                                {
-                                    $addFields: {
-                                        owner: {
-                                            $first: "$owner"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                ]
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline: [
+                { $project: { fullname: 1, username: 1, avatar: 1 } },
+                { $addFields: { owner: { $first: "$owner" } } }
+              ]
             }
-        }
-    ])
+          }
+        ]
+      }
+    },
 
-    return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                user[0]?.watchHistory || [],
-                "watc history  fetched successfully"
-            )
-        )
+    // Only return the populated videos array
+    {
+      $project: {
+        _id: 0,
+        watchedVideos: 1
+      }
+    }
+  ]);
 
-})
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      user?.watchedVideos || [],
+      "Watch history fetched successfully"
+    )
+  );
+});
+
 
 export {
     loginUser,

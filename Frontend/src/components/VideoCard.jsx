@@ -6,42 +6,38 @@ export default function VideoCard({
   thumbnail,
   title,
   channel,
-  dp,
+  avatar,
   views,
   time,
   className = "",
   classNameImg = ""
 }) {
   return (
-
     <Link to={`/video/${id}`} className="block my-5 lg:w-73">
-      <div className={`bg-black rounded-lg overflow-hidden cursor-pointer my-5 relative top-10 ${className}`}>
-
-
+      <div className={` rounded-lg overflow-hidden cursor-pointer bg-[#1f2937] ${className}`}>
         <img
           src={thumbnail}
           alt={title}
-          className={`w-full h-full object-contain ${classNameImg}`}
+          className={`w-full object-contain ${classNameImg}`}
         />
 
-        <div className={`p-3 flex gap-3  `}>
+        <div className="p-3 flex gap-3">
           <img
-            src={dp}
-            alt={`${channel} dp`}
-            className="h-10 rounded-full flex-shrink-0 "
+            src={avatar}
+            alt="channel avatar"
+            className="w-10 h-10 rounded-full"
           />
 
           <div className="flex-1">
             <h3 className="text-white font-semibold truncate">{title}</h3>
             <div className="flex items-center text-gray-400 text-sm mt-1">
-              <span className="truncate w500">{channel}</span>
+              <span className="truncate">{channel}</span>
             </div>
-            <p className="text-gray-500 text-xs mt-1 w-100">
-              {views} • {time} ago
+            <p className="text-gray-500 text-xs mt-1">
+              {views} • {time}
             </p>
           </div>
         </div>
-
       </div>
     </Link>
   );

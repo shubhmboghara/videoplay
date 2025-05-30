@@ -112,7 +112,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
             throw new ApiError(500, "video or thumbnail upload failed ")
         }
 
-        const duration = video?.duration ? Math.round(video.duration) : 0
+        const duration = video?.duration ? Math.floor(video.duration) : 0
 
         const newVideo = await Video.create({
             title,

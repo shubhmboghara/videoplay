@@ -20,7 +20,7 @@ const Sidebar = ({ className }) => {
 
     const navItems = [
         { label: "Home", icon: <HiHome size={25} />, slug: "/" },
-        { label: "Liked Videos", icon: <HiThumbUp size={25} />, slug: "/liked" },
+        { label: "Liked Videos", icon: <HiThumbUp size={25} />, slug: "/likedvideos" },
         { label: "History", icon: <HiClock size={25} />, slug: "/history" },
         { label: "My content", icon: <HiVideoCamera size={25} />, slug: "/my-content" },
         { label: "Collection", icon: <HiFolder size={25} />, slug: "/collection" },
@@ -36,9 +36,10 @@ const Sidebar = ({ className }) => {
         { label: "Subscribers", icon: <HiUsers size={25} />, slug: "/subscribers" }
     ];
 
+    // bg-[#111827]
     return (
         <div className={className}>
-            <div className="hidden lg:block border-r fixed border-gray-700 bg-[#111827]">
+            <div className="hidden lg:block border-r fixed border-gray-700 bg-[#18181b] z-200">
                 <div className={`h-screen text-white flex flex-col ${Width} z-50 p-4`}>
                     <div className="space-y-2 my-4">
                         {navItems.map((item) => {
@@ -46,19 +47,19 @@ const Sidebar = ({ className }) => {
                             return (
                                 <Link key={item.label} to={item.slug}>
                                     <Button
-                                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg  mb-2
-                                            ${isActive
+                                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg mb-2
+                                              ${isActive
                                                 ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-300 font-semibold"
                                                 : "hover:bg-gray-700 text-gray-300"
                                             }`}
                                     >
                                         {item.icon}
-
                                         {!hideLabels && <span>{item.label}</span>}
                                     </Button>
                                 </Link>
                             );
                         })}
+
                     </div>
                 </div>
             </div>

@@ -28,7 +28,8 @@ export default function Home() {
               channel={v.owner?.username}
               avatar={v.owner?.avatar}
               views={v.views}
-              time={v.duration ? `${Math.floor(v.duration / 60)}:${(v.duration % 60).toString().padStart(2, '0')}` : "N/A"}
+              time={v.timeAgo}
+              duration={v.duration}
             />
 
           ))

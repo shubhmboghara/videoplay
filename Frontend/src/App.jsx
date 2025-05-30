@@ -7,7 +7,9 @@ import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import Home from './pages/Home'
 import Signuppage from './pages/Signup-page'
 import AuthLoader from './components/AuthLoader'
-import { VideoDetails,Sidebar } from './components'
+import { VideoDetails, Sidebar } from './components'
+import LikedVideos from './pages/LikedVideos'
+
 
 
 
@@ -31,9 +33,12 @@ function App() {
             <Routes>
               <Route path='/' element={<Home />} />
               <Route path='/login' element={<Loginpage />} />
-              <Route path='signup' element={<Signuppage />} />
+              <Route path='/signup' element={<Signuppage />} />
               <Route path="/video/:id" element={<Video />} />
               <Route path="/video/:id" element={<VideoDetails />} />
+              <Route path="/likedvideos" element={<LikedVideos />} />
+
+
 
             </Routes>
 

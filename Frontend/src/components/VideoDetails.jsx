@@ -14,11 +14,10 @@ export default function VideoDetails() {
   if (error) return <p className="text-red-500 p-4">Error loading video.</p>;
 
   return (
-    <div className="flex min-h-screen relative">
-      {/* Main Content */}
+    <div className="flex min-h-screen relative ml-10 z-10000">
       <main className="flex-1 p-6 text-white">
         <div className="max-w-4xl mx-auto">
-          {/* Video Player */}
+
           <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
             <iframe
               src={video.VideoFile}
@@ -28,11 +27,9 @@ export default function VideoDetails() {
             />
           </div>
 
-          {/* Video Info & Actions */}
           <div className="p-6 rounded-xl border border-gray-800 mt-5">
             <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
 
-            {/* Views & Actions */}
             <div className="flex flex-wrap items-center justify-between text-gray-400">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
@@ -68,7 +65,6 @@ export default function VideoDetails() {
               </div>
             </div>
 
-            {/* Channel Info */}
             <div className="mt-6 flex items-center space-x-4">
               <img
                 src={video.owner?.avatar}
@@ -88,11 +84,9 @@ export default function VideoDetails() {
               </Button>
             </div>
 
-            {/* Description */}
             <p className="mt-6 text-gray-300">{video.description}</p>
           </div>
 
-          {/* Comments */}
           <div className="mt-10 max-w-4xl mx-auto">
             <div
               className="flex items-center justify-between cursor-pointer"
@@ -106,7 +100,6 @@ export default function VideoDetails() {
               </span>
             </div>
 
-            {/* Comment Input */}
             {showAllComments && (
               <div className="mt-4">
                 <textarea
@@ -120,7 +113,6 @@ export default function VideoDetails() {
               </div>
             )}
 
-            {/* Comment List */}
             <div className={`${showAllComments ? 'block' : 'hidden lg:block'} mt-6 space-y-6`}>
               {video.comments?.map((c) => (
                 <div key={c.id} className="flex items-start gap-4">
@@ -139,7 +131,6 @@ export default function VideoDetails() {
             </div>
           </div>
 
-          {/* Suggestions for small screens */}
           <aside className="w-full p-4 space-y-4 bg-black lg:hidden mt-10">
             {videos?.length > 0 ? (
               videos.map((vid) => (
@@ -152,6 +143,8 @@ export default function VideoDetails() {
                   avatar={vid.owner?.avatar}
                   views={vid.views}
                   time={vid.timeAgo}
+                  duration={vid.duration}
+
                 />
               ))
             ) : (
@@ -161,11 +154,12 @@ export default function VideoDetails() {
         </div>
       </main>
 
-      {/* Sidebar Suggestions for large screens */}
-      <aside className="hidden lg:block w-80 p-4 space-y-4">
+      <aside className="hidden lg:block  p-4 space-y-4  w-100">
         {videos?.length > 0 ? (
+
           videos.map((vid) => (
             <VideoCard
+              classNameImg="w-100"
               key={vid._id}
               id={vid._id}
               thumbnail={vid.thumbnail}
@@ -174,6 +168,8 @@ export default function VideoDetails() {
               avatar={vid.owner?.avatar}
               views={vid.views}
               time={vid.timeAgo}
+              duration={vid.duration}
+
             />
           ))
         ) : (

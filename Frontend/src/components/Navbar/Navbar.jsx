@@ -37,10 +37,24 @@ export default function Navbar() {
             />
           </div>
 
-          <ul className="hidden sm:flex items-center space-x-2 md:space-x-4">
-             <div className='pb-2 w-10'>
-                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:text-accent-foreground h-9 rounded-md px-3 text-white hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user h-5 w-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></button>
-             </div>
+          <ul className="hidden sm:flex items-center space-x-2 md:space-x-4  ">
+
+
+            <li>
+              <Button class="px-4 py-2 text-gray-300 hover:text-white transition-colors mb-7">
+                Login
+              </Button>
+            </li>
+
+            <li>
+              <Button class="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg font-semibold transition-all text-white mb-7">
+                Sign Up
+              </Button>
+
+            </li>
+
+
+
 
             {authStatus && (
               <div>

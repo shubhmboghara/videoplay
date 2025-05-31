@@ -36,7 +36,6 @@ const Sidebar = ({ className }) => {
         { label: "Subscribers", icon: <HiUsers size={25} />, slug: "/subscribers" }
     ];
 
-    // bg-[#111827]
     return (
         <div className={className}>
             <div className="hidden lg:block border-r fixed border-gray-700 bg-[#18181b] z-200">

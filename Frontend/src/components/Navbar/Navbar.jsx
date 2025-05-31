@@ -14,7 +14,7 @@ export default function Navbar() {
   ];
   // bg-[#111827] 
   return (
-    <header className="fixed w-full bg-  shadow z-50   h-17   bg-[#18181b] border-b border-gray-700 p-4  text-[#020817]">
+    <header className="fixed w-full   shadow z-9999   h-17   bg-[#18181b] border-b border-gray-700 p-4  text-[#020817]" >
       <Container>
         <div className="flex items-center justify-between h-16">
 

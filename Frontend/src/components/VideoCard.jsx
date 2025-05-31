@@ -26,7 +26,7 @@ export default function VideoCard({
     <Link to={`/video/${id}`} className="block my-5 lg:w-73">
       <div className={` rounded-lg overflow-hidden cursor-pointer  bg-[#18181b] ${className} `}>
 
-        <div className = "relative  w-full bg-[#18181b]">
+        <div className = "relative   bg-[#18181b]">
           <img
             src={thumbnail}
             alt={title}
@@ -54,7 +54,7 @@ export default function VideoCard({
             </p>
           </div>
         </div>
-
+        
       </div>
     </Link>
   );

@@ -62,8 +62,9 @@ const Sidebar = ({ className }) => {
                     </div>
                 </div>
             </div>
+            
 
-            <div className="block lg:hidden fixed bottom-0 left-0 w-full bg-[#1e293b] text-white border-t border-white/20 z-50">
+            <div className="block lg:hidden fixed bottom-0 left-0 w-full bg-[#18181b] text-white border-t border-white/20 z-50">
                 <div className="flex justify-around p-2">
                     {smItems.map(item => {
                         const isActive = location.pathname === item.slug;

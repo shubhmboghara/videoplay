@@ -1,6 +1,6 @@
-// src/components/VideoDetails.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   HiEye,
   HiCalendar,
@@ -10,56 +10,75 @@ import {
   HiDownload,
   HiUsers
 } from 'react-icons/hi';
-import Sidebar from './Sidebar';
-import { Button, VideoCard } from './index';
+import Sidebar from './Sidebar'; 
+import { Button, VideoCard } from './index'; 
 import { useVideo } from '../hooks/useVideos';
 import CommentSection from './CommentSection';
 import { toggleLike } from '../hooks/toggleLike';
-import { getLikeCount } from '../hooks/getLikeCount'; 
+import { getLikeCount } from '../hooks/getLikeCount';
+import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
 
 export default function VideoDetails() {
   const { id } = useParams();
   const { video, videos, loading, error } = useVideo(id);
+  const dispatch = useDispatch();
+
+  const likedvideos = useSelector(state => state.likes.likedVideos);
+  const isLikedInStore = likedvideos.includes(id);
 
   const [likeLoading, setLikeLoading] = useState(false);
-  const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
 
-  useEffect(() => {
-    if (video) {
-      setLiked(video.isLikedByUser);
 
-      getLikeCount('video', id).then((count) => {
-        setLikesCount(count);
-      });
+
+  useEffect(() => {
+
+    if (!video) {
+      console.log("6. Video object is null/undefined in useEffect, returning early.");
+      return;
     }
-  }, [video, id]);
+    if (video.isLikedByUser) {
+      dispatch(addVideoLike(id));
+    } else {
+      dispatch(removeVideoLike(id));
+    }
+
+    getLikeCount("video", id)
+      .then(count => {
+        setLikesCount(count);
+        console.log(`10. Fetched initial like count for ID: ${id}: ${count}`);
+      })
+      .catch(err => console.error("Error fetching initial like count:", err));
+
+  }, [video, id, dispatch]);
+
 
   const handleVideoLike = async () => {
-    if (likeLoading) return;
+    if (likeLoading) return; 
 
+    setLikeLoading(true); 
     try {
-      setLikeLoading(true);
-      const data = await toggleLike('video', id);
+      const res = await toggleLike('video', id);      const isNowLiked = res?.data?.newLike;
 
-      if (typeof data.likeCount === 'number') {
-        setLikesCount(Math.max(0, data.likeCount));
+      console.log(`11. Backend response from toggleLike - newLike: ${isNowLiked}`);
+
+      if (isNowLiked) {
+        dispatch(addVideoLike(id));
       } else {
-        setLikesCount(prev => Math.max(0, liked ? prev - 1 : prev + 1));
+        dispatch(removeVideoLike(id));
       }
 
-      if (typeof data.isLiked === 'boolean') {
-        setLiked(data.isLiked);
-      } else {
-        setLiked(prev => !prev);
-      }
+      const updatedCount = await getLikeCount('video', id);
+      setLikesCount(updatedCount);
+      console.log(`14. Updated like count to ${updatedCount}`);
 
     } catch (err) {
-      console.error('Video like failed', err);
+      console.error('Video like failed:', err);
     } finally {
-      setLikeLoading(false);
+      setLikeLoading(false); 
     }
   };
+
 
   if (loading || !video || !video.owner) {
     return <p className="text-white p-4 text-center">Loading...</p>;
@@ -70,7 +89,7 @@ export default function VideoDetails() {
   }
 
   return (
-    <div className="flex min-h-screen bg-black">
+    <div className="flex min-h-screen bg-[#18181b]">
       <main className="flex-1 p-6 text-white">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
@@ -100,13 +119,14 @@ export default function VideoDetails() {
                 <button
                   disabled={likeLoading}
                   onClick={handleVideoLike}
-                  className={`inline-flex items-center gap-1 px-3 h-9 rounded-md ${liked
-                    ? 'bg-purple-600 text-white'
-                    : 'border border-gray-600 text-white hover:bg-gray-800'
-                    } text-sm disabled:opacity-50 ${likeLoading ? 'pointer-events-none' : ''}`}
+                  className={`inline-flex items-center gap-1 px-3 h-9 rounded-md ${
+                    isLikedInStore 
+                      ? 'bg-purple-600 text-white'
+                      : 'border border-gray-600 text-white hover:bg-gray-800'
+                  } text-sm disabled:opacity-50 ${likeLoading ? 'pointer-events-none' : ''}`}
                 >
                   <HiThumbUp className="h-4 w-4" />
-                  {likeLoading ? '...' : liked ? "Liked" : "Like"} ({likesCount})
+                  {likeLoading ? '...' : isLikedInStore ? "Liked" : "Like"} ({likesCount})
                 </button>
 
                 <button className="inline-flex items-center gap-1 px-3 h-9 rounded-md border border-gray-600 text-white hover:bg-gray-800 text-sm">
@@ -145,7 +165,7 @@ export default function VideoDetails() {
           <CommentSection videoId={id} />
         </div>
 
-        <aside className="mt-10 bg-black lg:hidden">
+        <aside className="mt-10 bg-[#18181b] lg:hidden">
           {videos?.length ? (
             videos.map((vid) => (
               <VideoCard
@@ -166,7 +186,7 @@ export default function VideoDetails() {
         </aside>
       </main>
 
-      <aside className="hidden lg:block w-80 p-4 space-y-4 bg-black">
+      <aside className="hidden lg:block  p-4 space-y-4 bg-[#18181b] w-80 mr-15">
         {videos?.length ? (
           videos.map((vid) => (
             <VideoCard

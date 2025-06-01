@@ -6,6 +6,8 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 
 
 
+
+
 const getVideoLikeCount = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
 
@@ -14,6 +16,32 @@ const getVideoLikeCount = asyncHandler(async (req, res) => {
     }
 
     const likeCount = await Like.countDocuments({ video: videoId });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { likeCount }, "Fetched like count successfully"));
+});
+
+const getCommentLikeCount = asyncHandler(async (req, res) => {
+    const { commentId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+        throw new ApiError(400, "Invalid video ID");
+    }
+
+    const likeCount = await Like.countDocuments({ comment: commentId });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { likeCount }, "Fetched like count successfully"));
+});
+
+const getPostsLikeCount = asyncHandler(async (req, res) => {
+    const { postsId } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(postsId)) {
+        throw new ApiError(400, "Invalid post id");
+    }
+
+    const likeCount = await Like.find({ posts: postsId }).countDocuments();
     return res
         .status(200)
         .json(new ApiResponse(200, { likeCount }, "Fetched like count successfully"));
@@ -35,25 +63,22 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
     if (alreadyLiked) {
         await Like.deleteOne({ _id: alreadyLiked._id });
-        const likeCount = await Like.find({ video: videoId }).countDocuments();
 
         return res
             .status(200)
-            .json(new ApiResponse(200, { likeCount }, "Unliked successfully"))
+            .json(new ApiResponse(200, {}, "Unliked successfully"))
     }
 
-    const newLike = await Like.create({
+    const newLikeEntry  = await Like.create({
         video: videoId,
         likedBy: req.user._id
     })
-    console.log(newLike)
 
 
-    const likeCount = await Like.find({ video: videoId }).countDocuments();
     return res
         .status(200)
         .json(
-            new ApiResponse(200, { likeCount, newLike }, "Liked successfully")
+            new ApiResponse(200, { newLike: true  }, "Liked successfully")
         )
 
 })
@@ -82,12 +107,11 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
         likedBy: req.user._id,
     });
 
-    const likeCount = await Like.countDocuments({ comment: commentId });
 
     return res
         .status(200)
         .json(
-            new ApiResponse(200, { likeCount, newLike }, "Liked successfully")
+            new ApiResponse(200, { newLike }, "Liked successfully")
         );
 });
 
@@ -115,12 +139,11 @@ const togglePostsLike = asyncHandler(async (req, res) => {
         likedBy: req.user._id
     })
 
-    const likeCount = await Like.find({ posts: postsId }).countDocuments();
 
     return res
         .status(200)
         .json(
-            new ApiResponse(200, { likeCount, newLike }, " successfully")
+            new ApiResponse(200, { newLike }, " successfully")
         )
 }
 )
@@ -145,5 +168,7 @@ export {
     togglePostsLike,
     toggleVideoLike,
     getLikedVideos,
-    getVideoLikeCount
+    getVideoLikeCount,
+    getCommentLikeCount,
+    getPostsLikeCount,
 }

@@ -1,4 +1,3 @@
-// src/hooks/toggleLike.js
 import axios from "axios";
 
 export const toggleLike = async (type, id) => {
@@ -10,16 +9,9 @@ export const toggleLike = async (type, id) => {
     };
 
     const response = await axios.post(urlMap[type]);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Like toggle error:", error);
     throw error;
   }
 };
-
-
-
-
-
-
-

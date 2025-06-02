@@ -3,12 +3,13 @@ import { Sidebar, VideoCard } from '../components';
 import play from '../assets/play.svg';
 import { useParams } from 'react-router-dom';
 import { useVideo } from '../hooks/useVideos';
+import Loader from '../components/Loader';
 
 export default function Home() {
   const { id } = useParams()
   const { video, videos, loading, error } = useVideo(id)
 
-  if (loading) return <p className="text-white p-4 mt-50  ml-[45%]">Loading videos…</p>;
+  if (loading) return <Loader message="Loading videos..." />;
   if (error) return <p className="text-red-500 p-4">{error.message}</p>;
   console.log({ id, video, videos, loading, error })
 

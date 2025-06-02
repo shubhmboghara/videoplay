@@ -62,7 +62,6 @@ const addComment = asyncHandler(async (req, res) => {
         owner: req.user._id,
         video: videoId
     })
-
     return res
         .status(200)
         .json(

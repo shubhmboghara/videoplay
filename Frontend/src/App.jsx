@@ -9,6 +9,7 @@ import Signuppage from './pages/Signup-page'
 import AuthLoader from './components/AuthLoader'
 import { VideoDetails, Sidebar } from './components'
 import LikedVideos from './pages/LikedVideos'
+import VideosHistory from './pages/VideosHistory'
 
 
 
@@ -37,6 +38,9 @@ function App() {
               <Route path="/video/:id" element={<Video />} />
               <Route path="/video/:id" element={<VideoDetails />} />
               <Route path="/likedvideos" element={<LikedVideos />} />
+              <Route path="/history" element={<VideosHistory />} />
+
+
 
 
 

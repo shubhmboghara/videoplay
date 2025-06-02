@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login, logout } from "../redux/slices/authSlice";
+import Loader from "./Loader"; // Import the new Loader component
 
 const AuthLoader = ({ children }) => {
     const dispatch = useDispatch();
+    const [isLoading, setIsLoading] = useState(true); // Add loading state
 
     useEffect(() => {
         const fetchCurrentUser = async () => {
@@ -22,7 +24,6 @@ const AuthLoader = ({ children }) => {
 
                 if (err.response?.status === 401) {
                     try {
-
                         const refreshRes = await axios.post("/api/users/refresh-token", {}, { withCredentials: true });
 
                         if (refreshRes.status === 200) {
@@ -49,11 +50,17 @@ const AuthLoader = ({ children }) => {
                 } else {
                     dispatch(logout());
                 }
+            } finally {
+                setIsLoading(false); // Set loading to false after fetch
             }
         };
 
         fetchCurrentUser();
     }, [dispatch]);
+
+    if (isLoading) {
+        return <Loader message="Authenticating..." />; // Display Loader while authenticating
+    }
 
     return children;
 };

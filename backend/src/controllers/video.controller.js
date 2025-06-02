@@ -12,6 +12,7 @@ dayjs.extend(relativeTime);
 
 const timeAgo = (date) => dayjs(date).fromNow();
 
+
 const getAllVideos = asyncHandler(async (req, res) => {
     const {
         query,
@@ -83,9 +84,11 @@ const getAllVideos = asyncHandler(async (req, res) => {
         timeAgo: timeAgo(video.createdAt),
     }));
 
-    return res.status(200).json(
-        new ApiResponse(200, { videos: videosWithTimeAgo }, "All videos fetched successfully")
-    );
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, { videos: videosWithTimeAgo }, "All videos fetched successfully")
+        );
 });
 
 
@@ -135,7 +138,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    const userId = req.user?._id
+    const userId = req.user?._id;
 
 
     if (!mongoose.Types.ObjectId.isValid(videoId)) {
@@ -183,72 +186,101 @@ const getVideoById = asyncHandler(async (req, res) => {
     await Video.updateOne({ _id: videoId }, { $inc: { views: 1 } });
 
     const pipeline = [
-        { $match: { _id: new mongoose.Types.ObjectId(videoId) } },
-        {
-            $lookup: {
-                from: "users",
-                localField: "owner",
-                foreignField: "_id",
-                as: "owner",
-                pipeline: [
-                    {
-                        $lookup: {
-                            from: "subscriptions",
-                            foreignField: "channel",
-                            localField: "_id",
-                            as: "subscribers",
-                        },
+    { $match: { _id: new mongoose.Types.ObjectId(videoId) } },
+    {
+        $lookup: {
+            from: "users",
+            localField: "owner",
+            foreignField: "_id",
+            as: "owner",
+            pipeline: [
+                {
+                    $lookup: {
+                        from: "subscriptions",
+                        foreignField: "channel",
+                        localField: "_id",
+                        as: "subscribers",
                     },
-                    {
-                        $addFields: {
-                            subscribers: "$subscribers.subscriber",
-                        },
+                },
+                {
+                    $addFields: {
+                        subscribers: "$subscribers.subscriber",
                     },
-                    {
-                        $addFields: {
-                            subscriberCount: {
-                                $size: "$subscribers",
-                            },
-                            isSubscribed: req.user
-                                ? {
-                                    $cond: {
-                                        if: { $in: [req.user._id, "$subscribers"] },
-                                        then: true,
-                                        else: false,
+                },
+                {
+                    $addFields: {
+                        subscriberCount: { $size: "$subscribers" },
+                        isSubscribed: userId
+                            ? {
+                                $cond: {
+                                    if: {
+                                        $in: [new mongoose.Types.ObjectId(userId), "$subscribers"]
                                     },
+                                    then: true,
+                                    else: false
                                 }
-                                : false,
-                        },
+                            }
+                            : false
                     },
-                    {
-                        $project: {
-                            _id: 1,
-                            fullName: 1,
-                            username: 1,
-                            avatar: 1,
-                            createdAt: 1,
-                            subscriberCount: 1,
-                            isSubscribed: 1,
-                        },
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        fullName: 1,
+                        username: 1,
+                        avatar: 1,
+                        createdAt: 1,
+                        subscriberCount: 1,
+                        isSubscribed: 1,
                     },
-                ],
-            },
+                },
+            ],
         },
-        { $unwind: "$owner" },
-        {
-            $project: {
-                title: 1,
-                description: 1,
-                VideoFile: 1,
-                thumbnail: 1,
-                duration: 1,
-                views: 1,
-                createdAt: 1,
-                owner: 1,
+    },
+    { $unwind: "$owner" },
 
-            },
+    {
+        $lookup: {
+            from: "likes",
+            let: { videoId: "$_id" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $eq: ["$video", "$$videoId"]
+                        }
+                    }
+                }
+            ],
+            as: "likes"
+        }
+    },
+    {
+        $addFields: {
+            likeCount: { $size: "$likes" },
+            isLiked: userId ? {
+                $in: [new mongoose.Types.ObjectId(userId), "$likes.likedBy"]
+            } : false
+        }
+    },
+
+    {
+        $project: {
+            title: 1,
+            description: 1,
+            VideoFile: 1,
+            thumbnail: 1,
+            duration: 1,
+            views: 1,
+            createdAt: 1,
+            owner: 1,
+            likeCount: 1,
+            isLiked: 1
         },
-    ];
+    },
+];
+
+
 
     const result = await Video.aggregate(pipeline);
 
@@ -267,9 +299,9 @@ const getVideoById = asyncHandler(async (req, res) => {
         timeAgo: timeAgo(result[0].createdAt),
     };
 
-    res.status(200).json(new ApiResponse(200, 
-        {videoData, watchHistory: watchHistoryIds},
-         "Video found successfully"));
+    res.status(200).json(new ApiResponse(200,
+        { videoData, watchHistory: watchHistoryIds },
+        "Video found successfully"));
 });
 
 

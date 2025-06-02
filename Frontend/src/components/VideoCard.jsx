@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { timeAgo } from "../utils";
 
 function formatDuration(durationInSeconds) {
   const totalSeconds = Math.floor(durationInSeconds);
@@ -17,20 +18,17 @@ export default function VideoCard({
   views,
   time,
   duration,
-  className = "",
-  classNameImg = ""
 }) {
 
-  // bg-[#1f2937]
   return (
-    <Link to={`/video/${id}`} className="block my-5 lg:w-73">
-      <div className={` rounded-lg overflow-hidden cursor-pointer  bg-[#18181b] ${className} `}>
+    <Link to={`/video/${id}`} className="block">
+      <div className="w-full rounded-lg overflow-hidden cursor-pointer bg-[#18181b]">
 
         <div className = "relative   bg-[#18181b]">
           <img
             src={thumbnail}
             alt={title}
-            className={`w-full object-cover ${classNameImg}`}
+            className="w-full h-full object-cover"
           />
           <span className="bg-black px-2 py-0.5 rounded text-white text-xs absolute bottom-2 right-2">
             {formatDuration(duration)}
@@ -50,7 +48,7 @@ export default function VideoCard({
               <span className="truncate">{channel}</span>
             </div>
             <p className="text-gray-500 text-xs mt-1">
-              {views}views {time}
+              {views}views {timeAgo(time)}
             </p>
           </div>
         </div>

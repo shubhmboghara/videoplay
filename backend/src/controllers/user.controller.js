@@ -8,6 +8,12 @@ import { lookup } from "dns"
 import { subscribe } from "diagnostics_channel"
 import mongoose, { mongo } from "mongoose"
 import { pipeline } from "stream"
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime.js";
+
+dayjs.extend(relativeTime);
+
+const timeAgo = (date) => dayjs(date).fromNow();
 
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -492,11 +498,10 @@ const watchHistory = asyncHandler(async (req, res) => {
   const [user] = await User.aggregate([
     { $match: { _id: new mongoose.Types.ObjectId(userId) } },
 
-    // Populate videos into a new field "watchedVideos"
     {
       $lookup: {
         from: "videos",
-        localField: "watchHistory",    // raw ObjectId array
+        localField: "watchHistory",    
         foreignField: "_id",
         as: "watchedVideos",
         pipeline: [
@@ -517,7 +522,6 @@ const watchHistory = asyncHandler(async (req, res) => {
       }
     },
 
-    // Only return the populated videos array
     {
       $project: {
         _id: 0,
@@ -525,6 +529,8 @@ const watchHistory = asyncHandler(async (req, res) => {
       }
     }
   ]);
+
+  
 
   return res.status(200).json(
     new ApiResponse(

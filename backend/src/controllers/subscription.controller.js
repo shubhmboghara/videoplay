@@ -22,8 +22,6 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         throw new ApiError(400, "You cannot subscribe to yourself");
     }
 
-
-
     const existing = await Subscription.findOne({ channel: channelId, subscriber: subscriberId });
     if (existing) {
         await Subscription.deleteOne({ _id: existing._id });
@@ -31,10 +29,8 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     }
 
 
-
     await Subscription.create({ channel: channelId, subscriber: subscriberId });
-    const total = await Subscription.countDocuments({ channel: channelId });
-    return res.json(new ApiResponse(200, { subscribed: true, totalSubscribers: total }, "Subscribed successfully"));
+    return res.json(new ApiResponse(200, { subscribed: true }, "Subscribed successfully"));
 });
 
 const getChannelSubscribers = asyncHandler(async (req, res) => {
@@ -45,7 +41,6 @@ const getChannelSubscribers = asyncHandler(async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(channelId)) {
         throw new ApiError(400, "Invalid channel ID");
     }
-
 
 
     const subscribers = await Subscription.aggregate([

@@ -5,17 +5,17 @@ const API = axios.create({
 });
 
 export const getVideoComments = (videoId) => {
-  return API.get(`/${videoId}`);
+  return  API.get(`/${videoId}`);
 };
 
 export const addComment = (videoId, commentData) => {
-  return API.post(`/${videoId}`, commentData);
+  return  API.post(`/${videoId}`, commentData);
 };
 
 export const deleteComment = (commentId) => {
-  return API.delete(`/c/${commentId}`);
+  return  API.delete(`/c/${commentId}`);
 };
 
 export const updateComment = (commentId, updatedData) => {
-  return API.patch(`/c/${commentId}`, updatedData);
+  return  API.patch(`/c/${commentId}`, updatedData);
 };

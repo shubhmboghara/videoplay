@@ -38,7 +38,7 @@ export default function Navbar() {
           <ul className="hidden sm:flex items-center space-x-2 md:space-x-4  ">
             {!authStatus && (
               <>
-                1259,2339,<Link to="/login">
+                <Link to="/login">
                   <li>
                     <Button className="px-4 py-2 text-gray-300 hover:text-white transition-colors mb-7">
                       Login
@@ -54,7 +54,7 @@ export default function Navbar() {
                     </Button>
 
                   </li>
-                </Link>,2741
+                </Link>
               </>
             )}
 

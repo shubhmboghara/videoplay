@@ -24,6 +24,7 @@ export const VerifyJwt = asyncHandler(async (req, _, next) => {
         }
 
         req.user = user
+        console.log("User ID from JWT middleware:", req.user?._id);
         next()
     } catch (error) {
 
@@ -32,3 +33,23 @@ export const VerifyJwt = asyncHandler(async (req, _, next) => {
     }
 
 })
+
+export const optionalVerifyJwt = asyncHandler(async (req, _, next) => {
+  const raw = req.cookies.accessToken || req.header("Authorization")
+  if (!raw) {
+    return next()
+  }
+  const token = raw.startsWith("Bearer") ? raw.replace("Bearer", "").trim() : raw
+  let decoded
+  try {
+    decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+  } catch {
+    return next()
+  }
+  const user = await User.findById(decoded._id).select("-password -refreshToken")
+  if (!user) {
+    return next()
+  }
+  req.user = user
+  next()
+});

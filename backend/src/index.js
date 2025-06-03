@@ -27,13 +27,3 @@ connectDB()
         process.exit(1)
 
     })
-
-
-
-
-
-
-
-
-
-

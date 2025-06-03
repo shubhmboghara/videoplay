@@ -24,7 +24,7 @@ export const getChannelStats = async () => {
 export const togglePublishStatus = async (videoId) => {
 
     try {
-        const response = await axios.get(`/api//video/toggle/publish/${videoId}`)
+        const response = await axios.patch(`/api/video/toggle/publish/${videoId}`)
         return response.data;
     } catch (error) {
         console.error("Get liked videos  error:", error);

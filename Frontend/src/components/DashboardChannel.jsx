@@ -50,11 +50,10 @@ function DashboardChannel() {
   }
 
   return (
-    <div className="min-h-screen bg-[#18181b] text-white p-8 relative left-10">
-      <h1 className="text-3xl font-bold mb-8">Welcome back, Olivia</h1>
-      <p className="text-gray-400 mb-8">Track, manage and forecast your customers and orders.</p>
+    <div className="min-h-screen bg-[#18181b] text-white p-8 relative lg:left-68 lg:w-300">
+      <h1 className="text-3xl font-bold mb-8">Welcome back </h1>
+      <p className="text-gray-400 mb-8">Track, manage and forecast your channel .</p>
 
-      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className="bg-[#2a2a31] p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
           <div className="text-purple-400 text-4xl mb-3">👁️</div>
@@ -73,7 +72,6 @@ function DashboardChannel() {
         </div>
       </div>
 
-      {/* Videos Section */}
       <div className="bg-[#2a2a31] p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-6">Uploaded Videos</h2>
         <div className="overflow-x-auto">

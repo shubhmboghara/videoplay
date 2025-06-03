@@ -3,6 +3,7 @@ import { Like } from "../models/like.model.js"
 import { ApiError } from "../utils/AppError.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
+import path from "path"
 
 
 
@@ -68,7 +69,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
             .json(new ApiResponse(200, {}, "Unliked successfully"))
     }
 
-    const newLikeEntry  = await Like.create({
+    const newLikeEntry = await Like.create({
         video: videoId,
         likedBy: req.user._id
     })
@@ -77,7 +78,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(200, { newLike: true  }, "Liked successfully")
+            new ApiResponse(200, { newLike: true }, "Liked successfully")
         )
 
 })
@@ -152,7 +153,14 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     const likedVideos = await Like.find({
         likedBy: req.user.id,
         video: { $exists: true }
-    }).populate("video")
+    }).populate({
+        path: "video",
+        populate:{
+           path:"owner",
+                       select: "-password -email -fullname -coverImage -refreshToken -watchHistory" 
+        }
+
+    })
 
 
     return res

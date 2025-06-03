@@ -28,7 +28,7 @@ const UserWatchHistory = () => {
 
   return (
 
-    <div className="flex-1 p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:ml-65">
+    <div className="flex-1 p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:ml-65 overflow-hidden">
       <h1 className="text-2xl font-bold mb-4 col-span-full">Watch history</h1>
 
       {videos.length === 0 ? (
@@ -45,8 +45,8 @@ const UserWatchHistory = () => {
                 id={video._id}
                 thumbnail={video.thumbnail}
                 title={video.title}
-                channel={video.owner.username}
-                avatar={video.owner.avatar}
+                channel={video.owner[0].username}
+                avatar={video.owner[0].avatar}
                 views={video.views}
                 time={video.createdAt}
                 duration={video.duration}

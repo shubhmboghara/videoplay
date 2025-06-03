@@ -24,7 +24,7 @@ export const VerifyJwt = asyncHandler(async (req, _, next) => {
         }
 
         req.user = user
-        console.log("User ID from JWT middleware:", req.user?._id);
+        
         next()
     } catch (error) {
 

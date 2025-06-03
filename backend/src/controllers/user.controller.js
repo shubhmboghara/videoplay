@@ -8,12 +8,7 @@ import { lookup } from "dns"
 import { subscribe } from "diagnostics_channel"
 import mongoose, { mongo } from "mongoose"
 import { pipeline } from "stream"
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime.js";
 
-dayjs.extend(relativeTime);
-
-const timeAgo = (date) => dayjs(date).fromNow();
 
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -505,7 +500,6 @@ const watchHistory = asyncHandler(async (req, res) => {
         foreignField: "_id",
         as: "watchedVideos",
         pipeline: [
-          // (optional) join owner info
           {
             $lookup: {
               from: "users",

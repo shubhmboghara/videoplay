@@ -1,11 +1,10 @@
 import React from 'react'
-import { getLikedVideos } from '../components'
-
+import Likedvideo from '../components/likedvideo'
 function LikedVideos() {
   return (
     <div> 
 
-        <getLikedVideos />
+        <Likedvideo />
     </div>
   )
 }

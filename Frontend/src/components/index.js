@@ -8,8 +8,7 @@ import Signup from "./Signup";
 import Sidebar from "./Sidebar";
 import VideoCard from "./VideoCard";
 import VideoDetails from "./VideoDetails";
-import getLikedVideos from "./getLikedVideos";
-
+import likedvideo from "./likedvideo";
 export{
     Container,
     Logo,
@@ -21,5 +20,6 @@ export{
     Sidebar,
     VideoCard,
     VideoDetails,
-    getLikedVideos
+    likedvideo
+    
 }

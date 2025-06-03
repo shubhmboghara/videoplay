@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -10,8 +10,9 @@ import {
   HiUsers
 } from 'react-icons/hi';
 import Sidebar from './Sidebar';
-import { Button, VideoCard} from './index';
+import { Button, VideoCard } from './index';
 import Loader from './Loader';
+import { timeAgo } from '../utils';
 
 import { useVideo } from '../hooks/useVideos';
 import CommentSection from './CommentSection';
@@ -34,41 +35,41 @@ export default function VideoDetails() {
   const [subscriberCount, setSubscriberCount] = useState(0);
   const [likesCount, setLikesCount] = useState(0);
 
- useEffect(() => {
-  if (!video) return;
+  useEffect(() => {
+    if (!video) return;
 
-  dispatch(video.isLiked ? addVideoLike(id) : removeVideoLike(id));
-  getLikeCount('video', id).then(setLikesCount).catch(console.error);
+    dispatch(video.isLiked ? addVideoLike(id) : removeVideoLike(id));
+    getLikeCount('video', id).then(setLikesCount).catch(console.error);
 
-  setIsSubscribed(!!video.owner?.isSubscribed);
-  setSubscriberCount(Number(video.owner?.subscriberCount || 0));
-}, [video, id, dispatch]);
-
-
+    setIsSubscribed(!!video.owner?.isSubscribed);
+    setSubscriberCount(Number(video.owner?.subscriberCount || 0));
+  }, [video, id, dispatch]);
 
 
-const handleVideoLike = useCallback(async () => {
-  if (likeLoading) return;
-  setLikeLoading(true);
 
-  try {
-    const res = await toggleLike('video', id);
-    const isNowLiked = res?.data?.newLike;
 
-    if (isNowLiked && !likedvideos.includes(id)) {
-      dispatch(addVideoLike(id));
-    } else {
-      dispatch(removeVideoLike(id));
+  const handleVideoLike = useCallback(async () => {
+    if (likeLoading) return;
+    setLikeLoading(true);
+
+    try {
+      const res = await toggleLike('video', id);
+      const isNowLiked = res?.data?.newLike;
+
+      if (isNowLiked && !likedvideos.includes(id)) {
+        dispatch(addVideoLike(id));
+      } else {
+        dispatch(removeVideoLike(id));
+      }
+
+      const updatedCount = await getLikeCount('video', id);
+      setLikesCount(updatedCount);
+    } catch (err) {
+      console.error('Video like failed:', err);
+    } finally {
+      setLikeLoading(false);
     }
-
-    const updatedCount = await getLikeCount('video', id);
-    setLikesCount(updatedCount);
-  } catch (err) {
-    console.error('Video like failed:', err);
-  } finally {
-    setLikeLoading(false);
-  }
-}, [likeLoading, id, dispatch, likedvideos]);
+  }, [likeLoading, id, dispatch, likedvideos]);
 
 
 
@@ -119,7 +120,7 @@ const handleVideoLike = useCallback(async () => {
                 </div>
                 <div className="flex items-center gap-1">
                   <HiCalendar className="h-4 w-4" />
-                  <span>{video.timeAgo}</span>
+                  <span>{timeAgo(video.createdAt)}</span>
                 </div>
               </div>
 
@@ -185,17 +186,17 @@ const handleVideoLike = useCallback(async () => {
 
         <aside className="mt-10 bg-[#18181b] lg:hidden">
           {videos?.length ? (
-            videos.map((vid) => (
+            videos.map((video) => (
               <VideoCard
-                key={vid._id}
-                id={vid._id}
-                thumbnail={vid.thumbnail}
-                title={vid.title}
-                channel={vid.owner.username}
-                avatar={vid.owner.avatar}
-                views={vid.views}
-                time={vid.timeAgo}
-                duration={vid.duration}
+                key={video._id}
+                id={video._id}
+                thumbnail={video.thumbnail}
+                title={video.title}
+                channel={video.owner.username}
+                avatar={video.owner.avatar}
+                views={video.views}
+                time={video.createdAt}
+                duration={video.duration}
               />
             ))
           ) : (
@@ -206,18 +207,18 @@ const handleVideoLike = useCallback(async () => {
 
       <aside className="hidden lg:block p-4 space-y-4 bg-[#18181b] w-80 mr-15">
         {videos?.length ? (
-          videos.map((vid) => (
+          videos.map((video) => (
             <VideoCard
               classNameImg="w-full"
-              key={vid._id}
-              id={vid._id}
-              thumbnail={vid.thumbnail}
-              title={vid.title}
-              channel={vid.owner.username}
-              avatar={vid.owner.avatar}
-              views={vid.views}
-              time={vid.timeAgo}
-              duration={vid.duration}
+              key={video._id}
+              id={video._id}
+              thumbnail={video.thumbnail}
+              title={video.title}
+              channel={video.owner.username}
+              avatar={video.owner.avatar}
+              views={video.views}
+              time={video.createdAt}
+              duration={video.duration}
             />
           ))
         ) : (

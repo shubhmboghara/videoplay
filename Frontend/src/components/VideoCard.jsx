@@ -36,6 +36,7 @@ export default function VideoCard({
         </div>
 
         <div className="p-3 flex gap-3">
+          
           <img
             src={avatar}
             alt="channel avatar"
@@ -48,7 +49,7 @@ export default function VideoCard({
               <span className="truncate">{channel}</span>
             </div>
             <p className="text-gray-500 text-xs mt-1">
-              {views}views {timeAgo(time)}
+              {views} views {timeAgo(time)}
             </p>
           </div>
         </div>

@@ -12,7 +12,7 @@ const UserWatchHistory = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await getUserVideosHistory(); 
+        const res = await getUserVideosHistory();
         setVideos(res?.data || []);
       } catch (err) {
         console.error("Error loading watch history:", err);
@@ -22,7 +22,7 @@ const UserWatchHistory = () => {
     };
 
     fetchHistory();
-  }, []); 
+  }, []);
 
   if (loading) return <Loader message="Loading watch history..." />;
 
@@ -40,14 +40,16 @@ const UserWatchHistory = () => {
           {videos.map((video) => (
             <div key={video._id}>
               <VideoCard
+                classNameImg="w-full"
+                key={video._id}
                 id={video._id}
                 thumbnail={video.thumbnail}
                 title={video.title}
-                channel={video.channel?.usernam}
-                avatar={video.channel?.avatar}
-                views={video.views || 0}
+                channel={video.owner.username}
+                avatar={video.owner.avatar}
+                views={video.views}
                 time={video.createdAt}
-                duration={video.duration || 0}
+                duration={video.duration}
               />
             </div>
           ))}

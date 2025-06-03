@@ -20,19 +20,19 @@ export default function Home() {
 
       <div className="flex-1 p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:ml-65 ">
         {videos.length > 0 ? (
-          videos.map((v) => (
+          videos.map((video) => (
             <VideoCard
-              key={v._id}
-              id={v._id}
-              thumbnail={v.thumbnail}
-              title={v.title}
-              channel={v.owner?.username}
-              avatar={v.owner?.avatar}
-              views={v.views}
-              time={v.timeAgo}
-              duration={v.duration}
+              classNameImg="w-full"
+              key={video._id}
+              id={video._id}
+              thumbnail={video.thumbnail}
+              title={video.title}
+              channel={video.owner.username}
+              avatar={video.owner.avatar}
+              views={video.views}
+              time={video.createdAt}
+              duration={video.duration}
             />
-
           ))
         ) : (
           <div className="col-span-full text-center text-white mt-[10%] ml-[33%] fixed ">

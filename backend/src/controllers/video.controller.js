@@ -79,15 +79,11 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
     const videos = await Video.aggregate(pipeline);
 
-    const videosWithTimeAgo = videos.map((video) => ({
-        ...video,
-        timeAgo: timeAgo(video.createdAt),
-    }));
-
+    
     return res
         .status(200)
         .json(
-            new ApiResponse(200, { videos: videosWithTimeAgo }, "All videos fetched successfully")
+            new ApiResponse(200, { videos}, "All videos fetched successfully")
         );
 });
 

@@ -13,40 +13,42 @@ import Sidebar from './Sidebar';
 import { Button, VideoCard } from './index';
 import Loader from './Loader';
 import { timeAgo } from '../utils';
-
 import { useVideo } from '../hooks/useVideos';
 import CommentSection from './CommentSection';
 import { toggleLike } from '../hooks/toggleLike';
 import { getLikeCount } from '../hooks/getLikeCount';
 import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
-import { togglesubscribe } from '../hooks/toggleSubscribe';
+import { toggleSubscription } from '../redux/slices/subscriptionSlice';
 
 export default function VideoDetails() {
   const { id } = useParams();
   const { video, videos, loading, error } = useVideo(id);
   const dispatch = useDispatch();
 
-  const likedvideos = useSelector(state => state.likes.likedVideos);
-  const isLikedInStore = likedvideos.includes(id);
+  const likedVideos = useSelector((state) => state.likes.likedVideos);
+  const isLikedInStore = likedVideos.includes(id);
   const [likeLoading, setLikeLoading] = useState(false);
-
-  const [subscriberLoading, setsubscriberLoading] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [subscriberCount, setSubscriberCount] = useState(0);
   const [likesCount, setLikesCount] = useState(0);
+
+  const { subscribedChannels, loading: subscriptionLoading } = useSelector(
+    (state) => state.subscription
+  );
+  const [subscriberLoading, setSubscriberLoading] = useState(false);
+  const [subscriberCount, setSubscriberCount] = useState(0);
 
   useEffect(() => {
     if (!video) return;
 
-    dispatch(video.isLiked ? addVideoLike(id) : removeVideoLike(id));
+    if (video.isLiked) {
+      dispatch(addVideoLike(id));
+    } else {
+      dispatch(removeVideoLike(id));
+    }
+
     getLikeCount('video', id).then(setLikesCount).catch(console.error);
 
-    setIsSubscribed(!!video.owner?.isSubscribed);
     setSubscriberCount(Number(video.owner?.subscriberCount || 0));
   }, [video, id, dispatch]);
-
-
-
 
   const handleVideoLike = useCallback(async () => {
     if (likeLoading) return;
@@ -56,7 +58,7 @@ export default function VideoDetails() {
       const res = await toggleLike('video', id);
       const isNowLiked = res?.data?.newLike;
 
-      if (isNowLiked && !likedvideos.includes(id)) {
+      if (isNowLiked && !likedVideos.includes(id)) {
         dispatch(addVideoLike(id));
       } else {
         dispatch(removeVideoLike(id));
@@ -69,25 +71,18 @@ export default function VideoDetails() {
     } finally {
       setLikeLoading(false);
     }
-  }, [likeLoading, id, dispatch, likedvideos]);
+  }, [likeLoading, id, dispatch, likedVideos]);
 
+  const handleSubscribeToggle = () => {
+    if (!video?.owner?._id) return; 
+    const channelId = video.owner._id;
 
-
-  const handlesubscribers = async () => {
-    if (subscriberLoading) return;
-    setsubscriberLoading(true);
-
-    try {
-      const channelId = video.owner._id;
-      const res = await togglesubscribe(channelId);
-      const nowSubscribed = Boolean(res.data.subscribed);
-      setIsSubscribed(nowSubscribed);
-      setSubscriberCount(prev => (nowSubscribed ? prev + 1 : prev - 1));
-    } catch (err) {
-      console.error('Subscription toggle failed:', err);
-    } finally {
-      setsubscriberLoading(false);
-    }
+    dispatch(toggleSubscription(channelId)).then((action) => {
+      if (toggleSubscription.fulfilled.match(action)) {
+        const { subscribed } = action.payload;
+        setSubscriberCount((prev) => (subscribed ? prev + 1 : prev - 1));
+      }
+    });
   };
 
   if (loading || !video || !video.owner) {
@@ -96,6 +91,11 @@ export default function VideoDetails() {
   if (error) {
     return <p className="text-red-500 p-4">Error loading video.</p>;
   }
+
+  const channelId = video.owner._id;
+  const isSubscribed = channelId in subscribedChannels
+    ? subscribedChannels[channelId]
+    : !!video.owner.isSubscribed;
 
   return (
     <div className="flex min-h-screen bg-[#18181b]">
@@ -112,6 +112,7 @@ export default function VideoDetails() {
 
           <div className="p-6 rounded-xl border border-gray-800">
             <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
+
             <div className="flex items-center justify-between text-gray-400">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
@@ -128,11 +129,13 @@ export default function VideoDetails() {
                 <Button
                   disabled={likeLoading}
                   onClick={handleVideoLike}
-                  className={`inline-flex items-center gap-1 px-3 h-9 rounded-md transition-all duration-200  ${isLikedInStore
-                    ? 'bg-purple-600 text-white border-gray-600'
-                    : 'border border-gray-600 text-white hover:bg-gray-800'
-                    } text-sm disabled:opacity-50 ${likeLoading ? 'pointer-events-none' : ''
-                    }`}
+                  className={`inline-flex items-center gap-1 px-3 h-9 rounded-md transition-all duration-200 ${
+                    isLikedInStore
+                      ? 'bg-purple-600 text-white border-gray-600'
+                      : 'border border-gray-600 text-white hover:bg-gray-800'
+                  } text-sm disabled:opacity-50 ${
+                    likeLoading ? 'pointer-events-none' : ''
+                  }`}
                 >
                   <HiThumbUp className="h-4 w-4" />
                   {likeLoading ? '...' : isLikedInStore ? 'Liked' : 'Like'} (
@@ -163,19 +166,22 @@ export default function VideoDetails() {
                 </p>
               </div>
 
-              <button
-                onClick={handlesubscribers}
-                disabled={subscriberLoading}
-                className={`ml-auto flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200  ${isSubscribed
-                  ? 'bg-gray-700 text-white   hover:bg-gray-700  border border-gray-600 '
-                  : 'bg-purple-600 text-white hover:bg-purple-800 border border-gray-600'
-                  } disabled:opacity-50 ${subscriberLoading ? 'cursor-not-allowed' : 'cursor-pointer'
-                  }`}
+              <Button
+                onClick={handleSubscribeToggle}
+                disabled={subscriptionLoading}
+                className={`ml-auto flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ${
+                  isSubscribed
+                    ? 'bg-gray-700 text-white hover:bg-gray-700 border border-gray-600'
+                    : 'bg-purple-600 text-white hover:bg-purple-800 border border-gray-600'
+                } disabled:opacity-50 `}
               >
                 <HiUsers className="h-5 w-5" />
-                {subscriberLoading ? '...' : isSubscribed ? 'Subscribed' : 'Subscribe'}
-              </button>
-
+                {subscriptionLoading
+                  ? '...'
+                  : isSubscribed
+                  ? 'Subscribed'
+                  : 'Subscribe'}
+              </Button>
             </div>
 
             <p className="mt-6 text-gray-300">{video.description}</p>
@@ -186,17 +192,17 @@ export default function VideoDetails() {
 
         <aside className="mt-10 bg-[#18181b] lg:hidden">
           {videos?.length ? (
-            videos.map((video) => (
+            videos.map((sugg) => (
               <VideoCard
-                key={video._id}
-                id={video._id}
-                thumbnail={video.thumbnail}
-                title={video.title}
-                channel={video.owner.username}
-                avatar={video.owner.avatar}
-                views={video.views}
-                time={video.createdAt}
-                duration={video.duration}
+                key={sugg._id}
+                id={sugg._id}
+                thumbnail={sugg.thumbnail}
+                title={sugg.title}
+                channel={sugg.owner.username}
+                avatar={sugg.owner.avatar}
+                views={sugg.views}
+                time={sugg.createdAt}
+                duration={sugg.duration}
               />
             ))
           ) : (
@@ -207,18 +213,18 @@ export default function VideoDetails() {
 
       <aside className="hidden lg:block p-4 space-y-4 bg-[#18181b] w-80 mr-15">
         {videos?.length ? (
-          videos.map((video) => (
+          videos.map((sugg) => (
             <VideoCard
               classNameImg="w-full"
-              key={video._id}
-              id={video._id}
-              thumbnail={video.thumbnail}
-              title={video.title}
-              channel={video.owner.username}
-              avatar={video.owner.avatar}
-              views={video.views}
-              time={video.createdAt}
-              duration={video.duration}
+              key={sugg._id}
+              id={sugg._id}
+              thumbnail={sugg.thumbnail}
+              title={sugg.title}
+              channel={sugg.owner.username}
+              avatar={sugg.owner.avatar}
+              views={sugg.views}
+              time={sugg.createdAt}
+              duration={sugg.duration}
             />
           ))
         ) : (

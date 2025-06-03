@@ -6,9 +6,9 @@ import {
   HiCalendar,
   HiThumbUp,
   HiShare,
-  HiDownload,
-  HiUsers
+  HiDownload
 } from 'react-icons/hi';
+import SubscribeButton from './SubscribeButton';
 import Sidebar from './Sidebar';
 import { Button, VideoCard } from './index';
 import Loader from './Loader';
@@ -18,7 +18,6 @@ import CommentSection from './CommentSection';
 import { toggleLike } from '../hooks/toggleLike';
 import { getLikeCount } from '../hooks/getLikeCount';
 import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
-import { toggleSubscription } from '../redux/slices/subscriptionSlice';
 
 export default function VideoDetails() {
   const { id } = useParams();
@@ -30,10 +29,6 @@ export default function VideoDetails() {
   const [likeLoading, setLikeLoading] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
 
-  const { subscribedChannels, loading: subscriptionLoading } = useSelector(
-    (state) => state.subscription
-  );
-  const [subscriberLoading, setSubscriberLoading] = useState(false);
   const [subscriberCount, setSubscriberCount] = useState(0);
 
   useEffect(() => {
@@ -73,29 +68,13 @@ export default function VideoDetails() {
     }
   }, [likeLoading, id, dispatch, likedVideos]);
 
-  const handleSubscribeToggle = () => {
-    if (!video?.owner?._id) return; 
-    const channelId = video.owner._id;
-
-    dispatch(toggleSubscription(channelId)).then((action) => {
-      if (toggleSubscription.fulfilled.match(action)) {
-        const { subscribed } = action.payload;
-        setSubscriberCount((prev) => (subscribed ? prev + 1 : prev - 1));
-      }
-    });
-  };
-
+  
   if (loading || !video || !video.owner) {
     return <Loader message="Loading video details..." />;
   }
   if (error) {
     return <p className="text-red-500 p-4">Error loading video.</p>;
   }
-
-  const channelId = video.owner._id;
-  const isSubscribed = channelId in subscribedChannels
-    ? subscribedChannels[channelId]
-    : !!video.owner.isSubscribed;
 
   return (
     <div className="flex min-h-screen bg-[#18181b]">
@@ -129,13 +108,17 @@ export default function VideoDetails() {
                 <Button
                   disabled={likeLoading}
                   onClick={handleVideoLike}
-                  className={`inline-flex items-center gap-1 px-3 h-9 rounded-md transition-all duration-200 ${
-                    isLikedInStore
-                      ? 'bg-purple-600 text-white border-gray-600'
-                      : 'border border-gray-600 text-white hover:bg-gray-800'
-                  } text-sm disabled:opacity-50 ${
-                    likeLoading ? 'pointer-events-none' : ''
-                  }`}
+                  className={`
+                    inline-flex items-center gap-1 px-3 h-9 rounded-md 
+                    transition-all duration-200
+                    ${
+                      isLikedInStore
+                        ? 'bg-purple-600 text-white border-gray-600'
+                        : 'border border-gray-600 text-white hover:bg-gray-800'
+                    } 
+                    text-sm disabled:opacity-50 
+                    ${likeLoading ? 'pointer-events-none' : ''}
+                  `}
                 >
                   <HiThumbUp className="h-4 w-4" />
                   {likeLoading ? '...' : isLikedInStore ? 'Liked' : 'Like'} (
@@ -161,27 +144,17 @@ export default function VideoDetails() {
               <div>
                 <h2 className="font-medium">{video.owner.username}</h2>
                 <p className="text-sm text-gray-400">
-                  {subscriberCount.toLocaleString()} subscriber
+                  {subscriberCount} subscriber
                   {subscriberCount === 1 ? '' : 's'}
                 </p>
               </div>
 
-              <Button
-                onClick={handleSubscribeToggle}
-                disabled={subscriptionLoading}
-                className={`ml-auto flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ${
-                  isSubscribed
-                    ? 'bg-gray-700 text-white hover:bg-gray-700 border border-gray-600'
-                    : 'bg-purple-600 text-white hover:bg-purple-800 border border-gray-600'
-                } disabled:opacity-50 `}
-              >
-                <HiUsers className="h-5 w-5" />
-                {subscriptionLoading
-                  ? '...'
-                  : isSubscribed
-                  ? 'Subscribed'
-                  : 'Subscribe'}
-              </Button>
+              <SubscribeButton
+                channelId={video.owner._id}
+                initialSubscribed={video.owner.isSubscribed}
+                currentCount={video.owner.subscriberCount}
+                onCountChange={(newCount) => setSubscriberCount(newCount)}
+              /> 
             </div>
 
             <p className="mt-6 text-gray-300">{video.description}</p>

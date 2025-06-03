@@ -6,7 +6,7 @@ export const toggleSubscription = createAsyncThunk(
   async (channelId, { rejectWithValue }) => {
     try {
       const response = await togglesubscribe(channelId);
-      return { channelId, subscribed: response.data.subscribed };
+      return { channelId, subscribed: response.subscribed, subscribersCount: response.subscribersCount };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Toggle subscription failed');
     }
@@ -16,7 +16,8 @@ export const toggleSubscription = createAsyncThunk(
 const subscriptionSlice = createSlice({
   name: 'subscription',
   initialState: {
-    subscribedChannels: {}, 
+    subscribedChannels: {},
+    subscribersCount: 0, // Add subscribersCount to the initial state
     loading: false,
     error: null,
   },
@@ -28,8 +29,9 @@ const subscriptionSlice = createSlice({
         state.error = null;
       })
       .addCase(toggleSubscription.fulfilled, (state, action) => {
-        const { channelId, subscribed } = action.payload;
+        const { channelId, subscribed, subscribersCount } = action.payload; // Destructure subscribersCount from payload
         state.subscribedChannels[channelId] = subscribed;
+        state.subscribersCount = subscribersCount; // Update subscribersCount in state
         state.loading = false;
       })
       .addCase(toggleSubscription.rejected, (state, action) => {

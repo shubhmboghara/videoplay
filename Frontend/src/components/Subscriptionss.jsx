@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SubscribeButton from './SubscribeButton';
 import { getsubscriptions } from '../hooks/getsubscriptions';
+import Loader from './Loader';
 
 export default function Subscriptionss() {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -41,8 +42,9 @@ export default function Subscriptionss() {
   };
 
   if (loading) {
-    return <div className="p-6 text-white">Loading subscriptions...</div>;
+      return <Loader message="Loading subscriptions..." />;
   }
+
   if (error) {
     return <div className="p-6 text-red-500">Error: {error}</div>;
   }

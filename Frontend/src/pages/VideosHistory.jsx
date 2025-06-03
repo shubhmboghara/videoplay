@@ -3,7 +3,7 @@ import UserWatchHistory from '../components/UserWatchHistory'
 
 function VideosHistory() {
   return (
-    <div className="relative bottom-20">
+    <div>
       <UserWatchHistory />
 
     </div>

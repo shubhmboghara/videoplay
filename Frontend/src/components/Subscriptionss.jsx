@@ -48,12 +48,12 @@ export default function Subscriptionss() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1f1f24] p-6  relative lg:left-60 bottom-23">
+    <div className="min-h-screen  relative lg:left-60  bg-[#18181b]  px-20 py-5">
       <h1 className="text-3xl font-bold text-white mb-6">My Subscriptions</h1>
       {subscriptions.length === 0 ? (
         <p className="text-gray-400">No subscriptions found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative  ">
           {subscriptions.map((data) => (
             <div
               key={data._id}

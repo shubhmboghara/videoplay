@@ -28,21 +28,21 @@ function App() {
 
           </div>
 
-          <div className="flex">
-            <Sidebar />
-            <main className="flex-1 p-4 mt-16">
-              <Routes>
-                <Route path='/' element={<Home />} />
-                <Route path='/login' element={<Loginpage />} />
-                <Route path='/signup' element={<Signuppage />} />
-                <Route path="/video/:id" element={<Video />} />
-                <Route path="/video/:id" element={<VideoDetails />} />
-                <Route path="/likedvideos" element={<LikedVideos />} />
-                <Route path="/history" element={<VideosHistory />} />
-                <Route path="/subscriptions" element={<Subscriptions />} />
-              </Routes>
-            </main>
-          </div>
+          <main>
+
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/login' element={<Loginpage />} />
+              <Route path='/signup' element={<Signuppage />} />
+              <Route path="/video/:id" element={<Video />} />
+              <Route path="/video/:id" element={<VideoDetails />} />
+              <Route path="/likedvideos" element={<LikedVideos />} />
+              <Route path="/history" element={<VideosHistory />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
+
+            </Routes>
+
+          </main>
 
         </div>
       </div>

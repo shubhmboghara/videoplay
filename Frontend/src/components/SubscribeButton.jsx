@@ -61,6 +61,5 @@ export default function SubscribeButton({
                         ? 'Subscribed'
                         : 'Subscribe'}
             </Button>
-        
     );
 }

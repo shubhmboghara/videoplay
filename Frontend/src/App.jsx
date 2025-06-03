@@ -10,8 +10,7 @@ import AuthLoader from './components/AuthLoader'
 import { VideoDetails, Sidebar } from './components'
 import LikedVideos from './pages/LikedVideos'
 import VideosHistory from './pages/VideosHistory'
-
-
+import Subscriptions from './pages/Subscriptions'
 
 
 
@@ -29,24 +28,21 @@ function App() {
 
           </div>
 
-          <main>
-
-            <Routes>
-              <Route path='/' element={<Home />} />
-              <Route path='/login' element={<Loginpage />} />
-              <Route path='/signup' element={<Signuppage />} />
-              <Route path="/video/:id" element={<Video />} />
-              <Route path="/video/:id" element={<VideoDetails />} />
-              <Route path="/likedvideos" element={<LikedVideos />} />
-              <Route path="/history" element={<VideosHistory />} />
-
-
-
-
-
-            </Routes>
-
-          </main>
+          <div className="flex">
+            <Sidebar />
+            <main className="flex-1 p-4 mt-16">
+              <Routes>
+                <Route path='/' element={<Home />} />
+                <Route path='/login' element={<Loginpage />} />
+                <Route path='/signup' element={<Signuppage />} />
+                <Route path="/video/:id" element={<Video />} />
+                <Route path="/video/:id" element={<VideoDetails />} />
+                <Route path="/likedvideos" element={<LikedVideos />} />
+                <Route path="/history" element={<VideosHistory />} />
+                <Route path="/subscriptions" element={<Subscriptions />} />
+              </Routes>
+            </main>
+          </div>
 
         </div>
       </div>

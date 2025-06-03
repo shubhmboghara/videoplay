@@ -3,9 +3,11 @@ import UserWatchHistory from '../components/UserWatchHistory'
 
 function VideosHistory() {
   return (
-            
-     <UserWatchHistory  />
-)
+    <div className="relative bottom-20">
+      <UserWatchHistory />
+
+    </div>
+  )
 }
 
 export default VideosHistory

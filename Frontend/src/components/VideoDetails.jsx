@@ -68,6 +68,10 @@ export default function VideoDetails() {
     }
   }, [likeLoading, id, dispatch, likedVideos]);
 
+  const handleSubscriberCountChange = useCallback((newCount) => {
+    setSubscriberCount(newCount);
+  }, []);
+
   
   if (loading || !video || !video.owner) {
     return <Loader message="Loading video details..." />;
@@ -77,7 +81,7 @@ export default function VideoDetails() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#18181b]">
+    <div className="flex min-h-screen bg-[#18181b] relative bottom-20">
       <main className="flex-1 p-6 text-white">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
@@ -149,12 +153,14 @@ export default function VideoDetails() {
                 </p>
               </div>
 
-              <SubscribeButton
+              <div className="flex items-center space-x-2  relative left-135  ">
+                <SubscribeButton
                 channelId={video.owner._id}
                 initialSubscribed={video.owner.isSubscribed}
-                currentCount={video.owner.subscriberCount}
-                onCountChange={(newCount) => setSubscriberCount(newCount)}
+                currentCount={subscriberCount}
+                onCountChange={handleSubscriberCountChange}
               /> 
+              </div>
             </div>
 
             <p className="mt-6 text-gray-300">{video.description}</p>

@@ -24,7 +24,7 @@ const Sidebar = ({ className }) => {
         { label: "History", icon: <HiClock size={25} />, slug: "/history" },
         { label: "My content", icon: <HiVideoCamera size={25} />, slug: "/my-content" },
         { label: "Collection", icon: <HiFolder size={25} />, slug: "/collection" },
-        { label: "Subscribers", icon: <HiUsers size={25} />, slug: "/subscribers" },
+        { label: "Subscriptions", icon: <HiUsers size={25} />, slug: "/subscriptions" },
         { label: "Support", icon: <HiQuestionMarkCircle size={25} />, slug: "/support" },
         { label: "Settings", icon: <HiCog size={25} />, slug: "/settings" }
     ];

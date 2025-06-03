@@ -15,7 +15,7 @@ router.post("/:channelId", toggleSubscription);
 // List all subscribers of a channel
 router.get("/subscribers/:channelId", getChannelSubscribers);
 
-// List all channels that a specific user is subscribed to
-router.get("/subscribedto/:userId", getUserSubscriptions);
+// List all channels that user is subscribed 
+router.get("/subscribedto", getUserSubscriptions);
 
 export default router;

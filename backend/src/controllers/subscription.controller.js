@@ -90,7 +90,9 @@ const getUserSubscriptions = asyncHandler(async (req, res) => {
             $project: {
                 _id: "$channelInfo._id",
                 username: "$channelInfo.username",
-                avatar: "$channelInfo.avatar"
+                avatar: "$channelInfo.avatar",
+                fullname: "$channelInfo.fullname",
+
             }
         }
     ]);

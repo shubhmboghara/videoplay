@@ -2,7 +2,7 @@ import React from 'react'
 import Likedvideo from '../components/likedvideo'
 function LikedVideos() {
   return (
-    <div> 
+    <div className ="relative bottom-20"> 
 
         <Likedvideo />
     </div>

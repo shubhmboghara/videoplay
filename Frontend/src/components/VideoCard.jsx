@@ -6,7 +6,7 @@ function formatDuration(durationInSeconds) {
   const totalSeconds = Math.floor(durationInSeconds);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 }
 
 export default function VideoCard({
@@ -19,24 +19,23 @@ export default function VideoCard({
   time,
   duration,
 }) {
-
   return (
-    <Link to={`/video/${id}`} className="block">
+    <div className="block ">
       <div className="w-full rounded-lg overflow-hidden cursor-pointer bg-[#18181b]">
-
-        <div className = "relative   bg-[#18181b]">
-          <img
-            src={thumbnail}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-          <span className="bg-black px-2 py-0.5 rounded text-white text-xs absolute bottom-2 right-2">
-            {formatDuration(duration)}
-          </span>
-        </div>
+        <Link to={`/video/${id}`}>
+          <div className="relative bg-[#18181b]">
+            <img
+              src={thumbnail}
+              alt={title}
+              className="w-full h-full object-cover"
+            />
+            <span className="bg-black px-2 py-0.5 rounded text-white text-xs absolute bottom-2 right-2">
+              {formatDuration(duration)}
+            </span>
+          </div>
+        </Link>
 
         <div className="p-3 flex gap-3">
-          
           <img
             src={avatar}
             alt="channel avatar"
@@ -49,12 +48,11 @@ export default function VideoCard({
               <span className="truncate">{channel}</span>
             </div>
             <p className="text-gray-500 text-xs mt-1">
-              {views} views {timeAgo(time)}
+              {views} views · {timeAgo(time)}
             </p>
           </div>
         </div>
-        
       </div>
-    </Link>
+    </div>
   );
 }

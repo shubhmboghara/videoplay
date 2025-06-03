@@ -40,26 +40,26 @@ export default function SubscribeButton({
     }, [channelId, dispatch, currentCount, onCountChange]);
 
     return (
-            <Button
-                onClick={handleClick}
-                disabled={subscriptionLoading}
-                className={`
+        <Button
+            onClick={handleClick}
+            disabled={subscriptionLoading}
+            className={`
         flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold
         transition-all duration-200
         ${isSubscribed
-                        ? 'bg-gray-700 text-white hover:bg-gray-700 border border-gray-600'
-                        : 'bg-purple-600 text-white hover:bg-purple-800 border border-gray-600'
-                    }
+                    ? 'bg-gray-700 text-white hover:bg-gray-700 border border-gray-600'
+                    : 'bg-purple-600 text-white hover:bg-purple-800 border border-gray-600'
+                }
         disabled:opacity-50
         ${subscriptionLoading ? 'cursor-not-allowed' : 'cursor-pointer'}
       `}
-            >
-                <HiUsers className="h-5 w-5" />
-                {subscriptionLoading
-                    ? '...'
-                    : isSubscribed
-                        ? 'Subscribed'
-                        : 'Subscribe'}
-            </Button>
+        >
+            <HiUsers className="h-5 w-5" />
+            {subscriptionLoading
+                ? '...'
+                : isSubscribed
+                    ? 'Subscribed'
+                    : 'Subscribe'}
+        </Button>
     );
 }

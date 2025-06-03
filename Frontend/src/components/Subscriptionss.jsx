@@ -67,6 +67,7 @@ export default function Subscriptionss() {
                   alt={data.username}
                   className="w-14 h-14 rounded-full object-cover border-2 border-[#444]"
                 />
+                           
 
                 <div className="flex-1 flex flex-col justify-center">
                   <h2 className="text-lg font-semibold text-white truncate">

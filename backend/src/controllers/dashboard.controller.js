@@ -20,7 +20,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     const totalSubscribers = await Subscription.countDocuments({ channel: id })
     const totalViews = viewsResult[0]?.totalViews || 0;
 
-    const uservideos = await Video.find({ owner: id }, { _id: 1 }).len()
+    const uservideos = await Video.find({ owner: id }, { _id: 1 })
     const videoids = uservideos.map(video => video._id)
 
     const totalLikes = await Like.countDocuments({ video: { $in: videoids } })
@@ -38,7 +38,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
 const getChannelVideos = asyncHandler(async (req, res) => {
         const id = req.user._id;
 
-        const video = await Video.find({owner:id}).sort({ createdAt: -1 })
+        const video = await Video.find({owner:id,}).sort({ createdAt: -1 })
 
         return res
         .status(200)

@@ -11,6 +11,7 @@ import { VideoDetails, Sidebar } from './components'
 import LikedVideos from './pages/LikedVideos'
 import VideosHistory from './pages/VideosHistory'
 import Subscriptions from './pages/Subscriptions'
+import Dashboard from './pages/Dashboard'
 
 
 
@@ -39,6 +40,9 @@ function App() {
               <Route path="/likedvideos" element={<LikedVideos />} />
               <Route path="/history" element={<VideosHistory />} />
               <Route path="/subscriptions" element={<Subscriptions />} />
+              <Route path="/my-content" element={<Dashboard />} />
+
+             
 
             </Routes>
 

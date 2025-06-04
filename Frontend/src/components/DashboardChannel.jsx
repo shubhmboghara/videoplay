@@ -4,6 +4,10 @@ import { deleteVideo, updateVideo } from '../hooks/video';
 import Loader from './Loader';
 import UploadVideoModal from './UploadVideoModal';
 import EditVideoModal from './EditVideoModal';
+import {
+  TrashIcon,
+  PencilSquareIcon,
+} from "@heroicons/react/24/outline";
 
 function DashboardChannel() {
   const [stats, setStats] = useState(null);
@@ -69,7 +73,7 @@ function DashboardChannel() {
       await updateVideo(videoId, updatedData);
       setIsEditModalOpen(false);
       setEditingVideo(null);
-      fetchData(); 
+      fetchData();
     } catch (err) {
       console.error('Failed to update video:', err);
       alert('Failed to update video.');
@@ -81,7 +85,7 @@ function DashboardChannel() {
   };
 
   const handleVideoUploaded = () => {
-    fetchData(); 
+    fetchData();
     setIsUploadModalOpen(false);
   };
 
@@ -174,8 +178,16 @@ function DashboardChannel() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{video.views}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{new Date(video.createdAt).toLocaleDateString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => handleDeleteVideo(video._id)} className="text-purple-400 hover:text-purple-600 mr-3">🗑️</button>
-                    <button onClick={() => handleEditVideo(video)} className="text-purple-400 hover:text-purple-600">✏️</button>
+
+                    <button onClick={() => handleDeleteVideo(video._id)} className="text-purple-400 hover:text-purple-500 mr-3">
+                      <TrashIcon className="w-5 h-5  text-gray-420" />
+
+                    </button>
+
+                    <button onClick={() => handleEditVideo(video)} className="text-purple-400 hover:text-purple-600">
+                      <PencilSquareIcon className="w-5 h-5 text-blue-600 cursor-pointer" />
+
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -185,11 +197,14 @@ function DashboardChannel() {
       </div>
 
       {isUploadModalOpen && (
-        <UploadVideoModal
-          isOpen={isUploadModalOpen}
-          onClose={() => setIsUploadModalOpen(false)}
-          onVideoUploaded={handleVideoUploaded}
-        />
+        <div className='realtive'>
+          <UploadVideoModal
+            isOpen={isUploadModalOpen}
+            onClose={() => setIsUploadModalOpen(false)}
+            onVideoUploaded={handleVideoUploaded}
+          />
+        </div>
+
       )}
 
       {isEditModalOpen && editingVideo && (

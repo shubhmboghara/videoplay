@@ -55,11 +55,11 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg w-full max-w-md text-white relative">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50  t-10">
+            <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg w-full max-w-md text-white relative top-10 lg:left-[5%] ">
                 <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl">&times;</button>
-                <div className="flex items-center mb-4">
-                    <div className="bg-[#262626] p-2 rounded-full mr-3">
+                <div className="flex items-center">
+                    <div className="bg-[#403c3c] p-2 rounded-full mr-3">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 6C12.5523 6 13 6.44772 13 7V11H17C17.5523 17 18 17.4477 18 18C18 18.5523 17.5523 19 17 19H7C6.44772 19 6 18.5523 6 18C6 17.4477 6.44772 17 7 17H11V7C11 6.44772 11.4477 6 12 6Z" fill="currentColor"/>
                         </svg>
@@ -76,7 +76,7 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
                             </svg>
                             Click to upload or drag and drop
                         </label>
-                        <p className="text-sm text-gray-500">SVG, PNG, JPG or GIF (max. 800x400px)</p>
+                        <p className="text-sm text-gray-500"> mp4, webm, ogg/ogv, mov ,avi, flv (max. 800x400px)</p>
                         <input
                             id="video-upload"
                             type="file"
@@ -88,7 +88,7 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
                         />
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="title" className="block text-gray-400 text-sm font-bold mb-2">Title*</label>
+                        <label htmlFor="title" className="block text-gray-400 text-sm font-bold mb-2">Title</label>
                         <Input
                             id="title"
                             type="text"
@@ -134,7 +134,7 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
                         </Button>
                         <Button
                             type="submit"
-                            className="bg-[#AE7EEB] hover:bg-[#9B6ADF] text-white py-2 px-4 rounded-lg"
+                            className="bg-[#4f2f79] hover:bg-[#9B6ADF] text-white py-2 px-4 rounded-lg"
                             disabled={loading}
                         >
                             {loading ? 'Uploading...' : 'Finish'}

@@ -1,9 +1,30 @@
-import React from 'react'
+import React, { useEffect } from 'react';
 
-function Errorpopups() {
+const Errorpopups = ({ message, type, onClose }) => {
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 3000); // Auto-close after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [message, onClose]);
+
+  if (!message) return null;
+
+  const bgColor = type === 'error' ? 'bg-red-500' : 'bg-green-500';
+  const textColor = 'text-white';
+
   return (
-    <div>Errorpopups</div>
-  )
-}
+    <div
+      className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${bgColor} ${textColor} flex items-center justify-between z-50`}
+    >
+      <span>{message}</span>
+      <button onClick={onClose} className="ml-4 font-bold">
+        &times;
+      </button>
+    </div>
+  );
+};
 
-export default Errorpopups
+export default Errorpopups;

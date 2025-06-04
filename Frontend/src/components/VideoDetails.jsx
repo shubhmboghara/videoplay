@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   HiEye,
@@ -22,6 +22,8 @@ export default function VideoDetails() {
   const { id } = useParams();
   const { video, videos, loading, error } = useVideo(id);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const authStatus = useSelector((state) => state.auth.status);
 
   const likedVideos = useSelector((state) => state.likes.likedVideos);
   const isLikedInStore = likedVideos.includes(id);
@@ -45,6 +47,10 @@ export default function VideoDetails() {
   }, [video, id, dispatch]);
 
   const handleVideoLike = useCallback(async () => {
+    if (!authStatus) {
+      navigate('/login');
+      return;
+    }
     if (likeLoading) return;
     setLikeLoading(true);
 
@@ -130,7 +136,15 @@ export default function VideoDetails() {
 
               
 
-                <Button className="inline-flex items-center gap-1 px-3 h-9 rounded-md border border-gray-600 text-white hover:bg-gray-800 text-sm">
+                <Button
+                  onClick={() => {
+                    if (!authStatus) {
+                      navigate('/login');
+                      return;
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 px-3 h-9 rounded-md border border-gray-600 text-white hover:bg-gray-800 text-sm"
+                >
                   <HiFolderAdd className="h-4 w-4" /> Save 
                 </Button>
               </div>

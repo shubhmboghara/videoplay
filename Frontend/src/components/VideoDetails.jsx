@@ -5,8 +5,7 @@ import {
   HiEye,
   HiCalendar,
   HiThumbUp,
-  HiShare,
-  HiDownload
+  HiFolderAdd
 } from 'react-icons/hi';
 import SubscribeButton from './SubscribeButton';
 import { Button, VideoCard } from './index';
@@ -17,6 +16,7 @@ import CommentSection from './CommentSection';
 import { toggleLike } from '../hooks/toggleLike';
 import { getLikeCount } from '../hooks/getLikeCount';
 import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
+import ProtectedRoute from './ProtectedRoute';
 
 export default function VideoDetails() {
   const { id } = useParams();
@@ -71,7 +71,7 @@ export default function VideoDetails() {
     setSubscriberCount(newCount);
   }, []);
 
-  
+
   if (loading || !video || !video.owner) {
     return <Loader message="Loading video details..." />;
   }
@@ -108,16 +108,16 @@ export default function VideoDetails() {
               </div>
 
               <div className="flex items-center space-x-2">
+
                 <Button
                   disabled={likeLoading}
                   onClick={handleVideoLike}
                   className={`
                     inline-flex items-center gap-1 px-3 h-9 rounded-md 
                     transition-all duration-200
-                    ${
-                      isLikedInStore
-                        ? 'bg-purple-600 text-white border-gray-600'
-                        : 'border border-gray-600 text-white hover:bg-gray-800'
+                    ${isLikedInStore
+                      ? 'bg-purple-600 text-white border-gray-600'
+                      : 'border border-gray-600 text-white hover:bg-gray-800'
                     } 
                     text-sm disabled:opacity-50 
                     ${likeLoading ? 'pointer-events-none' : ''}
@@ -128,14 +128,14 @@ export default function VideoDetails() {
                   {likesCount})
                 </Button>
 
-                <Button className="inline-flex items-center gap-1 px-3 h-9 rounded-md border border-gray-600 text-white hover:bg-gray-800 text-sm">
-                  <HiShare className="h-4 w-4" /> Share
-                </Button>
+              
 
                 <Button className="inline-flex items-center gap-1 px-3 h-9 rounded-md border border-gray-600 text-white hover:bg-gray-800 text-sm">
-                  <HiDownload className="h-4 w-4" /> Save
+                  <HiFolderAdd className="h-4 w-4" /> Save 
                 </Button>
               </div>
+
+
             </div>
 
             <div className="mt-6 flex items-center gap-4">
@@ -154,11 +154,11 @@ export default function VideoDetails() {
 
               <div className="flex items-center space-x-2  relative left-135  ">
                 <SubscribeButton
-                channelId={video.owner._id}
-                initialSubscribed={video.owner.isSubscribed}
-                currentCount={subscriberCount}
-                onCountChange={handleSubscriberCountChange}
-              /> 
+                  channelId={video.owner._id}
+                  initialSubscribed={video.owner.isSubscribed}
+                  currentCount={subscriberCount}
+                  onCountChange={handleSubscriberCountChange}
+                />
               </div>
             </div>
 

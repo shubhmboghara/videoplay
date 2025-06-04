@@ -17,7 +17,7 @@ import axios from "axios";
             const response = await axios.delete(`/api/video/${videoId}`)
             return response.data;
         } catch (error) {
-            console.error("Get liked videos  error:", error);
+            console.error("delete Video error:", error);
             throw error;
         }
     }

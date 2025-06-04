@@ -4,6 +4,8 @@ const API = axios.create({
   baseURL: '/api/comments',
 });
 
+
+
 export const getVideoComments = (videoId) => {
   return  API.get(`/${videoId}`);
 };
@@ -19,3 +21,4 @@ export const deleteComment = (commentId) => {
 export const updateComment = (commentId, updatedData) => {
   return  API.patch(`/c/${commentId}`, updatedData);
 };
+

@@ -5,8 +5,9 @@ import {
   getVideoComments,
   deleteComment,
   updateComment,
-} from '../hooks/comments';
-import { HiTrash, HiPencil, HiCheck, HiX } from 'react-icons/hi';
+  } from '../hooks/comments';
+import { HiTrash, HiPencil, HiCheck, HiX, HiOutlineThumbUp, HiThumbUp } from 'react-icons/hi';
+import { toggleLike } from '../hooks/toggleLike';
 
 export default function CommentSection({ videoId }) {
   const [comments, setComments] = useState([]);
@@ -146,6 +147,31 @@ export default function CommentSection({ videoId }) {
                   </p>
                   <div className="flex items-center gap-2 text-gray-400">
                     <button
+                      onClick={async () => {
+                        try {
+                          const res = await toggleLike('comment', c._id);
+                          setComments((prev) =>
+                            prev.map((comment) =>
+                              comment._id === c._id
+                                ? { ...comment, isLiked: res.isLiked, likesCount: res.likesCount }
+                                : comment
+                            )
+                          );
+                        } catch (error) {
+                          console.error('Error toggling like on comment:', error);
+                        }
+                      }}
+                      className="hover:text-blue-500"
+                      title="Like"
+                    >
+                      {c.isLiked ? (
+                        <HiThumbUp size={16} className="text-blue-500" />
+                      ) : (
+                        <HiOutlineThumbUp size={16} />
+                      )}
+                      <span className="ml-1 text-xs">{c.likesCount}</span>
+                    </button>
+                    <button
                       onClick={() => handleStartEditing(c)}
                       className="hover:text-blue-500"
                       title="Edit"
@@ -220,6 +246,31 @@ export default function CommentSection({ videoId }) {
                     </span>
                   </p>
                   <div className="flex items-center gap-2 text-gray-400">
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await toggleLike('comment', c._id);
+                          setComments((prev) =>
+                            prev.map((comment) =>
+                              comment._id === c._id
+                                ? { ...comment, isLiked: res.isLiked, likesCount: res.likesCount }
+                                : comment
+                            )
+                          );
+                        } catch (error) {
+                          console.error('Error toggling like on comment:', error);
+                        }
+                      }}
+                      className="hover:text-blue-500"
+                      title="Like"
+                    >
+                      {c.isLiked ? (
+                        <HiThumbUp size={16} className="text-blue-500" />
+                      ) : (
+                        <HiOutlineThumbUp size={16} />
+                      )}
+                      <span className="ml-1 text-xs">{c.likesCount}</span>
+                    </button>
                     <button
                       onClick={() => handleStartEditing(c)}
                       className="hover:text-blue-500"

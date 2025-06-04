@@ -86,7 +86,7 @@ export default function VideoDetails() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#18181b] relative bottom-20">
+    <div className="flex min-h-screen bg-[#18181b] relative ">
       <main className="flex-1 p-6 text-white">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
@@ -143,7 +143,7 @@ export default function VideoDetails() {
                       return;
                     }
                   }}
-                  className="inline-flex items-center gap-1 px-3 h-9 rounded-md border border-gray-600 text-white hover:bg-gray-800 text-sm"
+                  className="inline-flex items-center gap-1 px-3 h-9 rounded-md border border-gray-600 text-white hover:bg-gray-800 text-sm ml-5"
                 >
                   <HiFolderAdd className="h-4 w-4" /> Save 
                 </Button>
@@ -166,7 +166,7 @@ export default function VideoDetails() {
                 </p>
               </div>
 
-              <div className="flex items-center space-x-2  relative left-135  ">
+              <div className="flex items-center space-x-2  relative lg:left-135  ">
                 <SubscribeButton
                   channelId={video.owner._id}
                   initialSubscribed={video.owner.isSubscribed}

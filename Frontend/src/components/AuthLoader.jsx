@@ -6,7 +6,7 @@ import Loader from "./Loader"; // Import the new Loader component
 
 const AuthLoader = ({ children }) => {
     const dispatch = useDispatch();
-    const [isLoading, setIsLoading] = useState(true); // Add loading state
+    const [isLoading, setIsLoading] = useState(true); 
 
     useEffect(() => {
         const fetchCurrentUser = async () => {
@@ -51,7 +51,7 @@ const AuthLoader = ({ children }) => {
                     dispatch(logout());
                 }
             } finally {
-                setIsLoading(false); // Set loading to false after fetch
+                setIsLoading(false); 
             }
         };
 

@@ -11,18 +11,18 @@ function likedvideo() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchHistory = async () => {
+        const getlikedvideoss = async () => {
             try {
                 const res = await getlikedvideos();
                 setVideos(res?.data || []);
             } catch (err) {
-                console.error("Error loading watch history:", err);
+                console.error("Error loading liked video:", err);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchHistory();
+        getlikedvideoss();
     }, []);
 
     if (loading) return <Loader message="Loading liked videos..." />;
@@ -32,11 +32,11 @@ function likedvideo() {
 
             {videos.length === 0 ? (
                 <p className="text-center text-gray-400 text-lg col-span-full">
-                    No watch history found.
+                    No liked video  found.
                 </p>
             ) : (
                 <>
-                    {videos.map((video) => (
+                    {videos.filter(video => video.video !== null).map((video) => (
                         <div key={video._id}>
                             <VideoCard
                                 classNameImg="w-full"

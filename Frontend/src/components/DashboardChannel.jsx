@@ -69,7 +69,7 @@ function DashboardChannel() {
       await updateVideo(videoId, updatedData);
       setIsEditModalOpen(false);
       setEditingVideo(null);
-      fetchData(); // Re-fetch videos to update the list
+      fetchData(); 
     } catch (err) {
       console.error('Failed to update video:', err);
       alert('Failed to update video.');
@@ -81,12 +81,12 @@ function DashboardChannel() {
   };
 
   const handleVideoUploaded = () => {
-    fetchData(); // Re-fetch videos after upload
+    fetchData(); 
     setIsUploadModalOpen(false);
   };
 
   const handleVideoUpdated = () => {
-    fetchData(); // Re-fetch videos after update
+    fetchData();
     setIsEditModalOpen(false);
     setEditingVideo(null);
   };
@@ -101,24 +101,21 @@ function DashboardChannel() {
 
   return (
     <div className="min-h-screen bg-[#18181b] text-white p-8 relative lg:left-68 lg:w-300">
-      <h1 className="text-3xl font-bold mb-8">Welcome back, Olivia</h1>
-      <p className="text-gray-400 mb-8">Track, manage and forecast your customers and orders.</p>
+      <h1 className="text-3xl font-bold mb-8">Welcome back  </h1>
+      <p className="text-gray-400 mb-8">Track, manage and forecast your channel.</p>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className="bg-[#2a2a31] p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
-          <div className="text-purple-400 text-4xl mb-3">👁️</div>
           <p className="text-gray-400 text-lg">Total Views</p>
           <p className="text-3xl font-bold">{stats?.totalViews || 0}</p>
         </div>
         <div className="bg-[#2a2a31] p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
-          <div className="text-purple-400 text-4xl mb-3">👥</div>
           <p className="text-gray-400 text-lg">Total Subscribers</p>
           <p className="text-3xl font-bold">{stats?.totalSubscribers || 0}</p>
         </div>
         <div className="bg-[#2a2a31] p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
-          <div className="text-purple-400 text-4xl mb-3">❤️</div>
           <p className="text-gray-400 text-lg">Total Likes</p>
           <p className="text-3xl font-bold">{stats?.totalLikes || 0}</p>
         </div>

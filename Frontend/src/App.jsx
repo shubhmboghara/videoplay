@@ -12,6 +12,8 @@ import LikedVideos from './pages/LikedVideos'
 import VideosHistory from './pages/VideosHistory'
 import Subscriptions from './pages/Subscriptions'
 import Dashboard from './pages/Dashboard'
+import ProtectedRoute from './components/ProtectedRoute'
+
 
 
 
@@ -37,10 +39,10 @@ function App() {
               <Route path='/signup' element={<Signuppage />} />
               <Route path="/video/:id" element={<Video />} />
               <Route path="/video/:id" element={<VideoDetails />} />
-              <Route path="/likedvideos" element={<LikedVideos />} />
-              <Route path="/history" element={<VideosHistory />} />
-              <Route path="/subscriptions" element={<Subscriptions />} />
-              <Route path="/my-content" element={<Dashboard />} />
+              <Route path="/likedvideos" element={<ProtectedRoute><LikedVideos /></ProtectedRoute>} />
+              <Route path="/history" element={<ProtectedRoute><VideosHistory /></ProtectedRoute>} />
+              <Route path="/subscriptions" element={<ProtectedRoute><Subscriptions /></ProtectedRoute>} />
+              <Route path="/my-content" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
              
 

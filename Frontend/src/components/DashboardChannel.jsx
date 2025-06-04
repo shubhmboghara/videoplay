@@ -1,29 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { getChannelStats, getChannelVideos, togglePublishStatus } from '../hooks/getdashboard';
+import { deleteVideo, updateVideo } from '../hooks/video';
 import Loader from './Loader';
+import UploadVideoModal from './UploadVideoModal';
+import EditVideoModal from './EditVideoModal';
 
 function DashboardChannel() {
   const [stats, setStats] = useState(null);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingVideo, setEditingVideo] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const statsResponse = await getChannelStats();
+      setStats(statsResponse.data);
+
+      const videosResponse = await getChannelVideos();
+      setVideos(videosResponse.data);
+    } catch (err) {
+      setError('Failed to fetch dashboard data.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const statsResponse = await getChannelStats();
-        setStats(statsResponse.data);
-
-        const videosResponse = await getChannelVideos();
-        setVideos(videosResponse.data);
-      } catch (err) {
-        setError('Failed to fetch dashboard data.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -41,6 +47,50 @@ function DashboardChannel() {
     }
   };
 
+  const handleDeleteVideo = async (videoId) => {
+    if (window.confirm('Are you sure you want to delete this video?')) {
+      try {
+        await deleteVideo(videoId);
+        setVideos(prevVideos => prevVideos.filter(video => video._id !== videoId));
+      } catch (err) {
+        console.error('Failed to delete video:', err);
+        alert('Failed to delete video.');
+      }
+    }
+  };
+
+  const handleEditVideo = (video) => {
+    setEditingVideo(video);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateVideo = async (videoId, updatedData) => {
+    try {
+      await updateVideo(videoId, updatedData);
+      setIsEditModalOpen(false);
+      setEditingVideo(null);
+      fetchData(); // Re-fetch videos to update the list
+    } catch (err) {
+      console.error('Failed to update video:', err);
+      alert('Failed to update video.');
+    }
+  };
+
+  const handleUploadVideo = () => {
+    setIsUploadModalOpen(true);
+  };
+
+  const handleVideoUploaded = () => {
+    fetchData(); // Re-fetch videos after upload
+    setIsUploadModalOpen(false);
+  };
+
+  const handleVideoUpdated = () => {
+    fetchData(); // Re-fetch videos after update
+    setIsEditModalOpen(false);
+    setEditingVideo(null);
+  };
+
   if (loading) {
     return <Loader message="Loading dashboard..." />;
   }
@@ -51,8 +101,10 @@ function DashboardChannel() {
 
   return (
     <div className="min-h-screen bg-[#18181b] text-white p-8 relative lg:left-68 lg:w-300">
-      <h1 className="text-3xl font-bold mb-8">Welcome back </h1>
-      <p className="text-gray-400 mb-8">Track, manage and forecast your channel .</p>
+      <h1 className="text-3xl font-bold mb-8">Welcome back, Olivia</h1>
+      <p className="text-gray-400 mb-8">Track, manage and forecast your customers and orders.</p>
+
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className="bg-[#2a2a31] p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
@@ -70,6 +122,16 @@ function DashboardChannel() {
           <p className="text-gray-400 text-lg">Total Likes</p>
           <p className="text-3xl font-bold">{stats?.totalLikes || 0}</p>
         </div>
+      </div>
+
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Your Videos</h2>
+        <button
+          onClick={handleUploadVideo}
+          className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Upload Video
+        </button>
       </div>
 
       <div className="bg-[#2a2a31] p-6 rounded-lg shadow-md">
@@ -115,8 +177,8 @@ function DashboardChannel() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{video.views}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{new Date(video.createdAt).toLocaleDateString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-purple-400 hover:text-purple-600 mr-3">🗑️</button>
-                    <button className="text-purple-400 hover:text-purple-600">✏️</button>
+                    <button onClick={() => handleDeleteVideo(video._id)} className="text-purple-400 hover:text-purple-600 mr-3">🗑️</button>
+                    <button onClick={() => handleEditVideo(video)} className="text-purple-400 hover:text-purple-600">✏️</button>
                   </td>
                 </tr>
               ))}
@@ -124,6 +186,23 @@ function DashboardChannel() {
           </table>
         </div>
       </div>
+
+      {isUploadModalOpen && (
+        <UploadVideoModal
+          isOpen={isUploadModalOpen}
+          onClose={() => setIsUploadModalOpen(false)}
+          onVideoUploaded={handleVideoUploaded}
+        />
+      )}
+
+      {isEditModalOpen && editingVideo && (
+        <EditVideoModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          video={editingVideo}
+          onVideoUpdated={handleVideoUpdated}
+        />
+      )}
     </div>
   );
 }

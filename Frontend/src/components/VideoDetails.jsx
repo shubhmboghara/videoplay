@@ -9,7 +9,6 @@ import {
   HiDownload
 } from 'react-icons/hi';
 import SubscribeButton from './SubscribeButton';
-import Sidebar from './Sidebar';
 import { Button, VideoCard } from './index';
 import Loader from './Loader';
 import { timeAgo } from '../utils';

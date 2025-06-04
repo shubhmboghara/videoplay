@@ -32,7 +32,7 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
-        formData.append('videoFile', videoFile);
+        formData.append('video', videoFile);
         if (thumbnail) {
             formData.append('thumbnail', thumbnail);
         }

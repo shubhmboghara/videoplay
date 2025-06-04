@@ -15,6 +15,7 @@ export default function CommentSection({ videoId }) {
   const [showAllComments, setShowAllComments] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editContent, setEditContent] = useState('');
+  
 
   useEffect(() => {
     async function fetchComments() {
@@ -35,21 +36,19 @@ export default function CommentSection({ videoId }) {
   const handlePostComment = async () => {
     console.log('▶️ handlePostComment clicked, newComment =', newComment);
     if (!newComment.trim()) {
-      console.log('✋ newComment is empty, doing nothing.');
+      ('✋ newComment is empty, doing nothing.');
       return;
     }
 
     try {
-      console.log('☎️ POST →', `/api/comments/${videoId}`, { text: newComment });
 
       const res = await addComment(videoId, { content: newComment });
-      console.log('✅ addComment response:', res);
 
       setComments([res.data.data, ...comments]);
       setNewComment('');
       setShowAllComments(true);
     } catch (err) {
-      console.error('❌ Error posting comment:', err);
+      console.error('Error posting comment:', err);
     }
   };
 

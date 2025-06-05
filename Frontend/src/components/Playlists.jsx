@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { HiFolderAdd } from 'react-icons/hi';
+import PlaylistCard from './PlaylistCard';
 
 const API_BASE = '/api/playlist';
 
@@ -52,7 +53,7 @@ function Playlists({ videoId, authStatus, onPlaylistSelected }) {
 
         try {
             const res = await axios.patch(
-                `${API_BASE}/add/${videoId}/${playlistId}`
+                `${API_BASE}/${playlistId}/add/${videoId}`
             );
             if (res.data.success) {
                 alert('Video added to playlist');
@@ -95,7 +96,7 @@ function Playlists({ videoId, authStatus, onPlaylistSelected }) {
 
     const updatePlaylist = async (playlistId, updateData) => {
         try {
-            const res = await axios.patch(`${API_BASE}/playlist/${playlistId}`, updateData);
+            const res = await axios.patch(`${API_BASE}/${playlistId}`, updateData);
             if (res.data.success) {
                 alert('Playlist updated');
                 fetchUserPlaylists();
@@ -198,114 +199,56 @@ function Playlists({ videoId, authStatus, onPlaylistSelected }) {
 
             <div className="mb-8 p-4 border border-gray-700 rounded-lg bg-gray-800">
                 <h3 className="text-xl font-semibold mb-3">Create New Playlist</h3>
-                <input
-                    type="text"
-                    placeholder="Playlist Name"
-                    value={newPlaylistName}
-                    onChange={(e) => setNewPlaylistName(e.target.value)}
-                    className="p-3 rounded-md text-black w-full mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-                <textarea
-                    placeholder="Description"
-                    value={newPlaylistDescription}
-                    onChange={(e) => setNewPlaylistDescription(e.target.value)}
-                    className="p-3 rounded-md text-black w-full mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    rows={3}
-                />
-                <button
-                    onClick={createPlaylist}
-                    className="w-full bg-gradient-to-r from-green-500 to-green-700 text-white px-5 py-2.5 rounded-md hover:from-green-600 hover:to-green-800 transition duration-300 ease-in-out transform hover:scale-105"
-                >
-                    Create Playlist
-                </button>
-            </div>
-
-            <div className="mb-8 p-4 border border-gray-700 rounded-lg bg-gray-800">
-                <h3 className="text-xl font-semibold mb-3">Add Video to Existing Playlist</h3>
-                <select
-                    className="w-full p-3 rounded-md mb-4 bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    onChange={(e) => setSelectedPlaylistId(e.target.value)}
-                    value={selectedPlaylistId}
-                >
-                    <option value="">Select a playlist</option>
-                    {playlists.map((pl) => (
-                        <option key={pl._id} value={pl._id}>
-                            {pl.name}
-                        </option>
-                    ))}
-                </select>
-
-                <button
-                    onClick={addVideoToPlaylist}
-                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800 transition duration-300 ease-in-out transform hover:scale-105"
-                >
-                    <HiFolderAdd className="h-5 w-5" />
-                    Save Video to Selected Playlist
-                </button>
-            </div>
-
-            <div>
-                <h3 className="text-2xl font-bold mb-4 text-center text-purple-400">Your Playlists</h3>
-                {playlists.length === 0 ? (
-                    <p className="text-center text-gray-500">No playlists found. Create one above!</p>
+                {!showNewPlaylistInput ? (
+                    <button
+                        onClick={() => setShowNewPlaylistInput(true)}
+                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-white hover:bg-gray-700 transition duration-300 ease-in-out"
+                    >
+                        <HiFolderAdd className="h-5 w-5" />
+                        New playlist
+                    </button>
                 ) : (
-                    playlists.map((pl) => (
-                        <div
-                            key={pl._id}
-                            className="mb-6 p-5 border border-gray-700 rounded-lg bg-gray-800 shadow-md"
+                    <div className="space-y-3">
+                        <input
+                            type="text"
+                            placeholder="Playlist Name"
+                            value={newPlaylistName}
+                            onChange={(e) => setNewPlaylistName(e.target.value)}
+                            className="p-3 rounded-md text-black w-full focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        />
+                        <textarea
+                            placeholder="Playlist Description (Optional)"
+                            value={newPlaylistDescription}
+                            onChange={(e) => setNewPlaylistDescription(e.target.value)}
+                            className="p-3 rounded-md text-black w-full h-24 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        ></textarea>
+                        <button
+                            onClick={createPlaylist}
+                            className="w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-2 rounded-md hover:from-purple-600 hover:to-purple-800 transition duration-300 ease-in-out"
                         >
-                            <div className="flex justify-between items-center mb-3">
-                                <strong className="text-xl text-yellow-300">{pl.name}</strong>
-                                <div className="flex space-x-2">
-                                    <button
-                                        onClick={() => deletePlaylist(pl._id)}
-                                        className="text-red-400 hover:text-red-600 transition duration-200 ease-in-out"
-                                    >
-                                        Delete
-                                    </button>
-                                    {/* Add an edit button for updating playlist */}
-                                    <button
-                                        onClick={() => {
-                                            const newName = prompt('Enter new playlist name:', pl.name);
-                                            const newDescription = prompt('Enter new playlist description:', pl.description);
-                                            if (newName !== null || newDescription !== null) {
-                                                updatePlaylist(pl._id, { name: newName || pl.name, description: newDescription || pl.description });
-                                            }
-                                        }}
-                                        className="text-blue-400 hover:text-blue-600 transition duration-200 ease-in-out"
-                                    >
-                                        Edit
-                                    </button>
-                                </div>
-                            </div>
-                            <p className="text-gray-400 text-sm mb-3">{pl.description}</p>
+                            Create Playlist
+                        </button>
+                        <button
+                            onClick={() => setShowNewPlaylistInput(false)}
+                            className="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition duration-300 ease-in-out"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                )}
+            </div>
 
-                            {/* List videos in playlist */}
-                            <h4 className="text-lg font-semibold mb-2 text-gray-300">Videos:</h4>
-                            <ul className="mb-2 space-y-2">
-                                {pl.videos && pl.videos.length > 0 ? (
-                                    pl.videos.map((vid) => (
-                                        <li key={vid._id} className="flex justify-between items-center p-2 bg-gray-700 rounded-md">
-                                            <span className="text-white">{vid.title || 'Untitled Video'}</span>
-                                            <button
-                                                onClick={() => removeVideoFromPlaylist(pl._id, vid._id)} // Pass videoId to remove
-                                                className="text-red-400 hover:text-red-600 text-sm transition duration-200 ease-in-out"
-                                            >
-                                                Remove
-                                            </button>
-                                        </li>
-                                    ))
-                                ) : (
-                                    <li className="text-gray-500 italic">No videos in this playlist yet.</li>
-                                )}
-
-                            </ul>
-                        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {playlists.length > 0 ? (
+                    playlists.map((playlist) => (
+                        <PlaylistCard key={playlist._id} playlist={playlist} />
                     ))
+                ) : (
+                    <p className="text-gray-400 text-center col-span-full">No playlists created yet.</p>
                 )}
             </div>
         </div>
     );
 }
 
-export default Playlists;   
+export default Playlists;

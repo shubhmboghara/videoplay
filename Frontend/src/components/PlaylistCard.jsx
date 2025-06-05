@@ -2,33 +2,27 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const PlaylistCard = ({ playlist }) => {
-    const thumbnailUrl = playlist.videos.length > 0
-        ? playlist.videos[0].thumbnail?.url || playlist.videos[0].thumbnail
-        : 'https://via.placeholder.com/320x180.png?text=No+Videos';
+    const defaultThumbnail = 'https://via.placeholder.com/300x169.png?text=No+Thumbnail'; // Placeholder image
 
     return (
-        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
-            <Link to={`/playlist/${playlist._id}`}>
-                <img
-                    src={thumbnailUrl}
-                    alt={playlist.name}
-                    className="w-full h-40 object-cover"
-                />
-            </Link>
-            <div className="p-4">
-                <h3 className="text-lg font-semibold text-white mb-1 truncate">
-                    <Link to={`/playlist/${playlist._id}`} className="hover:text-blue-400">
-                        {playlist.name}
-                    </Link>
-                </h3>
-                <p className="text-gray-400 text-sm">
-                    {playlist.videos.length} video{playlist.videos.length !== 1 ? 's' : ''}
-                </p>
-                <p className="text-gray-500 text-xs mt-1">
-                    {playlist.isPrivate ? 'Private' : 'Public'} • Playlist
-                </p>
+        <Link to={`/playlist/${playlist._id}`}>
+            <div className="w-full rounded-lg overflow-hidden cursor-pointer bg-[#18181b] shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div className="relative bg-[#18181b]">
+                    <img
+                        src={playlist.videos[0]?.thumbnail || defaultThumbnail}
+                        alt={playlist.name}
+                        className="w-full h-full object-cover aspect-video"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                        <span className="text-white text-lg font-semibold">{playlist.videos.length} Videos</span>
+                    </div>
+                </div>
+                <div className="p-3">
+                    <h3 className="text-white font-semibold text-lg truncate mb-1">{playlist.name}</h3>
+                    <p className="text-gray-400 text-sm line-clamp-2">{playlist.description}</p>
+                </div>
             </div>
-        </div>
+        </Link>
     );
 };
 

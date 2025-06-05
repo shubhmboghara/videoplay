@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { HiFolderAdd } from 'react-icons/hi';
+import PlaylistCard from './PlaylistCard';
 
 const API_BASE = '/api/playlist';
 
-function PlaylistManager({ videoId, authStatus, onPlaylistSelected, onClose }) {
+function Playlists({ videoId, authStatus, onPlaylistSelected, onClose }) {
 
     const [playlists, setPlaylists] = useState([]);
 
@@ -139,34 +140,12 @@ function PlaylistManager({ videoId, authStatus, onPlaylistSelected, onClose }) {
                 </div>
                 <div className="py-1">
                     {playlists.map((pl) => (
-                        <div
+                        <PlaylistCard
                             key={pl._id}
-                            className="flex items-center justify-between px-4 py-2 hover:bg-gray-700 cursor-pointer"
-                            onClick={(e) => { e.stopPropagation(); handlePlaylistSelection(pl._id); }}
-                        >
-                            <label className="inline-flex items-center cursor-pointer">
-                                <input
-                                     type="checkbox"
-                                     className="form-checkbox h-5 w-5 text-white bg-gray-900 border-gray-600 rounded focus:ring-blue-500"
-                                     checked={selectedPlaylistId === pl._id}
-                                 />
-                                 <span className="ml-4 text-white text-base">{pl.name}</span>
-                            </label>
-                            {pl.isPrivate && (
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                     className="h-4 w-4 text-gray-400 ml-2"
-                                     viewBox="0 0 20 20"
-                                     fill="currentColor"
-                                >
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M10 1a4 4 0 00-4 4v2a4 4 0 00-4 4v4a2 2 0 002 2h8a2 2 0 002-2v-4a4 4 0 00-4-4V5a4 4 0 00-4-4zm3 8V5a3 3 0 10-6 0v4h6z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
-                            )}
-                        </div>
+                            playlist={pl}
+                            onClick={() => handlePlaylistSelection(pl._id)}
+                            isSelected={selectedPlaylistId === pl._id}
+                        />
                     ))} 
                 </div>
                 <div className="border-t border-gray-700 mt-1 pt-1">
@@ -261,57 +240,7 @@ function PlaylistManager({ videoId, authStatus, onPlaylistSelected, onClose }) {
                     <p className="text-center text-gray-500">No playlists found. Create one above!</p>
                 ) : (
                     playlists.map((pl) => (
-                        <div
-                            key={pl._id}
-                            className="mb-6 p-5 border border-gray-700 rounded-lg bg-gray-800 shadow-md"
-                        >
-                            <div className="flex justify-between items-center mb-3">
-                                <strong className="text-xl text-yellow-300">{pl.name}</strong>
-                                <div className="flex space-x-2">
-                                    <button
-                                        onClick={() => deletePlaylist(pl._id)}
-                                        className="text-red-400 hover:text-red-600 transition duration-200 ease-in-out"
-                                    >
-                                        Delete
-                                    </button>
-                                    {/* Add an edit button for updating playlist */}
-                                    <button
-                                        onClick={() => {
-                                            const newName = prompt('Enter new playlist name:', pl.name);
-                                            const newDescription = prompt('Enter new playlist description:', pl.description);
-                                            if (newName !== null || newDescription !== null) {
-                                                updatePlaylist(pl._id, { name: newName || pl.name, description: newDescription || pl.description });
-                                            }
-                                        }}
-                                        className="text-blue-400 hover:text-blue-600 transition duration-200 ease-in-out"
-                                    >
-                                        Edit
-                                    </button>
-                                </div>
-                            </div>
-                            <p className="text-gray-400 text-sm mb-3">{pl.description}</p>
-
-                            {/* List videos in playlist */}
-                            <h4 className="text-lg font-semibold mb-2 text-gray-300">Videos:</h4>
-                            <ul className="mb-2 space-y-2">
-                                {pl.videos && pl.videos.length > 0 ? (
-                                    pl.videos.map((vid) => (
-                                        <li key={vid._id} className="flex justify-between items-center p-2 bg-gray-700 rounded-md">
-                                            <span className="text-white">{vid.title || 'Untitled Video'}</span>
-                                            <button
-                                                onClick={() => removeVideoFromPlaylist(pl._id, vid._id)} // Pass videoId to remove
-                                                className="text-red-400 hover:text-red-600 text-sm transition duration-200 ease-in-out"
-                                            >
-                                                Remove
-                                            </button>
-                                        </li>
-                                    ))
-                                ) : (
-                                    <li className="text-gray-500 italic">No videos in this playlist yet.</li>
-                                )}
-
-                            </ul>
-                        </div>
+                        <PlaylistCard key={pl._id} playlist={pl} />
                     ))
                 )}
             </div>
@@ -319,4 +248,4 @@ function PlaylistManager({ videoId, authStatus, onPlaylistSelected, onClose }) {
     );
 }
 
-export default PlaylistManager;
+export default Playlists;   

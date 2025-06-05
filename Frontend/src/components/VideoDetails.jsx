@@ -37,10 +37,9 @@ export default function VideoDetails({ showPopup }) {
   useEffect(() => {
     function handleClickOutside(event) {
       if (playlistDropdownRef.current && !playlistDropdownRef.current.contains(event.target)) {
-        // Delay closing the modal to allow click events inside the modal to register
         setTimeout(() => {
           setShowPlaylistModal(false);
-        }, 300); // Increased delay to allow internal clicks to register
+        }, 300);  
       }
     }
 

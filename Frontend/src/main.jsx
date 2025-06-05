@@ -5,6 +5,9 @@ import { store } from "./redux/store.jsx";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.css'
 import App from './App.jsx'
+import axios from 'axios';
+
+axios.defaults.withCredentials = true;
 
 
 

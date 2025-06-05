@@ -9,7 +9,7 @@ import axios from 'axios'
 
 
 
-function Signup() {
+function Signup({ showPopup }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const {
@@ -23,7 +23,7 @@ function Signup() {
 
         try {
             if (!data.FullName || !data.Username || !data.Email || !data.password) {
-                alert("All fields are required");
+                showPopup("All fields are required", 'error');
                 return;
             }
             const res = await axios.post("/api/users/signup", {
@@ -39,11 +39,12 @@ function Signup() {
             const userData = res.data.data.user
 
 
-            dispatch(loginAction(userData))
-            navigate('/')
+            dispatch(loginAction(userData));
+            navigate('/');
+            showPopup('Signup successful!', 'success');
 
-        } catch (error) {
-            alert(err.response?.data?.message || "Signup failed");
+        } catch (err) {
+            showPopup(err.response?.data?.message || "Signup failed", 'error');
 
         }
 

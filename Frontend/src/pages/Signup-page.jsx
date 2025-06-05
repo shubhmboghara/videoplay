@@ -1,10 +1,10 @@
 import React from 'react'
 import { Signup } from '../components/index'
 
-function Signuppage() {
+function Signuppage({ showPopup }) {
   return (
     <div>
-        <Signup />
+        <Signup showPopup={showPopup} />
     </div>
   )
 }

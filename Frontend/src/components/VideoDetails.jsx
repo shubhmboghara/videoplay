@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback ,useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -16,21 +16,39 @@ import CommentSection from './CommentSection';
 import { toggleLike } from '../hooks/toggleLike';
 import { getLikeCount } from '../hooks/getLikeCount';
 import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
-import ProtectedRoute from './ProtectedRoute';
+import PlaylistManager from './Playlists';
 
-export default function VideoDetails() {
+export default function VideoDetails({ showPopup }) {
   const { id } = useParams();
   const { video, videos, loading, error } = useVideo(id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authStatus = useSelector((state) => state.auth.status);
-
   const likedVideos = useSelector((state) => state.likes.likedVideos);
   const isLikedInStore = likedVideos.includes(id);
+
   const [likeLoading, setLikeLoading] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
-
   const [subscriberCount, setSubscriberCount] = useState(0);
+  const [showPlaylistModal, setShowPlaylistModal] = useState(false);
+  const [showSavePopup, setShowSavePopup] = useState(false);
+  const playlistDropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (playlistDropdownRef.current && !playlistDropdownRef.current.contains(event.target)) {
+        // Delay closing the modal to allow click events inside the modal to register
+        setTimeout(() => {
+          setShowPlaylistModal(false);
+        }, 300); // Increased delay to allow internal clicks to register
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [playlistDropdownRef]);
 
   useEffect(() => {
     if (!video) return;
@@ -42,7 +60,6 @@ export default function VideoDetails() {
     }
 
     getLikeCount('video', id).then(setLikesCount).catch(console.error);
-
     setSubscriberCount(Number(video.owner?.subscriberCount || 0));
   }, [video, id, dispatch]);
 
@@ -68,15 +85,30 @@ export default function VideoDetails() {
       setLikesCount(updatedCount);
     } catch (err) {
       console.error('Video like failed:', err);
+      showPopup?.('Failed to toggle like. Please try again.');
     } finally {
       setLikeLoading(false);
     }
-  }, [likeLoading, id, dispatch, likedVideos]);
+  }, [likeLoading, id, dispatch, likedVideos, authStatus]);
 
   const handleSubscriberCountChange = useCallback((newCount) => {
     setSubscriberCount(newCount);
   }, []);
 
+  const handleSaveClick = () => {
+    console.log('handleSaveClick triggered');
+    if (!authStatus) {
+      navigate('/login');
+      showPopup?.('Please log in to save videos.', 'error');
+      return;
+    }
+    setShowPlaylistModal(true);
+  };
+
+  const handlePlaylistSelected = (playlistId) => {
+    setShowSavePopup(true);
+    setTimeout(() => setShowSavePopup(false), 3000);
+  };
 
   if (loading || !video || !video.owner) {
     return <Loader message="Loading video details..." />;
@@ -86,7 +118,7 @@ export default function VideoDetails() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#18181b] relative ">
+    <div className="flex min-h-screen bg-[#18181b] relative">
       <main className="flex-1 p-6 text-white">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
@@ -114,42 +146,35 @@ export default function VideoDetails() {
               </div>
 
               <div className="flex items-center space-x-2">
-
                 <Button
                   disabled={likeLoading}
                   onClick={handleVideoLike}
                   className={`
                     inline-flex items-center gap-1 px-3 h-9 rounded-md 
                     transition-all duration-200
-                    ${isLikedInStore
-                      ? 'bg-purple-600 text-white border-gray-600'
-                      : 'border border-gray-600 text-white hover:bg-gray-800'
-                    } 
+                    ${isLikedInStore ? 'bg-purple-600 text-white border-gray-600' : 'border border-gray-600 text-white hover:bg-gray-800'} 
                     text-sm disabled:opacity-50 
                     ${likeLoading ? 'pointer-events-none' : ''}
                   `}
                 >
                   <HiThumbUp className="h-4 w-4" />
-                  {likeLoading ? '...' : isLikedInStore ? 'Liked' : 'Like'} (
-                  {likesCount})
+                  {likeLoading ? '...' : isLikedInStore ? 'Liked' : 'Like'} ({likesCount})
                 </Button>
 
-              
-
-                <Button
-                  onClick={() => {
-                    if (!authStatus) {
-                      navigate('/login');
-                      return;
-                    }
-                  }}
-                  className="inline-flex items-center gap-1 px-3 h-9 rounded-md border border-gray-600 text-white hover:bg-gray-800 text-sm ml-5"
-                >
-                  <HiFolderAdd className="h-4 w-4" /> Save 
-                </Button>
+                <div className="relative">
+                  <Button
+                    onClick={handleSaveClick}
+                    className="inline-flex items-center gap-1 px-3 h-9 rounded-md border border-gray-600 text-white hover:bg-gray-800 text-sm ml-5"
+                  >
+                    <HiFolderAdd className="h-4 w-4" /> Save
+                  </Button>
+                  {showPlaylistModal && (
+                    <div ref={playlistDropdownRef} className="absolute top-full left-0 mt-2 z-50 bg-gray-900 p-4 rounded-lg shadow-lg w-80">
+                      <PlaylistManager videoId={id} authStatus={authStatus} onPlaylistSelected={handlePlaylistSelected} onClose={() => setShowPlaylistModal(false)} />
+                    </div>
+                  )}
+                </div>
               </div>
-
-
             </div>
 
             <div className="mt-6 flex items-center gap-4">
@@ -161,12 +186,11 @@ export default function VideoDetails() {
               <div>
                 <h2 className="font-medium">{video.owner.username}</h2>
                 <p className="text-sm text-gray-400">
-                  {subscriberCount} subscriber
-                  {subscriberCount === 1 ? '' : 's'}
+                  {subscriberCount} subscriber{subscriberCount === 1 ? '' : 's'}
                 </p>
               </div>
 
-              <div className="flex items-center space-x-2  relative lg:left-135  ">
+              <div className="flex items-center space-x-2 relative lg:left-135">
                 <SubscribeButton
                   channelId={video.owner._id}
                   initialSubscribed={video.owner.isSubscribed}
@@ -181,6 +205,13 @@ export default function VideoDetails() {
 
           <CommentSection videoId={id} />
         </div>
+        )}
+
+        {showSavePopup && (
+          <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50">
+            Video saved successfully!
+          </div>
+        )}
 
         <aside className="mt-10 bg-[#18181b] lg:hidden">
           {videos?.length ? (
@@ -198,7 +229,7 @@ export default function VideoDetails() {
               />
             ))
           ) : (
-            <p className="text-gray-500">No suggestions yet.</p>
+            <p className="text-center text-gray-500">No suggested videos.</p>
           )}
         </aside>
       </main>
@@ -223,6 +254,26 @@ export default function VideoDetails() {
           <p className="text-gray-500 mt-60">No suggestions yet.</p>
         )}
       </aside>
+
+      {/* Playlist Modal */}
+      {showPlaylistModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-sm">
+            <h3 className="text-xl font-bold mb-4 text-white">Select Playlist</h3>
+            <PlaylistManager
+              videoId={id}
+              authStatus={authStatus}
+              onPlaylistSelected={handlePlaylistSelected}
+            />
+            <button
+              onClick={() => setShowPlaylistModal(false)}
+              className="mt-4 w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

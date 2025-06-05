@@ -1,10 +1,10 @@
 import React from 'react'
 import { Login } from '../components/index'
 
-function Loginpage() {
+function Loginpage({ showPopup }) {
   return (
     <div className='' >
-        <Login />
+        <Login showPopup={showPopup} />
     </div>
   )
 }

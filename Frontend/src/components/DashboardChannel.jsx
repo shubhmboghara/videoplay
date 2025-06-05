@@ -9,7 +9,7 @@ import {
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 
-function DashboardChannel() {
+function DashboardChannel({ showPopup }) {
   const [stats, setStats] = useState(null);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ function DashboardChannel() {
       setVideos(videosResponse.data);
     } catch (err) {
       setError('Failed to fetch dashboard data.');
-      console.error(err);
+      showPopup('error', 'Failed to fetch dashboard data.');
     } finally {
       setLoading(false);
     }
@@ -45,9 +45,9 @@ function DashboardChannel() {
           video._id === videoId ? { ...video, isPublished: !video.isPublished } : video
         )
       );
+      showPopup('success', 'Publish status toggled successfully!');
     } catch (err) {
-      console.error('Failed to toggle publish status:', err);
-      alert('Failed to toggle publish status.');
+      showPopup('error', 'Failed to toggle publish status.');
     }
   };
 
@@ -56,9 +56,9 @@ function DashboardChannel() {
       try {
         await deleteVideo(videoId);
         setVideos(prevVideos => prevVideos.filter(video => video._id !== videoId));
+        showPopup('success', 'Video deleted successfully!');
       } catch (err) {
-        console.error('Failed to delete video:', err);
-        alert('Failed to delete video.');
+        showPopup('error', 'Failed to delete video.');
       }
     }
   };
@@ -74,9 +74,9 @@ function DashboardChannel() {
       setIsEditModalOpen(false);
       setEditingVideo(null);
       fetchData();
+      showPopup('success', 'Video updated successfully!');
     } catch (err) {
-      console.error('Failed to update video:', err);
-      alert('Failed to update video.');
+      showPopup('error', 'Failed to update video.');
     }
   };
 

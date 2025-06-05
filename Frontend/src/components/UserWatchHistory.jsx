@@ -4,7 +4,7 @@ import { getUserVideosHistory } from "../hooks/getuserVideosHistory";
 import Loader from "./Loader";
 import VideoCard from "./VideoCard";
 
-const UserWatchHistory = () => {
+const UserWatchHistory = ({ showPopup }) => {
   const userId = useSelector((state) => state.auth.user?._id);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +15,7 @@ const UserWatchHistory = () => {
         const res = await getUserVideosHistory();
         setVideos(res?.data || []);
       } catch (err) {
-        console.error("Error loading watch history:", err);
+        showPopup("error", "Error loading watch history.");
       } finally {
         setLoading(false);
       }

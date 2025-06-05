@@ -1,10 +1,10 @@
 import React from 'react'
 import UserWatchHistory from '../components/UserWatchHistory'
 
-function VideosHistory() {
+function VideosHistory({ showPopup }) {
   return (
     <div>
-      <UserWatchHistory />
+      <UserWatchHistory showPopup={showPopup} />
 
     </div>
   )

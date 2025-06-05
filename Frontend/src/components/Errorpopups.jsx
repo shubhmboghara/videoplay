@@ -5,7 +5,7 @@ const Errorpopups = ({ message, type, onClose }) => {
     if (message) {
       const timer = setTimeout(() => {
         onClose();
-      }, 3000); // Auto-close after 3 seconds
+      }, 3000); 
       return () => clearTimeout(timer);
     }
   }, [message, onClose]);

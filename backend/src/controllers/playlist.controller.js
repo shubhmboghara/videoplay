@@ -30,7 +30,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
 })
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
-    const { userId } = req.params
+    const userId = req.user._id
 
     if (!mongoose.isValidObjectId(userId)) {
         throw new ApiError(400, "invalid user id ")

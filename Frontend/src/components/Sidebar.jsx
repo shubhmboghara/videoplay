@@ -23,17 +23,16 @@ const Sidebar = ({ className }) => {
         { label: "Liked Videos", icon: <HiThumbUp size={25} />, slug: "/likedvideos" },
         { label: "History", icon: <HiClock size={25} />, slug: "/history" },
         { label: "My content", icon: <HiVideoCamera size={25} />, slug: "/my-content" },
-        { label: "Collection", icon: <HiFolder size={25} />, slug: "/collection" },
+        { label: "playlists", icon: <HiFolder size={25} />, slug: "/playlists" },
         { label: "Subscriptions", icon: <HiUsers size={25} />, slug: "/subscriptions" },
-        { label: "Support", icon: <HiQuestionMarkCircle size={25} />, slug: "/support" },
         { label: "Settings", icon: <HiCog size={25} />, slug: "/settings" }
     ];
 
     const smItems = [
         { label: "Home", icon: <HiHome size={25} />, slug: "/" },
         { label: "History", icon: <HiClock size={25} />, slug: "/history" },
-        { label: "Collection", icon: <HiFolder size={25} />, slug: "/collection" },
-        { label: "Subscribers", icon: <HiUsers size={25} />, slug: "/subscribers" }
+        { label: "playlists", icon: <HiFolder size={25} />, slug: "/playlists" },
+        { label: "Subscribers", icon: <HiUsers size={25} />, slug: "/subscriptions" }
     ];
 
     return (

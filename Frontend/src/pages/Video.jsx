@@ -2,11 +2,11 @@ import React from 'react'
 import { VideoDetails } from '../components/index'
 
 
-function Video() {
+function Video({ showPopup }) {
   return (
     
     <div>
-<VideoDetails  />
+<VideoDetails showPopup={showPopup} />
     </div>
   )
 }

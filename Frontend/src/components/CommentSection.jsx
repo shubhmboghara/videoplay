@@ -9,7 +9,7 @@ import {
 import { HiTrash, HiPencil, HiCheck, HiX, HiOutlineThumbUp, HiThumbUp } from 'react-icons/hi';
 import { toggleLike } from '../hooks/toggleLike';
 
-export default function CommentSection({ videoId }) {
+export default function CommentSection({ videoId, showPopup }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [showAllComments, setShowAllComments] = useState(false);
@@ -19,11 +19,12 @@ export default function CommentSection({ videoId }) {
 
   useEffect(() => {
     async function fetchComments() {
-      try {
+      try { 
         const res = await getVideoComments(videoId);
         setComments(res.data.data.comments);
       } catch (err) {
         console.error('Error loading comments:', err);
+      showPopup('Failed to load comments.', 'error');
       }
     }
     if (videoId) {
@@ -47,8 +48,10 @@ export default function CommentSection({ videoId }) {
       setComments([res.data.data, ...comments]);
       setNewComment('');
       setShowAllComments(true);
+      showPopup('Comment posted successfully!', 'success');
     } catch (err) {
       console.error('Error posting comment:', err);
+      showPopup('Failed to post comment.', 'error');
     }
   };
 
@@ -56,8 +59,10 @@ export default function CommentSection({ videoId }) {
     try {
       await deleteComment(commentId);
       setComments((prev) => prev.filter((c) => c._id !== commentId));
+      showPopup('Comment deleted successfully!', 'success');
     } catch (err) {
       console.error('Error deleting comment:', err);
+      showPopup('Failed to delete comment.', 'error');
     }
   };
 
@@ -78,8 +83,10 @@ export default function CommentSection({ videoId }) {
       );
       setEditingCommentId(null);
       setEditContent('');
+      showPopup('Comment updated successfully!', 'success');
     } catch (err) {
       console.error('Error updating comment:', err);
+      showPopup('Failed to update comment.', 'error');
     }
   };
 
@@ -156,8 +163,10 @@ export default function CommentSection({ videoId }) {
                                 : comment
                             )
                           );
+                          showPopup(res.isLiked ? 'Comment liked!' : 'Comment unliked!', 'success');
                         } catch (error) {
                           console.error('Error toggling like on comment:', error);
+                          showPopup('Failed to toggle like on comment.', 'error');
                         }
                       }}
                       className="hover:text-blue-500"
@@ -256,8 +265,10 @@ export default function CommentSection({ videoId }) {
                                 : comment
                             )
                           );
+                          showPopup(res.isLiked ? 'Comment liked!' : 'Comment unliked!', 'success');
                         } catch (error) {
                           console.error('Error toggling like on comment:', error);
+                          showPopup('Failed to toggle like on comment.', 'error');
                         }
                       }}
                       className="hover:text-blue-500"

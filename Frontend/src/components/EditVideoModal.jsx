@@ -55,13 +55,13 @@ const EditVideoModal = ({ isOpen, onClose, video, onVideoUpdated }) => {
     if (!isOpen || !video) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg w-full max-w-md text-white relative top-10 lg:left-[5%] ">
+        <div class=" inset-0 backdrop-blur-sm  flex items-center justify-center fixed">
+            <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg w-full max-w-md text-white relative top-10 lg:left-25">
                 <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl">&times;</button>
                 <div className="flex items-center mb-4">
                     <div className="bg-[#262626] p-2 rounded-full mr-3">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 6C12.5523 6 13 6.44772 13 7V11H17C17.5523 17 18 17.4477 18 18C18 18.5523 17.5523 19 17 19H7C6.44772 19 6 18.5523 6 18C6 17.4477 6.44772 17 7 17H11V7C11 6.44772 11.4477 6 12 6Z" fill="currentColor"/>
+                            <path d="M12 6C12.5523 6 13 6.44772 13 7V11H17C17.5523 17 18 17.4477 18 18C18 18.5523 17.5523 19 17 19H7C6.44772 19 6 18.5523 6 18C6 17.4477 6.44772 17 7 17H11V7C11 6.44772 11.4477 6 12 6Z" fill="currentColor" />
                         </svg>
                     </div>
                     <h2 className="text-xl font-bold">Edit video</h2>
@@ -72,7 +72,7 @@ const EditVideoModal = ({ isOpen, onClose, video, onVideoUpdated }) => {
                     <div className="mb-4 border border-gray-600 p-4 rounded-lg text-center cursor-pointer">
                         <label htmlFor="thumbnail-upload" className="block text-gray-400 mb-2">
                             <svg className="mx-auto mb-2" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 6C12.5523 6 13 6.44772 13 7V11H17C17.5523 17 18 17.4477 18 18C18 18.5523 17.5523 19 17 19H7C6.44772 19 6 18.5523 6 18C6 17.4477 6.44772 17 7 17H11V7C11 6.44772 11.4477 6 12 6Z" fill="currentColor"/>
+                                <path d="M12 6C12.5523 6 13 6.44772 13 7V11H17C17.5523 17 18 17.4477 18 18C18 18.5523 17.5523 19 17 19H7C6.44772 19 6 18.5523 6 18C6 17.4477 6.44772 17 7 17H11V7C11 6.44772 11.4477 6 12 6Z" fill="currentColor" />
                             </svg>
                             Click to upload or drag and drop
                         </label>

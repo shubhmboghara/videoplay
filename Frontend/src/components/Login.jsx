@@ -8,7 +8,7 @@ import { login as loginAction } from '../redux/slices/authSlice'
 import axios from 'axios'
 import { useState } from 'react'
 
-function Login() {
+function Login({ showPopup }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const [error, setError] = useState(null)
@@ -32,7 +32,8 @@ function Login() {
 
             dispatch(loginAction(userData));
             navigate('/');
-            setError("")
+            setError("");
+            showPopup('Login successful!', 'success');
 
         } catch (err) {
             console.error("Login failed:", err.response?.data || err.message);
@@ -43,8 +44,10 @@ function Login() {
 
             if (msgFromServer === "User does not exist" || msgFromServer === "Invalid user credentials") {
                 setError(msgFromServer);
+                showPopup(msgFromServer, 'error');
             } else {
                 setError("Something went wrong. Please try again.");
+                showPopup("Something went wrong. Please try again.", 'error');
             }
         }
 

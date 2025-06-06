@@ -7,7 +7,7 @@ import Input from "./Input";
 import Signup from "./Signup";
 import Sidebar from "./Sidebar";
 import VideoCard from "./VideoCard";
-import VideoDetails from "./VideoDetails"
+import VideoDetails from "./VideoDetails";
 import likedvideo from "./likedvideo";
 export{
     Container,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback ,useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -39,7 +39,7 @@ export default function VideoDetails({ showPopup }) {
       if (playlistDropdownRef.current && !playlistDropdownRef.current.contains(event.target)) {
         setTimeout(() => {
           setShowPlaylistModal(false);
-        }, 300);
+        }, 300);  
       }
     }
 
@@ -254,6 +254,7 @@ export default function VideoDetails({ showPopup }) {
         )}
       </aside>
 
+      {/* Playlist Modal */}
       {showPlaylistModal && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-sm">

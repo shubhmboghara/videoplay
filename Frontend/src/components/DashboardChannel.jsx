@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { getChannelStats, getChannelVideos, togglePublishStatus } from '../hooks/getdashboard';
 import { deleteVideo, updateVideo } from '../hooks/video';
 import Loader from './Loader';
@@ -11,10 +10,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { AiOutlineEye, AiOutlineLike } from 'react-icons/ai';
 import { HiUserGroup } from 'react-icons/hi';
+import AuthLoader from './AuthLoader';
 
 function DashboardChannel({ showPopup }) {
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user);
   const [stats, setStats] = useState(null);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,7 +108,7 @@ function DashboardChannel({ showPopup }) {
 
   return (
     <div className="min-h-screen bg-[#18181b] text-white p-8 relative lg:left-68 lg:w-300">
-      <h1 className="text-3xl font-bold mb-8">Welcome   {user?.username && `, ${user.username}`} </h1>
+      <h1 className="text-3xl font-bold mb-8">Welcome bac   </h1>
       <p className="text-gray-400 mb-8">Track, manage and forecast your channel.</p>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -147,7 +145,7 @@ function DashboardChannel({ showPopup }) {
 
       <div className="bg-[#2a2a31] p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-6">Uploaded Videos</h2>
-        <div className='overflow-x-auto lg:overflow-hidden'>
+        <div>
           <table className="min-w-[768px] md:min-w-full">
             <thead>
               <tr>

@@ -155,9 +155,10 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         video: { $exists: true }
     }).populate({
         path: "video",
+        select:"-VideoFile -description",
         populate:{
            path:"owner",
-                       select: "-password -email -fullname -coverImage -refreshToken -watchHistory" 
+                       select: "-password -email -fullname -coverImage -refreshToken -watchHistory -createdAt -updatedAt" 
         }
 
     })

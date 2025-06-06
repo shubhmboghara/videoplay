@@ -11,10 +11,8 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
   const [progress, setProgress] = useState(0);
   const [uploadedSize, setUploadedSize] = useState('0 MB');
 
-  // Lock body scroll
   useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = 'auto';
+    document.body.style.overflow = isOpen ? 'hidden' : 'auto';
     return () => (document.body.style.overflow = 'auto');
   }, [isOpen]);
 
@@ -102,7 +100,6 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2">
       <div className="bg-[#1a1a1a] w-full max-w-3xl rounded-lg p-6 relative top-10">
-        {/* Close Button */}
         <button
           onClick={handleClose}
           className="absolute top-3 right-4 text-gray-400 hover:text-white text-2xl"
@@ -110,11 +107,9 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
           &times;
         </button>
 
-        {/* Title */}
         <h2 className="text-2xl font-bold text-white mb-6">Upload Video</h2>
 
         <form onSubmit={handleSubmit}>
-          {/* Title Input */}
           <div className="mb-4">
             <label htmlFor="title" className="block text-gray-400 mb-2">
               Title
@@ -130,7 +125,6 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
             />
           </div>
 
-          {/* Description Input */}
           <div className="mb-4">
             <label htmlFor="description" className="block text-gray-400 mb-2">
               Description
@@ -141,18 +135,18 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Enter video description"
-            ></textarea>
+            />
           </div>
 
-          {/* Drag and Drop Video */}
-          <div
-            className="mb-4 border border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors duration-200"
+          <label
+            htmlFor="video-upload"
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
+            className="mb-4 block border border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors duration-200 cursor-pointer"
           >
-            <label htmlFor="video-upload" className="cursor-pointer text-gray-400 mb-2 block">
+            <p className="text-gray-400 mb-2">
               Drag and drop your video here or <span className="text-purple-500 underline">click to upload</span>
-            </label>
+            </p>
             <input
               id="video-upload"
               name="video"
@@ -161,12 +155,9 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
               onChange={handleFileChange}
               className="hidden"
             />
-            {videoFile && (
-              <p className="text-white mt-2">Selected: {videoFile.name}</p>
-            )}
-          </div>
+            {videoFile && <p className="text-white mt-2">Selected: {videoFile.name}</p>}
+          </label>
 
-          {/* Video Preview */}
           {videoFile && (
             <div className="mb-4">
               <video
@@ -177,11 +168,11 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
             </div>
           )}
 
-          {/* Thumbnail Upload */}
-          <div className="mb-4 border border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors duration-200">
-            <label htmlFor="thumbnail-upload" className="cursor-pointer text-gray-400 mb-2 block">
-              Thumbnail (optional)
-            </label>
+          <label
+            htmlFor="thumbnail-upload"
+            className="mb-4 block border border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors duration-200 cursor-pointer"
+          >
+            <p className="text-gray-400 mb-2">Thumbnail (optional)</p>
             <input
               id="thumbnail-upload"
               name="thumbnail"
@@ -199,16 +190,15 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
                 />
               </div>
             )}
-          </div>
+          </label>
 
-          {/* Upload Progress */}
           {loading && (
             <div className="mb-4">
               <div className="w-full bg-gray-700 rounded-full h-2.5">
                 <div
                   className="bg-purple-600 h-2.5 rounded-full"
                   style={{ width: `${progress}%` }}
-                ></div>
+                />
               </div>
               <p className="text-gray-300 text-sm mt-1">
                 {progress}% uploaded ({uploadedSize})
@@ -216,10 +206,8 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
             </div>
           )}
 
-          {/* Error */}
           {error && <p className="text-red-500 mb-4">{error}</p>}
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors duration-200"

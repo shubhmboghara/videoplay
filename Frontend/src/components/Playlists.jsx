@@ -44,7 +44,7 @@ function Playlists({ videoId, authStatus, onPlaylistSelected }) {
             }
         } catch (error) {
             console.error('Error creating playlist:', error);
-        }
+        }   
     };
 
     const addVideoToPlaylist = async (playlistId) => {
@@ -53,14 +53,14 @@ function Playlists({ videoId, authStatus, onPlaylistSelected }) {
 
         try {
             const res = await axios.patch(
-                `${API_BASE}/add/${playlistId}/${videoId}`
-                
+                `${API_BASE}/add/${videoId}/${playlistId}`
+
             );
             if (res.data.success) {
                 alert('Video added to playlist');
                 fetchUserPlaylists();
                 if (onPlaylistSelected) {
-                    onPlaylistSelected(selectedPlaylistId); // Notify parent component
+                    onPlaylistSelected(selectedPlaylistId); 
                 }
             }
         } catch (error) {

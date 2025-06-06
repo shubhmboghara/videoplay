@@ -11,7 +11,7 @@ const API_BASE = '/api/playlist';
 
 
 
-function Playlists({ onPlaylistSelect }) {
+function Playlists({ onPlaylistSelected }) {
   const [playlists, setPlaylists] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState('Recently added');
   const [search, setSearch] = useState('');
@@ -38,7 +38,7 @@ function Playlists({ onPlaylistSelect }) {
   return (
     <div className="min-h-screen text-white w-full ">
 
-      <div className="ml-0 lg:ml-64 px-4 sm:px-8  pb-4">
+      <div className="ml-0 lg:ml-64 px-4 sm:px-8 pt-10 pb-4">
         <h2 className="text-2xl font-bold mb-6">Your Playlists</h2>
       </div>
 
@@ -59,7 +59,7 @@ function Playlists({ onPlaylistSelect }) {
                 >
                   <div
                     className="relative w-full aspect-video overflow-hidden rounded-t-2xl"
-                    onClick={() => onPlaylistSelect && onPlaylistSelect(playlist._id)}
+                    onClick={() => onPlaylistSelected && onPlaylistSelected(playlist._id)}
                   >
                     <img
                       src={coverImg}
@@ -83,7 +83,7 @@ function Playlists({ onPlaylistSelect }) {
                         className="text-sm text-purple-400 font-semibold hover:underline"
                         onClick={e => {
                           e.preventDefault();
-                          onPlaylistSelect && onPlaylistSelect(playlist._id);
+                          onPlaylistSelected && onPlaylistSelected(playlist._id);
                         }}
                       >
                         View full playlist

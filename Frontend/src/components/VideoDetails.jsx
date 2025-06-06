@@ -16,7 +16,7 @@ import CommentSection from './CommentSection';
 import { toggleLike } from '../hooks/toggleLike';
 import { getLikeCount } from '../hooks/getLikeCount';
 import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
-import PlaylistManager from './Playlists';
+import PlaylistManager from './playlists';
 
 export default function VideoDetails({ showPopup }) {
   const { id } = useParams();
@@ -204,7 +204,6 @@ export default function VideoDetails({ showPopup }) {
 
           <CommentSection videoId={id} />
         </div>
-        )}
 
         {showSavePopup && (
           <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50">
@@ -254,7 +253,6 @@ export default function VideoDetails({ showPopup }) {
         )}
       </aside>
 
-      {/* Playlist Modal */}
       {showPlaylistModal && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-sm">

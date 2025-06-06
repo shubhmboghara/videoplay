@@ -20,10 +20,10 @@ function PlaylistsPage() {
                 setError(null);
                 try {
                     const res = await axios.get(`/api/playlist/${selectedPlaylistId}`);
-
+                    console.log('API response for playlist:', res.data);
                     if (res.data.success) {
-                        console.log('API Response videos data:', res.data.data.videos);
-                        setPlaylistVideos(res.data.data.videos || []);
+                        setPlaylistVideos(res.data.data.playlist?.videos || []);
+                        console.log('Setting playlistVideos:', res.data.data.playlist?.videos || []);
                     } else {
                         setError(res.data.message || 'Failed to fetch playlist videos.');
                     }

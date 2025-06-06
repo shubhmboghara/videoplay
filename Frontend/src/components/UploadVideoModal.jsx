@@ -1,149 +1,236 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { publishAVideo } from '../hooks/video';
-import { Button, Input } from './index';
 
 const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [videoFile, setVideoFile] = useState(null);
-    const [thumbnail, setThumbnail] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [videoFile, setVideoFile] = useState(null);
+  const [thumbnail, setThumbnail] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [progress, setProgress] = useState(0);
+  const [uploadedSize, setUploadedSize] = useState('0 MB');
 
-    const handleFileChange = (e) => {
-        if (e.target.name === 'video') {
-            setVideoFile(e.target.files[0]);
-        } else if (e.target.name === 'thumbnail') {
-            setThumbnail(e.target.files[0]);
-        }
-    };
+  // Lock body scroll
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = 'auto';
+    return () => (document.body.style.overflow = 'auto');
+  }, [isOpen]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+  if (!isOpen) return null;
 
-        if (!videoFile || !title || !description) {
-            setError('Please fill in all required fields and select a video file.');
-            setLoading(false);
-            return;
-        }
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (e.target.name === 'video' && file?.type.startsWith('video/')) {
+      setVideoFile(file);
+      if (!title && file.name) {
+        setTitle(file.name.split('.').slice(0, -1).join('.'));
+      }
+      setError('');
+    } else if (e.target.name === 'thumbnail' && file?.type.startsWith('image/')) {
+      setThumbnail(file);
+      setError('');
+    } else {
+      setError('Invalid file type selected.');
+    }
+  };
 
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('video', videoFile);
-        if (thumbnail) {
-            formData.append('thumbnail', thumbnail);
-        }
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file?.type.startsWith('video/')) {
+      setVideoFile(file);
+      if (!title && file.name) {
+        setTitle(file.name.split('.').slice(0, -1).join('.'));
+      }
+      setError('');
+    } else {
+      setError('Please drop a valid video file.');
+    }
+  };
 
-        try {
-            await publishAVideo(formData);
-            onVideoUploaded();
-            onClose();
-            setTitle('');
-            setDescription('');
-            setVideoFile(null);
-            setThumbnail(null);
-        } catch (err) {
-            setError(err.message || 'Failed to upload video.');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setProgress(0);
+    setUploadedSize('0 MB');
 
-    if (!isOpen) return null;
+    if (!videoFile) {
+      setError('Please select a video file.');
+      setLoading(false);
+      return;
+    }
 
-    return (
-        <div class=" inset-0 backdrop-blur-sm  flex items-center justify-center fixed">
-            <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg w-full max-w-md text-white relative top-10 lg:left-15  ">
-                <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl">&times;</button>
-                <div className="flex items-center">
-                    <div className="bg-[#403c3c] p-2 rounded-full mr-3">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 6C12.5523 6 13 6.44772 13 7V11H17C17.5523 17 18 17.4477 18 18C18 18.5523 17.5523 19 17 19H7C6.44772 19 6 18.5523 6 18C6 17.4477 6.44772 17 7 17H11V7C11 6.44772 11.4477 6 12 6Z" fill="currentColor" />
-                        </svg>
-                    </div>
-                    <h2 className="text-xl font-bold">Upload video</h2>
-                </div>
-                <p className="text-gray-400 mb-4">Share where you've worked on your profile.</p>
-                {error && <p className="text-red-500 mb-4">{error}</p>}
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4 border border-gray-600 p-4 rounded-lg text-center cursor-pointer">
-                        <label htmlFor="video-upload" className="block text-gray-400 mb-2">
-                            <svg className="mx-auto mb-2" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 6C12.5523 6 13 6.44772 13 7V11H17C17.5523 17 18 17.4477 18 18C18 18.5523 17.5523 19 17 19H7C6.44772 19 6 18.5523 6 18C6 17.4477 6.44772 17 7 17H11V7C11 6.44772 11.4477 6 12 6Z" fill="currentColor" />
-                            </svg>
-                            Click to upload or drag and drop
-                        </label>
-                        <p className="text-sm text-gray-500"> mp4, webm, ogg/ogv, mov ,avi, flv (max. 800x400px)</p>
-                        <input
-                            id="video-upload"
-                            type="file"
-                            name="video"
-                            accept="video/*"
-                            onChange={handleFileChange}
-                            className="hidden"
-                            required
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="title" className="block text-gray-400 text-sm font-bold mb-2">Title</label>
-                        <Input
-                            id="title"
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="What is your title?"
-                            className="bg-[#262626] text-white border border-gray-600 rounded-lg py-2 px-3 w-full leading-tight focus:outline-none focus:shadow-outline"
-                            required
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="description" className="block text-gray-400 text-sm font-bold mb-2">Description*</label>
-                        <Input
-                            id="description"
-                            type="textarea"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            placeholder="e.g. I joined Stripe's Customer Success team to help them scale their checkout product. I focused mainly on onboarding new customers and resolving complaints."
-                            rows="4"
-                            className="bg-[#262626] text-white border border-gray-600 rounded-lg py-2 px-3 w-full leading-tight focus:outline-none focus:shadow-outline"
-                            required
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="thumbnail" className="block text-gray-400 text-sm font-bold mb-2">Thumbnail (Optional):</label>
-                        <input
-                            id="thumbnail"
-                            type="file"
-                            name="thumbnail"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="bg-[#262626] text-white border border-gray-600 rounded-lg py-2 px-3 w-full leading-tight focus:outline-none focus:shadow-outline"
-                        />
-                    </div>
-                    <div className="flex justify-end gap-4 mt-6">
-                        <Button
-                            type="button"
-                            onClick={onClose}
-                            className="bg-transparent hover:bg-gray-700 text-white border border-gray-600 py-2 px-4 rounded-lg"
-                            disabled={loading}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            className="bg-[#4f2f79] hover:bg-[#9B6ADF] text-white py-2 px-4 rounded-lg"
-                            disabled={loading}
-                        >
-                            {loading ? 'Uploading...' : 'Finish'}
-                        </Button>
-                    </div>
-                </form>
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('video', videoFile);
+    if (thumbnail) formData.append('thumbnail', thumbnail);
+
+    try {
+      await publishAVideo(formData, (event) => {
+        const percent = Math.round((event.loaded * 100) / event.total);
+        const sizeMB = (event.loaded / (1024 * 1024)).toFixed(2);
+        const sizeGB = (event.loaded / (1024 * 1024 * 1024)).toFixed(2);
+        setProgress(percent);
+        setUploadedSize(parseFloat(sizeMB) > 1000 ? `${sizeGB} GB` : `${sizeMB} MB`);
+      });
+
+      onVideoUploaded();
+      handleClose();
+    } catch (err) {
+      setError(err?.response?.data?.message || err.message || 'Failed to upload video.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    setTitle('');
+    setDescription('');
+    setVideoFile(null);
+    setThumbnail(null);
+    setLoading(false);
+    setError('');
+    setProgress(0);
+    setUploadedSize('0 MB');
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2">
+      <div className="bg-[#1a1a1a] w-full max-w-3xl rounded-lg p-6 relative top-10">
+        {/* Close Button */}
+        <button
+          onClick={handleClose}
+          className="absolute top-3 right-4 text-gray-400 hover:text-white text-2xl"
+        >
+          &times;
+        </button>
+
+        {/* Title */}
+        <h2 className="text-2xl font-bold text-white mb-6">Upload Video</h2>
+
+        <form onSubmit={handleSubmit}>
+          {/* Title Input */}
+          <div className="mb-4">
+            <label htmlFor="title" className="block text-gray-400 mb-2">
+              Title
+            </label>
+            <input
+              type="text"
+              id="title"
+              className="w-full p-3 rounded bg-[#2a2a2a] text-white border border-[#3a3a3a] focus:outline-none focus:border-purple-500"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter video title"
+              required
+            />
+          </div>
+
+          {/* Description Input */}
+          <div className="mb-4">
+            <label htmlFor="description" className="block text-gray-400 mb-2">
+              Description
+            </label>
+            <textarea
+              id="description"
+              className="w-full p-3 rounded bg-[#2a2a2a] text-white border border-[#3a3a3a] focus:outline-none focus:border-purple-500 h-24"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter video description"
+            ></textarea>
+          </div>
+
+          {/* Drag and Drop Video */}
+          <div
+            className="mb-4 border border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors duration-200"
+            onDrop={handleDrop}
+            onDragOver={(e) => e.preventDefault()}
+          >
+            <label htmlFor="video-upload" className="cursor-pointer text-gray-400 mb-2 block">
+              Drag and drop your video here or <span className="text-purple-500 underline">click to upload</span>
+            </label>
+            <input
+              id="video-upload"
+              name="video"
+              type="file"
+              accept="video/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            {videoFile && (
+              <p className="text-white mt-2">Selected: {videoFile.name}</p>
+            )}
+          </div>
+
+          {/* Video Preview */}
+          {videoFile && (
+            <div className="mb-4">
+              <video
+                src={URL.createObjectURL(videoFile)}
+                controls
+                className="w-full max-h-64 object-cover rounded-lg"
+              />
             </div>
-        </div>
-    );
+          )}
+
+          {/* Thumbnail Upload */}
+          <div className="mb-4 border border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors duration-200">
+            <label htmlFor="thumbnail-upload" className="cursor-pointer text-gray-400 mb-2 block">
+              Thumbnail (optional)
+            </label>
+            <input
+              id="thumbnail-upload"
+              name="thumbnail"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            {thumbnail && (
+              <div className="mt-4">
+                <img
+                  src={URL.createObjectURL(thumbnail)}
+                  alt="Thumbnail preview"
+                  className="w-full max-h-48 object-cover rounded"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Upload Progress */}
+          {loading && (
+            <div className="mb-4">
+              <div className="w-full bg-gray-700 rounded-full h-2.5">
+                <div
+                  className="bg-purple-600 h-2.5 rounded-full"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              <p className="text-gray-300 text-sm mt-1">
+                {progress}% uploaded ({uploadedSize})
+              </p>
+            </div>
+          )}
+
+          {/* Error */}
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors duration-200"
+            disabled={loading}
+          >
+            {loading ? 'Uploading...' : 'Upload Video'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 export default UploadVideoModal;

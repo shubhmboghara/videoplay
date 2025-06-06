@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/AppError.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
-import { uploadOnCloudinary, deleteFromCloudinary, publicId } from "../utils/cloudinaryvideo.js"
+import { uploadOnCloudinary, deleteFromCloudinary, publicId, generateVideoThumbnail } from "../utils/cloudinaryvideo.js"
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 
@@ -79,36 +79,73 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
     const videos = await Video.aggregate(pipeline);
 
-    
+
     return res
         .status(200)
         .json(
-            new ApiResponse(200, { videos}, "All videos fetched successfully")
+            new ApiResponse(200, { videos }, "All videos fetched successfully")
         );
 });
 
 
 const publishAVideo = asyncHandler(async (req, res) => {
-    const { title, description } = req.body
+    let { title, description } = req.body
 
-    if (!title || !description) {
-        throw new ApiError(400, "title and description are required");
+    const Videofile = req.files?.video?.[0]
+    const videoPath = Videofile?.path
+    const originalName = Videofile?.originalname
+
+
+    if (!title || title.trim() === "") {
+
+        if (originalName && originalName.includes(".")) {
+            const dotIndex = originalName.lastIndexOf(".");
+            title = originalName.slice(0, dotIndex).trim();
+
+        } else {
+
+            const dataobj = new Date()
+            const day = dataobj.getDate()
+            const month = dataobj.getMonth()
+            const year = dataobj.getFullYear()
+
+            title = `${day} - ${month} - ${year}`
+        }
     }
 
     const videoFilePath = req.files?.video?.[0]?.path
     const thumbnailFilePath = req.files?.thumbnail?.[0]?.path
 
+    if (!videoPath) {
+    throw new ApiError(400, "A video file is required");
+  }
 
-    if (!videoFilePath || !thumbnailFilePath) {
-        throw new ApiError(400, "video and thumbnail are required ")
+    if (!videoFilePath) {
+        throw new ApiError(400, "video  are required ")
     }
 
     try {
         const video = await uploadOnCloudinary(videoFilePath, "video")
-        const thumbnail = await uploadOnCloudinary(thumbnailFilePath)
 
-        if (!video?.url || !thumbnail?.url) {
-            throw new ApiError(500, "video or thumbnail upload failed ")
+
+        if (!video?.url) {
+            throw new ApiError(500, "video  upload failed ")
+        }
+
+        let thumbnailUrl = null
+
+        if (thumbnailFilePath) {
+            const uploadedThumbnail = await uploadOnCloudinary(thumbnailFilePath)
+            if (!uploadedThumbnail?.secure_url) {
+                throw new ApiError(500, "Thumbnail upload failed");
+            }
+            thumbnailUrl = uploadedThumbnail.secure_url;
+
+        }
+        else {
+            const vidPublicId = video.public_id;
+            thumbnailUrl = generateVideoThumbnail(vidPublicId)
+
         }
 
         const duration = video?.duration ? Math.floor(video.duration) : 0
@@ -118,7 +155,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
             description,
             owner: req.user._id,
             VideoFile: video.url,
-            thumbnail: thumbnail.secure_url,
+            thumbnail: thumbnailUrl,
             duration: duration,
             isPublished: true
 
@@ -182,99 +219,99 @@ const getVideoById = asyncHandler(async (req, res) => {
     await Video.updateOne({ _id: videoId }, { $inc: { views: 1 } });
 
     const pipeline = [
-    { $match: { _id: new mongoose.Types.ObjectId(videoId) } },
-    {
-        $lookup: {
-            from: "users",
-            localField: "owner",
-            foreignField: "_id",
-            as: "owner",
-            pipeline: [
-                {
-                    $lookup: {
-                        from: "subscriptions",
-                        foreignField: "channel",
-                        localField: "_id",
-                        as: "subscribers",
+        { $match: { _id: new mongoose.Types.ObjectId(videoId) } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "subscriptions",
+                            foreignField: "channel",
+                            localField: "_id",
+                            as: "subscribers",
+                        },
                     },
-                },
-                {
-                    $addFields: {
-                        subscribers: "$subscribers.subscriber",
+                    {
+                        $addFields: {
+                            subscribers: "$subscribers.subscriber",
+                        },
                     },
-                },
-                {
-                    $addFields: {
-                        subscriberCount: { $size: "$subscribers" },
-                        isSubscribed: userId
-                            ? {
-                                $cond: {
-                                    if: {
-                                        $in: [new mongoose.Types.ObjectId(userId), "$subscribers"]
-                                    },
-                                    then: true,
-                                    else: false
+                    {
+                        $addFields: {
+                            subscriberCount: { $size: "$subscribers" },
+                            isSubscribed: userId
+                                ? {
+                                    $cond: {
+                                        if: {
+                                            $in: [new mongoose.Types.ObjectId(userId), "$subscribers"]
+                                        },
+                                        then: true,
+                                        else: false
+                                    }
                                 }
-                            }
-                            : false
+                                : false
+                        },
                     },
-                },
-                {
-                    $project: {
-                        _id: 1,
-                        fullName: 1,
-                        username: 1,
-                        avatar: 1,
-                        createdAt: 1,
-                        subscriberCount: 1,
-                        isSubscribed: 1,
+                    {
+                        $project: {
+                            _id: 1,
+                            fullName: 1,
+                            username: 1,
+                            avatar: 1,
+                            createdAt: 1,
+                            subscriberCount: 1,
+                            isSubscribed: 1,
+                        },
                     },
-                },
-            ],
+                ],
+            },
         },
-    },
-    { $unwind: "$owner" },
+        { $unwind: "$owner" },
 
-    {
-        $lookup: {
-            from: "likes",
-            let: { videoId: "$_id" },
-            pipeline: [
-                {
-                    $match: {
-                        $expr: {
-                            $eq: ["$video", "$$videoId"]
+        {
+            $lookup: {
+                from: "likes",
+                let: { videoId: "$_id" },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ["$video", "$$videoId"]
+                            }
                         }
                     }
-                }
-            ],
-            as: "likes"
-        }
-    },
-    {
-        $addFields: {
-            likeCount: { $size: "$likes" },
-            isLiked: userId ? {
-                $in: [new mongoose.Types.ObjectId(userId), "$likes.likedBy"]
-            } : false
-        }
-    },
-
-    {
-        $project: {
-            title: 1,
-            description: 1,
-            VideoFile: 1,
-            thumbnail: 1,
-            duration: 1,
-            views: 1,
-            createdAt: 1,
-            owner: 1,
-            likeCount: 1,
-            isLiked: 1
+                ],
+                as: "likes"
+            }
         },
-    },
-];
+        {
+            $addFields: {
+                likeCount: { $size: "$likes" },
+                isLiked: userId ? {
+                    $in: [new mongoose.Types.ObjectId(userId), "$likes.likedBy"]
+                } : false
+            }
+        },
+
+        {
+            $project: {
+                title: 1,
+                description: 1,
+                VideoFile: 1,
+                thumbnail: 1,
+                duration: 1,
+                views: 1,
+                createdAt: 1,
+                owner: 1,
+                likeCount: 1,
+                isLiked: 1
+            },
+        },
+    ];
 
 
 
@@ -323,24 +360,28 @@ const updateVideo = asyncHandler(async (req, res) => {
 
     let uploadedThumbnail;
 
-    if (thumbnailLocalPath && video.thumbnail) {
-        const id = publicId(video.thumbnail)
 
-        if (id) {
-            await deleteFromCloudinary(id)
+    if (thumbnailLocalPath) {
+        const thumbPublicId = publicId(video.thumbnail);
+        const isRealThumbnail = video.thumbnail?.includes("res.cloudinary.com") &&
+            thumbPublicId &&
+            video.thumbnail.includes("/image/upload/");
+
+        if (isRealThumbnail) {
+            await deleteFromCloudinary(thumbPublicId, "image");
         }
 
-        uploadedThumbnail = await uploadOnCloudinary(thumbnailLocalPath)
-
-        if (!uploadedThumbnail) {
-            throw new ApiError(500, "Error uploading new thumbnail")
+        uploadedThumbnail = await uploadOnCloudinary(thumbnailLocalPath, "image");
+        if (!uploadedThumbnail?.secure_url) {
+            throw new ApiError(500, "Error uploading new thumbnail");
         }
     }
-
     const updatedFields = {}
     if (title) updatedFields.title = title;
     if (description) updatedFields.description = description;
-    if (uploadedThumbnail) updatedFields.thumbnail = uploadedThumbnail.secure_url;
+    if (uploadedThumbnail) {
+        updatedFields.thumbnail = uploadedThumbnail.secure_url;
+    }
 
     const response = await Video.findByIdAndUpdate(
         videoId,
@@ -366,7 +407,20 @@ const deleteVideo = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Video not found");
     }
 
-    await deleteFromCloudinary(publicId(video.thumbnail), "image");
+
+    if (video.thumbnail) {
+        const thumbPublicId = publicId(video.thumbnail)
+
+        const isRealThumbnail =
+            video.thumbnail.includes("res.cloudinary.com") &&
+            thumbPublicId &&
+            video.thumbnail.includes("/image/upload/")
+
+        if (isRealThumbnail) {
+            await deleteFromCloudinary(publicId(video.thumbnail), "image");
+        }
+
+    }
     await deleteFromCloudinary(publicId(video.VideoFile), "video");
 
 

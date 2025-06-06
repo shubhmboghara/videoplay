@@ -1,29 +1,49 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { HiLockClosed } from 'react-icons/hi';
 
 const PlaylistCard = ({ playlist }) => {
-    const defaultThumbnail = 'https://via.placeholder.com/300x169.png?text=No+Thumbnail'; // Placeholder image
+  const defaultThumbnail = 'https://via.placeholder.com/320x180.png?text=No+Thumbnail';
+  const thumbnail = playlist.videos[0]?.thumbnail || defaultThumbnail;
 
-    return (
-        <Link to={`/playlist/${playlist._id}`}>
-            <div className="w-full rounded-lg overflow-hidden cursor-pointer bg-[#18181b] shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <div className="relative bg-[#18181b]">
-                    <img
-                        src={playlist.videos[0]?.thumbnail || defaultThumbnail}
-                        alt={playlist.name}
-                        className="w-full h-full object-cover aspect-video"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                        <span className="text-white text-lg font-semibold">{playlist.videos.length} Videos</span>
-                    </div>
-                </div>
-                <div className="p-3">
-                    <h3 className="text-white font-semibold text-lg truncate mb-1">{playlist.name}</h3>
-                    <p className="text-gray-400 text-sm line-clamp-2">{playlist.description}</p>
-                </div>
+  return (
+    <Link to={`/playlist/${playlist._id}`} className="block w-full max-w-sm">
+      <div className="bg-[#0f0f0f] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300">
+        {/* Thumbnail Section */}
+        <div className="relative aspect-video">
+          <img
+            src={thumbnail}
+            alt={playlist.name}
+            className="w-full h-full object-cover"
+          />
+
+          {/* Hover Overlay */}
+          <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition duration-300 flex items-end justify-end p-2">
+            <span className="bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded">
+              {playlist.videos.length} videos
+            </span>
+          </div>
+
+          {/* Lock Icon for Private */}
+          {playlist.isPrivate && (
+            <div className="absolute top-2 left-2 bg-black bg-opacity-60 p-1 rounded-full">
+              <HiLockClosed className="text-white text-sm" />
             </div>
-        </Link>
-    );
+          )}
+        </div>
+
+        {/* Text Content */}
+        <div className="px-3 py-2">
+          <h3 className="text-white font-semibold text-base truncate">{playlist.name}</h3>
+          {playlist.description && (
+            <p className="text-gray-400 text-sm line-clamp-2">
+              {playlist.description}
+            </p>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
 };
 
 export default PlaylistCard;

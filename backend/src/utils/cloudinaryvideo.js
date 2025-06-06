@@ -8,7 +8,16 @@ cloudinary.config({
 });
 
 
-
+const generateVideoThumbnail = (publicId) => {
+  return cloudinary.url(publicId,{
+    resource_type: 'video',
+    start_offset: '0',
+    format: 'jpg',
+    transformation: [
+      { width: 400, height: 250, crop: 'fill' },
+    ],
+  });
+};
 const uploadOnCloudinary = async (localFilePath,resourceType = "image") => {
 
   try {
@@ -49,4 +58,4 @@ const deleteFromCloudinary = async (publicId, type = "image") => {
   }
 };
 
-export { uploadOnCloudinary, deleteFromCloudinary, publicId }
+export { uploadOnCloudinary, deleteFromCloudinary, publicId,generateVideoThumbnail }

@@ -47,7 +47,7 @@ const PlaylistDetailsPage = ({ showPopup }) => {
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4   lg:left-50 relative">
             <h1 className="text-3xl font-bold text-white mb-6">{playlist.name}</h1>
             {playlist.description && (
                 <p className="text-gray-400 mb-6">{playlist.description}</p>
@@ -55,7 +55,19 @@ const PlaylistDetailsPage = ({ showPopup }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {playlist.videos.length > 0 ? (
                     playlist.videos.map((video) => (
-                        <VideoCard key={video._id} video={video} showPopup={showPopup} authStatus={authStatus} />
+                        <VideoCard
+                            key={video._id}
+                            id={video._id}
+                            thumbnail={video.thumbnail}
+                            title={video.title}
+                            channel={video.owner.username}
+                            avatar={video.owner.avatar}
+                            views={video.views}
+                            time={video.createdAt}
+                            duration={video.duration}
+                            showPopup={showPopup}
+                            authStatus={authStatus}
+                        />
                     ))
                 ) : (
                     <p className="text-white">No videos in this playlist yet.</p>

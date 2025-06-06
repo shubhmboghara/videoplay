@@ -22,10 +22,12 @@ import axios from "axios";
         }
     }
 
-    export const publishAVideo= async (formData) => {
+    export const publishAVideo= async (formData, onUploadProgress) => {
     
     try {
-        const response = await axios.post(`/api/video/`, formData)
+        const response = await axios.post(`/api/video/`, formData, {
+            onUploadProgress,
+        });
         return response.data;
     } catch (error) {
         console.error("Publish video error:", error);

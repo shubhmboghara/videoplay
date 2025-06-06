@@ -8,6 +8,13 @@ cloudinary.config({
 });
 
 
+function publicId(url) {
+  if (!url) return null;
+  url = url.split('?')[0];
+  const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-zA-Z0-9]+$/);
+  return matches ? matches[1] : null;
+}
+
 
 const uploadOnCloudinary = async (localFilePath) => {
 
@@ -30,12 +37,10 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 }
 
-function publicId(url) {
-  if (!url) return null;
-  url = url.split('?')[0];
-  const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-zA-Z0-9]+$/);
-  return matches ? matches[1] : null;
-}
+
+
+
+
 
 const deleteFromCloudinary = async (publicId) => {
   try {
@@ -47,4 +52,6 @@ const deleteFromCloudinary = async (publicId) => {
   }
 };
 
-export { uploadOnCloudinary, deleteFromCloudinary, publicId }
+
+
+export { uploadOnCloudinary, deleteFromCloudinary, publicId  }

@@ -53,7 +53,8 @@ function Playlists({ videoId, authStatus, onPlaylistSelected }) {
 
         try {
             const res = await axios.patch(
-                `${API_BASE}/${playlistId}/add/${videoId}`
+                `${API_BASE}/add/${playlistId}/${videoId}`
+                
             );
             if (res.data.success) {
                 alert('Video added to playlist');
@@ -117,79 +118,64 @@ function Playlists({ videoId, authStatus, onPlaylistSelected }) {
 
     if (onPlaylistSelected) {
         return (
-            <div className="w-full bg-gray-800 rounded-md shadow-lg py-1 text-white">
-                <div className="flex justify-between items-center px-4 py-2 text-sm text-gray-400">
-                    <span className="text-base font-semibold text-white">Save video to...</span>
-                    <button onClick={() => onPlaylistSelected(null)} className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div className="py-1">
-                    {playlists.map((pl) => (
-                        <div
-                            key={pl._id}
-                            className="flex items-center justify-between px-4 py-2 hover:bg-gray-700 cursor-pointer"
-                            onClick={() => handlePlaylistSelection(pl._id)}
-                        >
-                            <label className="inline-flex items-center cursor-pointer">
-                                <input
-                                     type="checkbox"
-                                     className="form-checkbox h-5 w-5 text-white bg-gray-900 border-gray-600 rounded focus:ring-blue-500"
-                                     checked={selectedPlaylistId === pl._id}
-                                     onChange={() => handlePlaylistSelection(pl._id)}
-                                 />
-                                 <span className="ml-4 text-white text-base">{pl.name}</span>
-                            </label>
-                            {pl.isPrivate && (
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                     className="h-4 w-4 text-gray-400 ml-2"
-                                     viewBox="0 0 20 20"
-                                     fill="currentColor"
-                                >
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M10 1a4 4 0 00-4 4v2a4 4 0 00-4 4v4a2 2 0 002 2h8a2 2 0 002-2v-4a4 4 0 00-4-4V5a4 4 0 00-4-4zm3 8V5a3 3 0 10-6 0v4h6z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
-                            )}
-                        </div>
-                    ))} 
-                </div>
-                <div className="border-t border-gray-700 mt-1 pt-1">
-                    {!showNewPlaylistInput ? (
-                        <div className="px-4 py-2">
-                            <button
-                                onClick={() => setShowNewPlaylistInput(true)}
-                                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-white hover:bg-gray-700 transition duration-300 ease-in-out"
-                            >
-                                <HiFolderAdd className="h-5 w-5" />
-                                New playlist
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="p-4">
-                            <h3 className="text-lg font-semibold mb-2">Create New Playlist</h3>
-                            <input
-                                type="text"
-                                placeholder="Playlist Name"
-                                value={newPlaylistName}
-                                onChange={(e) => setNewPlaylistName(e.target.value)}
-                                className="p-2 rounded-md text-black w-full mb-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            />
-                            <button
-                                onClick={createPlaylist}
-                                className="w-full bg-gradient-to-r from-green-500 to-green-700 text-white px-4 py-2 rounded-md hover:from-green-600 hover:to-green-800 transition duration-300 ease-in-out"
-                            >
-                                Create & Add Video
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </div>
+            <div className="w-[360px] bg-[#212121] rounded-xl shadow-xl text-white overflow-hidden">
+  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+    <h2 className="text-lg font-medium">Save to playlist</h2>
+    <button onClick={() => onPlaylistSelected(null)} className="text-gray-400 hover:text-white">
+      ✕
+    </button>
+  </div>
+
+  <div className="max-h-[300px] overflow-y-auto divide-y divide-gray-700">
+    {playlists.map((pl) => (
+      <div key={pl._id} className="flex items-center justify-between px-4 py-3 hover:bg-[#303030] cursor-pointer">
+        <label className="flex items-center gap-3 w-full cursor-pointer">
+          <input
+            type="checkbox"
+            className="form-checkbox h-5 w-5 text-purple-500 border-gray-600"
+            checked={selectedPlaylistId === pl._id}
+            onChange={() => handlePlaylistSelection(pl._id)}
+          />
+          <span className="truncate text-sm">{pl.name}</span>
+        </label>
+        {pl.isPrivate && (
+          <svg className="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 1a4 4..." clipRule="evenodd" />
+          </svg>
+        )}
+      </div>
+    ))}
+  </div>
+
+  <div className="border-t border-gray-700 px-4 py-3">
+    {!showNewPlaylistInput ? (
+      <button
+        onClick={() => setShowNewPlaylistInput(true)}
+        className="w-full flex items-center justify-center gap-2 text-sm hover:text-purple-400 transition"
+      >
+        <HiFolderAdd className="w-5 h-5" />
+        <span>New playlist</span>
+      </button>
+    ) : (
+      <div className="space-y-2">
+        <input
+          type="text"
+          placeholder="Playlist name"
+          value={newPlaylistName}
+          onChange={(e) => setNewPlaylistName(e.target.value)}
+          className="w-full px-3 py-2 rounded-md bg-[#2b2b2b] text-white text-sm focus:outline-none focus:ring focus:ring-purple-500"
+        />
+        <button
+          onClick={createPlaylist}
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm py-2 rounded-md"
+        >
+          Create & Add
+        </button>
+      </div>
+    )}
+  </div>
+</div>
+
         );
     }
 

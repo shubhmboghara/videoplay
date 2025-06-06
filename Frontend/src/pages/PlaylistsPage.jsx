@@ -3,12 +3,15 @@ import PlaylistsComponent from '../components/playlists';
 import { VideoCard } from '../components';
 import axios from 'axios';
 import Loader from '../components/Loader';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function PlaylistsPage() {
-    const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
+    const params = useParams();
+    const [selectedPlaylistId, setSelectedPlaylistId] = useState(params.id || null);
     const [playlistVideos, setPlaylistVideos] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPlaylistVideos = async () => {
@@ -36,9 +39,15 @@ function PlaylistsPage() {
         fetchPlaylistVideos();
     }, [selectedPlaylistId]);
 
+    useEffect(() => {
+        if (params.id && params.id !== selectedPlaylistId) {
+            setSelectedPlaylistId(params.id);
+        }
+    }, [params.id]);
+
     const handlePlaylistSelect = (playlistId) => {
-        console.log('Playlist selected:', playlistId);
         setSelectedPlaylistId(playlistId);
+        navigate(`/playlist/${playlistId}`);
     };
 
     if (loading) {
@@ -64,14 +73,14 @@ function PlaylistsPage() {
                         <p className="text-white">No videos in this playlist.</p>
                     )}
                     <button
-                        onClick={() => setSelectedPlaylistId(null)}
+                        onClick={() => { setSelectedPlaylistId(null); navigate('/playlists'); }}
                         className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
                         Back to Playlists
                     </button>
                 </div>
             ) : (
-                <PlaylistsComponent onPlaylistSelect={handlePlaylistSelect} />
+                <PlaylistsComponent onPlaylistSelected={handlePlaylistSelect} />
             )}
         </div>
     );

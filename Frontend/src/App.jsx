@@ -15,7 +15,6 @@ import Subscriptions from './pages/Subscriptions'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import PlaylistsPage from './pages/PlaylistsPage'
-import PlaylistDetailsPage from './pages/PlaylistDetailsPage'
 
 
 
@@ -59,7 +58,6 @@ function App() {
               <Route path="/subscriptions" element={<ProtectedRoute>  <Subscriptions showPopup={showPopup} /></ProtectedRoute>} />
               <Route path="/my-content" element={<ProtectedRoute>  <Dashboard showPopup={showPopup} /></ProtectedRoute>} />
               <Route path="/playlists" element={<ProtectedRoute>  <PlaylistsPage showPopup={showPopup} /></ProtectedRoute>} />
-              <Route path="/playlist/:id" element={<ProtectedRoute>  <PlaylistDetailsPage showPopup={showPopup} /></ProtectedRoute>} />
 
             </Routes>
 

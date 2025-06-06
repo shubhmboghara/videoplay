@@ -7,6 +7,7 @@ import Loader from "./Loader"; // Import the new Loader component
 const AuthLoader = ({ children }) => {
     const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(true); 
+    
 
     useEffect(() => {
         const fetchCurrentUser = async () => {

@@ -6,7 +6,7 @@ import PlaylistCard from './PlaylistCard';
 
 const API_BASE = '/api/playlist';
 
-function Playlists({ videoId, authStatus, onPlaylistSelected }) {
+function Playlists({ videoId, authStatus, onPlaylistSelected, onPlaylistSelect }) {
 
     const [playlists, setPlaylists] = useState([]);
 
@@ -227,7 +227,7 @@ function Playlists({ videoId, authStatus, onPlaylistSelected }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {playlists.length > 0 ? (
                     playlists.map((playlist) => (
-                        <PlaylistCard key={playlist._id} playlist={playlist} />
+                        <PlaylistCard key={playlist._id} playlist={playlist} onClick={() => onPlaylistSelect && onPlaylistSelect(playlist._id)} />
                     ))
                 ) : (
                     <p className="text-gray-400 text-center col-span-full">No playlists created yet.</p>

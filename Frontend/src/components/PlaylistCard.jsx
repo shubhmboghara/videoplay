@@ -2,12 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { HiLockClosed } from 'react-icons/hi';
 
-const PlaylistCard = ({ playlist }) => {
+const PlaylistCard = ({ playlist, onClick }) => {
   const defaultThumbnail = 'https://via.placeholder.com/320x180.png?text=No+Thumbnail';
   const thumbnail = playlist.videos[0]?.thumbnail || defaultThumbnail;
 
   return (
-    <Link to={`/playlist/${playlist._id}`} className="block w-full max-w-sm">
+    <div onClick={onClick} className="block w-full max-w-sm cursor-pointer">
       <div className="bg-[#0f0f0f] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300">
         {/* Thumbnail Section */}
         <div className="relative aspect-video">
@@ -42,7 +42,7 @@ const PlaylistCard = ({ playlist }) => {
           )}
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

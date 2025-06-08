@@ -16,7 +16,8 @@ import CommentSection from './CommentSection';
 import { toggleLike } from '../hooks/toggleLike';
 import { getLikeCount } from '../hooks/getLikeCount';
 import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
-import PlaylistManager from './playlists';
+import PlaylistManager from './PlaylistManager';
+import SaveToPlaylistDropdown from './SaveToPlaylistDropdown';
 
 export default function VideoDetails({ showPopup }) {
   const { id } = useParams();
@@ -31,23 +32,10 @@ export default function VideoDetails({ showPopup }) {
   const [likesCount, setLikesCount] = useState(0);
   const [subscriberCount, setSubscriberCount] = useState(0);
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
-  const [showSavePopup, setShowSavePopup] = useState(false);
+
   const playlistDropdownRef = useRef(null);
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (playlistDropdownRef.current && !playlistDropdownRef.current.contains(event.target)) {
-        setTimeout(() => {
-          setShowPlaylistModal(false);
-        }, 300);  
-      }
-    }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [playlistDropdownRef]);
 
   useEffect(() => {
     if (!video) return;
@@ -105,8 +93,8 @@ export default function VideoDetails({ showPopup }) {
   };
 
   const handlePlaylistSelected = (playlistId) => {
-    setShowSavePopup(true);
-    setTimeout(() => setShowSavePopup(false), 3000);
+    console.log(`Video ${id} selected for playlist ${playlistId}`);
+    showPopup?.('Video added to playlist!', 'success');
   };
 
   if (loading || !video || !video.owner) {
@@ -205,11 +193,7 @@ export default function VideoDetails({ showPopup }) {
           <CommentSection videoId={id} />
         </div>
 
-        {showSavePopup && (
-          <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50">
-            Video saved successfully!
-          </div>
-        )}
+
 
         <aside className="mt-10 bg-[#18181b] lg:hidden">
           {videos?.length ? (
@@ -271,6 +255,8 @@ export default function VideoDetails({ showPopup }) {
           </div>
         </div>
       )}
+
+      <SaveToPlaylistDropdown videoId={id} />
     </div>
   );
 }

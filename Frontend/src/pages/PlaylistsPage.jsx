@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PlaylistsComponent from '../components/playlists';
-import { VideoCard } from '../components';
+import VideoCard from '../components/VideoCard';
 import axios from 'axios';
 import Loader from '../components/Loader';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -20,7 +20,6 @@ function PlaylistsPage() {
                 setError(null);
                 try {
                     const res = await axios.get(`/api/playlist/${selectedPlaylistId}`);
-                    console.log('API response for playlist:', res.data);
                     if (res.data.success) {
                         setPlaylistVideos(res.data.data.playlist?.videos || []);
                         console.log('Setting playlistVideos:', res.data.data.playlist?.videos || []);
@@ -66,7 +65,17 @@ function PlaylistsPage() {
                     {playlistVideos.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {playlistVideos.map((video) => (
-                                <VideoCard key={video._id} video={video} />
+                                <VideoCard
+                                    key={video._id}
+                                    id={video._id}
+                                    thumbnail={video.thumbnail}
+                                    title={video.title}
+                                    channel={video.owner?.username || video.channelName || video.channel || ''}
+                                    avatar={video.owner?.avatar || video.channelAvatar || video.avatar || ''}
+                                    views={video.views || 0}
+                                    time={video.createdAt || video.time || ''}
+                                    duration={video.duration || 0}
+                                />
                             ))}
                         </div>
                     ) : (

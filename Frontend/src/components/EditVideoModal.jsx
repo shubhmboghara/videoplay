@@ -56,7 +56,7 @@ const EditVideoModal = ({ isOpen, onClose, video, onVideoUpdated }) => {
 
     return (
         <div className="inset-0 backdrop-blur-sm flex items-center justify-center fixed z-50">
-            <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg w-full max-w-md text-white relative top- lg:left-25">
+            <div className="bg-[#1A1A1A] p-6 rounded-lg shadow-lg w-full max-w-md text-white relative  lg:left-25">
                 <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl">&times;</button>
                 <div className="flex items-center mb-4">
                     <div className="bg-[#262626] p-2 rounded-full mr-3">

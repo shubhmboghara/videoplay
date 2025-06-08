@@ -6,6 +6,8 @@ import { FiSearch } from 'react-icons/fi';
 import folderImg from '../assets/folder.png';
 import playIcon from '../assets/play.svg';
 import Logo from '../assets/Logo.png';
+import PlaylistCard from './PlaylistCard';
+import Loader from './Loader';
 
 const API_BASE = '/api/playlist';
 
@@ -15,6 +17,7 @@ function Playlists({ onPlaylistSelected }) {
   const [playlists, setPlaylists] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState('Recently added');
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserPlaylists = async () => {
@@ -25,12 +28,13 @@ function Playlists({ onPlaylistSelected }) {
         }
       } catch (error) {
         console.error('Error fetching playlists:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchUserPlaylists();
   }, []);
 
-  // Filter and search logic (simple demo)
   const filteredPlaylists = playlists.filter((pl) =>
     pl.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -44,7 +48,11 @@ function Playlists({ onPlaylistSelected }) {
 
       <div className="ml-0 lg:ml-64 px-4 sm:px-8 pb-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredPlaylists.length > 0 ? (
+          {loading ? (
+           <div className='relative left-200 '>
+            <Loader message="Loading playlists..." /> 
+           </div>
+          ) : filteredPlaylists.length > 0 ? (
             filteredPlaylists.map((playlist) => {
               const videosArr = Array.isArray(playlist.videos) ? playlist.videos : [];
               let coverImg = folderImg;

@@ -7,7 +7,6 @@ import {
 } from '../hooks/comments';
 import { HiTrash, HiPencil, HiCheck, HiX, HiOutlineThumbUp, HiThumbUp } from 'react-icons/hi';
 import { toggleLike } from '../hooks/toggleLike';
-import { getLikeCount } from '../hooks/getCount';
 import DefaultAvatar from "../assets/DefaultAvatar.png"
 
 export default function CommentSection({ videoId, showPopup }) {
@@ -22,13 +21,7 @@ export default function CommentSection({ videoId, showPopup }) {
     async function fetchComments() {
       try {
         const res = await getVideoComments(videoId);
-        const commentsWithLikes = await Promise.all(
-          res.data.data.comments.map(async (comment) => {
-            const likeCount = await getLikeCount('comment', comment._id);
-            return { ...comment, likesCount: likeCount };
-          })
-        );
-        setComments(commentsWithLikes);
+        setComments(res.data.data.comments);
       } catch (err) {
         console.error('Error loading comments:', err);
         showPopup('Failed to load comments.', 'error');
@@ -49,16 +42,23 @@ export default function CommentSection({ videoId, showPopup }) {
     }
 
     try {
-
       const res = await addComment(videoId, { content: newComment });
-
-      setComments([res.data.data, ...comments]);
-      setNewComment('');
-      setShowAllComments(true);
-      showPopup('Comment posted successfully!', 'success');
+      const newC = res.data.data;
+      let likeCount = await getLikeCount('comment', newC._id);
+      likeCount = Number.isNaN(Number(likeCount)) ? 0 : Number(likeCount);
+      let isLiked = false;
+      try {
+        const likeRes = await toggleLike('comment', newC._id, true)
+        isLiked = likeRes?.data?.data?.isLiked || false
+      } catch (e) { }
+      const newCommentWithLikes = { ...newC, likesCount: likeCount, isLiked }
+      setComments([newCommentWithLikes, ...comments])
+      setNewComment('')
+      setShowAllComments(true)
+      showPopup('Comment posted successfully!', 'success')
     } catch (err) {
-      console.error('Error posting comment:', err);
-      showPopup('Failed to post comment.', 'error');
+      console.error('Error posting comment:', err)
+      showPopup('Failed to post comment.', 'error')
     }
   }
 
@@ -186,7 +186,7 @@ export default function CommentSection({ videoId, showPopup }) {
                         <HiOutlineThumbUp size={16} />
                       )}
                       <span className="ml-1 text-xs">
-                        {typeof c.likesCount === 'number' ? c.likesCount : null}
+                        {typeof c.likesCount === 'number' && c.likesCount >= 0 ? c.likesCount : ''}
                       </span>
                     </button>
                     <button
@@ -289,7 +289,7 @@ export default function CommentSection({ videoId, showPopup }) {
                         <HiOutlineThumbUp size={16} />
                       )}
                       <span className="ml-1 text-xs">
-                        {typeof c.likesCount === 'number' ? c.likesCount : null}
+                        {typeof c.likesCount === 'number' && c.likesCount >= 0 ? c.likesCount : ''}
                       </span>
                     </button>
                     <button

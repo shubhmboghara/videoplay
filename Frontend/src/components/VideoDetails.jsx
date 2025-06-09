@@ -48,6 +48,10 @@ export default function VideoDetails({ showPopup }) {
     getsubscribercount(video.owner._id)
       .then(setSubscriberCount)
       .catch(console.error);
+
+    getLikeCount('video', id)
+      .then(setLikesCount)
+      .catch(console.error);
   }, [video, id, dispatch]);
 
   const handleVideoLike = useCallback(async () => {

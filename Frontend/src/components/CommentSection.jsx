@@ -207,7 +207,6 @@ export default function CommentSection({ videoId, showPopup }) {
                         {typeof c.likesCount === 'number' && c.likesCount >= 0 ? c.likesCount : ''}
                       </span>
                     </button>
-                    {/* Only show edit/delete if current user is owner of the comment */}
                     {String(c.owner._id) === String(currentUserId) && (
                       <>
                         <button

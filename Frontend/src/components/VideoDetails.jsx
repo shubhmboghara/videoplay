@@ -17,7 +17,6 @@ import { toggleLike } from '../hooks/toggleLike';
 import { getLikeCount } from '../hooks/getLikeCount';
 import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
 import PlaylistManager from './PlaylistManager';
-import SaveToPlaylistDropdown from './SaveToPlaylistDropdown';
 
 export default function VideoDetails({ showPopup }) {
   const { id } = useParams();
@@ -256,7 +255,6 @@ export default function VideoDetails({ showPopup }) {
         </div>
       )}
 
-      <SaveToPlaylistDropdown videoId={id} />
     </div>
   );
 }

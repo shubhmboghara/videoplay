@@ -28,8 +28,8 @@ const PlaylistManager = ({ videoId, authStatus, onPlaylistSelected, onClose }) =
   }, []);
 
   useEffect(() => {
-   
-   
+
+
   }, [onClose]);
 
   const isVideoInPlaylist = (playlist) => {
@@ -115,14 +115,20 @@ const PlaylistManager = ({ videoId, authStatus, onPlaylistSelected, onClose }) =
               </label>
             </li>
           ))}
-          <li
-            className="flex items-center text-blue-400 hover:text-blue-300 cursor-pointer mt-2"
-            onClick={() => setShowNewPlaylistForm(true)}
-          >
-            <HiFolderAdd className="h-5 w-5 mr-2" /> New Playlist
-          </li>
+
         </ul>
+
       )}
+      <ul>
+        <li
+          className="flex items-center text-blue-400 hover:text-blue-300 cursor-pointer mt-2"
+          onClick={() => setShowNewPlaylistForm(true)}
+        >
+          <HiFolderAdd className="h-5 w-5 mr-2" /> + New playlist
+
+        </li>
+      </ul>
+
       {showNewPlaylistForm && (
         <form onSubmit={handleCreateNewPlaylist} className="mt-4 p-3 bg-gray-800 rounded-md">
           <Input

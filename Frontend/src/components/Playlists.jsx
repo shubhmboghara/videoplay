@@ -1,29 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { HiFolderAdd } from 'react-icons/hi';
 import { BsThreeDotsVertical } from 'react-icons/bs';
-import { FiSearch } from 'react-icons/fi';
 import folderImg from '../assets/folder.png';
-import playIcon from '../assets/play.svg';
-import Logo from '../assets/Logo.png';
-import PlaylistCard from './PlaylistCard';
 import VideoCard from './VideoCard';
 import Loader from './Loader';
-import { useNavigate } from 'react-router-dom';
+import {Button,Input} from './index';
 
 const API_BASE = '/api/playlist';
 
 function PlaylistsComponent({ onPlaylistSelected }) {
   const [playlists, setPlaylists] = useState([]);
-  const [selectedFilter, setSelectedFilter] = useState('Recently added');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [playlistVideos, setPlaylistVideos] = useState([]);
   const [videosLoading, setVideosLoading] = useState(false);
   const [videosError, setVideosError] = useState(null);
-  const navigate = useNavigate();
+  const [showNewPlaylistForm, setShowNewPlaylistForm] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [newPlaylistDescription, setNewPlaylistDescription] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState(null);
 
   useEffect(() => {
     const fetchUserPlaylists = async () => {
@@ -41,41 +38,33 @@ function PlaylistsComponent({ onPlaylistSelected }) {
     fetchUserPlaylists();
   }, []);
 
-  // Add a video to a playlist
   const addVideoToPlaylist = async (videoId, playlistId) => {
     try {
       await axios.patch(`/api/playlist/add/${videoId}/${playlistId}`);
-      // Optionally, refresh playlists or show a success message
     } catch (error) {
       console.error('Error adding video to playlist:', error);
     }
   };
 
-  // Remove a video from a playlist
   const removeVideoFromPlaylist = async (videoId, playlistId) => {
     try {
       await axios.patch(`/api/playlist/remove/${videoId}/${playlistId}`);
-      // Optionally, refresh playlists or show a success message
     } catch (error) {
       console.error('Error removing video from playlist:', error);
     }
   };
 
-  // Update a playlist
   const updatePlaylist = async (playlistId, newName) => {
     try {
       await axios.patch(`/api/playlist/${playlistId}`, { name: newName });
-      // Optionally, refresh playlists or show a success message
     } catch (error) {
       console.error('Error updating playlist:', error);
     }
   };
 
-  // Delete a playlist
   const deletePlaylist = async (playlistId) => {
     try {
       await axios.delete(`/api/playlist/${playlistId}`);
-      // Optionally, refresh playlists or show a success message
     } catch (error) {
       console.error('Error deleting playlist:', error);
     }
@@ -99,6 +88,32 @@ function PlaylistsComponent({ onPlaylistSelected }) {
     }
   };
 
+  const handleCreatePlaylist = async (e) => {
+    e.preventDefault();
+    if (!newPlaylistName.trim()) return;
+    setCreating(true);
+    setCreateError(null);
+    try {
+      const res = await axios.post('/api/playlist', {
+        name: newPlaylistName,
+        description: newPlaylistDescription
+      });
+      if (res.data && (res.data._id || (res.data.data && res.data.data._id))) {
+        const refreshed = await axios.get(`${API_BASE}/user`);
+        setPlaylists(refreshed.data.data?.playlist || []);
+        setShowNewPlaylistForm(false);
+        setNewPlaylistName('');
+        setNewPlaylistDescription('');
+      } else {
+        setCreateError('Failed to create playlist');
+      }
+    } catch {
+      setCreateError('Failed to create playlist');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const filteredPlaylists = playlists.filter((pl) =>
     pl.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -109,14 +124,61 @@ function PlaylistsComponent({ onPlaylistSelected }) {
         <h2 className="text-2xl font-bold mb-6">Your Playlists</h2>
       </div>
       <div className="ml-0 lg:ml-64 px-4 sm:px-8 pb-16">
+        <div className="mb-6">
+          {showNewPlaylistForm ? (
+            <form onSubmit={handleCreatePlaylist} className="flex flex-col sm:flex-row gap-2 items-start sm:items-end bg-[#23232b] p-4 rounded-xl shadow-md max-w-165">
+              <Input
+                type="text"
+                placeholder="Playlist name"
+                value={newPlaylistName}
+                onChange={e => setNewPlaylistName(e.target.value)}
+                className="px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none w-full sm:w-48"
+                required
+                disabled={creating}
+                autoFocus
+              />
+              <Input
+                type="text"
+                placeholder="Description (optional)"
+                value={newPlaylistDescription}
+                onChange={e => setNewPlaylistDescription(e.target.value)}
+                className="px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none w-full sm:w-64"
+                disabled={creating}
+              />
+              <Button
+                type="submit"
+                className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-4 py-2 rounded shadow disabled:bg-purple-600 disabled:text-white disabled:opacity-70"
+                disabled={creating || !newPlaylistName.trim()}
+              >
+                {creating ? 'Creating...' : 'Create'}
+              </Button>
+              <Button
+                type="button"
+                className="text-white text-xs px-4 py-2 rounded shadow bg-red-600 disabled:bg-red-600 "
+                onClick={() => { setShowNewPlaylistForm(false); setNewPlaylistName(''); setNewPlaylistDescription(''); }}
+                disabled={creating}
+              >
+                Cancel
+              </Button>
+              {createError && <span className="text-red-400 text-xs ml-2">{createError}</span>}
+            </form>
+          ) : (
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow text-sm font-semibold"
+              onClick={() => setShowNewPlaylistForm(true)}
+            >
+              + New Playlist
+            </Button>
+          )}
+        </div>
         {selectedPlaylist ? (
           <div>
-            <button
+            <Button
               className="mb-4 text-purple-400 hover:underline"
               onClick={() => { setSelectedPlaylist(null); setPlaylistVideos([]); }}
             >
               ← Back to playlists
-            </button>
+            </Button>
             <h3 className="text-2xl font-bold mb-6">Videos in Playlist</h3>
             {videosLoading ? (
               <Loader message="Loading playlist videos..." />
@@ -177,11 +239,47 @@ function PlaylistsComponent({ onPlaylistSelected }) {
                     </div>
                     <div className="flex-1 flex flex-col justify-between p-4">
                       <div>
-                        <h3 className="text-lg font-bold truncate mb-1">{playlist.name}</h3>
-                        <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
-                          {playlist.isPrivate && <span>Private</span>}
-                          <span>Playlist</span>
-                        </div>
+                        <h3 className="text-lg font-bold truncate mb-1 flex items-center gap-2">
+                          {playlist.isEditing ? (
+                            <input
+                              className="bg-gray-800 text-white rounded px-2 py-1 text-base w-32"
+                              value={playlist.editName || playlist.name}
+                              onChange={e => {
+                                setPlaylists(pls => pls.map(pl => pl._id === playlist._id ? { ...pl, editName: e.target.value } : pl));
+                              }}
+                              onBlur={async () => {
+                                if (playlist.editName && playlist.editName !== playlist.name) {
+                                  await updatePlaylist(playlist._id, playlist.editName);
+                                  setPlaylists(pls => pls.map(pl => pl._id === playlist._id ? { ...pl, name: playlist.editName, isEditing: false, editName: undefined } : pl));
+                                } else {
+                                  setPlaylists(pls => pls.map(pl => pl._id === playlist._id ? { ...pl, isEditing: false, editName: undefined } : pl));
+                                }
+                              }}
+                              autoFocus
+                            />
+                          ) : (
+                            <span
+                              className="hover:underline cursor-pointer"
+                              onClick={() => setPlaylists(pls => pls.map(pl => pl._id === playlist._id ? { ...pl, isEditing: true, editName: playlist.name } : pl))}
+                            >
+                              {playlist.name}
+                            </span>
+                          )}
+                          <Button
+                            className="ml-2 text-xs text-gray-400  bg-red-600"
+                            title="Delete playlist"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              if (window.confirm('Delete this playlist?')) {
+                                await deletePlaylist(playlist._id);
+                                setPlaylists(pls => pls.filter(pl => pl._id !== playlist._id));
+                              }
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </h3>
+
                         <a
                           href="#"
                           className="text-sm text-purple-400 font-semibold hover:underline"
@@ -192,6 +290,7 @@ function PlaylistsComponent({ onPlaylistSelected }) {
                         >
                           View full playlist
                         </a>
+
                       </div>
                     </div>
                   </div>

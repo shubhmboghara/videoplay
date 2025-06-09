@@ -229,28 +229,32 @@ export default function CommentSection({ videoId, showPopup }) {
                   </div>
                 </div>
                 {editingCommentId === c._id ? (
-                  <div className="mt-2">
+                  <div className="mt-2 bg-[#181824] border-2 border-purple-700 rounded-lg shadow-lg p-3 animate-fade-in">
                     <textarea
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
                       rows={3}
-                      className="w-full bg-[#23232b] border-2 border-purple-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-400 p-2 rounded-lg text-white placeholder-gray-400 transition-all shadow-md focus:shadow-lg"
+                      className="w-full bg-transparent border-none focus:ring-0 text-white placeholder-gray-400 text-base resize-none outline-none"
                       maxLength={500}
+                      autoFocus
+                      placeholder="Edit your comment..."
                     />
-                    <div className="flex gap-2 mt-2 justify-end">
+                    <div className="flex gap-2 mt-3 justify-end">
                       <button
                         onClick={() => handleSaveEdit(c._id)}
-                        className="text-green-500 hover:text-green-600 bg-gray-800 px-3 py-1 rounded-lg font-semibold"
+                        className="flex items-center gap-1 text-white bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 px-4 py-1.5 rounded-lg font-semibold shadow transition-all focus:outline-none focus:ring-2 focus:ring-green-400"
                         title="Save"
                       >
                         <HiCheck size={20} />
+                        <span>Save</span>
                       </button>
                       <button
                         onClick={handleCancelEditing}
-                        className="text-red-400 hover:text-red-500 bg-gray-800 px-3 py-1 rounded-lg font-semibold"
+                        className="flex items-center gap-1 text-white bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 px-4 py-1.5 rounded-lg font-semibold shadow transition-all focus:outline-none focus:ring-2 focus:ring-red-400"
                         title="Cancel"
                       >
                         <HiX size={20} />
+                        <span>Cancel</span>
                       </button>
                     </div>
                   </div>

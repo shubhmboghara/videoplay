@@ -9,6 +9,7 @@ import { HiTrash, HiPencil, HiCheck, HiX, HiOutlineThumbUp, HiThumbUp } from 're
 import { toggleLike } from '../hooks/toggleLike';
 import DefaultAvatar from "../assets/DefaultAvatar.png"
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import { useSelector } from 'react-redux';
 
 export default function CommentSection({ videoId, showPopup }) {
   const [comments, setComments] = useState([]);
@@ -18,6 +19,7 @@ export default function CommentSection({ videoId, showPopup }) {
   const [editContent, setEditContent] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
+  const currentUserId = useSelector(state => state.auth?.user?._id);
 
 
   useEffect(() => {
@@ -205,20 +207,25 @@ export default function CommentSection({ videoId, showPopup }) {
                         {typeof c.likesCount === 'number' && c.likesCount >= 0 ? c.likesCount : ''}
                       </span>
                     </button>
-                    <button
-                      onClick={() => handleStartEditing(c)}
-                      className="hover:text-blue-500 p-1 rounded hover:bg-gray-700/40"
-                      title="Edit"
-                    >
-                      <HiPencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(c._id)}
-                      className="hover:text-red-500 p-1 rounded hover:bg-gray-700/40"
-                      title="Delete"
-                    >
-                      <HiTrash size={16} />
-                    </button>
+                    {/* Only show edit/delete if current user is owner of the comment */}
+                    {String(c.owner._id) === String(currentUserId) && (
+                      <>
+                        <button
+                          onClick={() => handleStartEditing(c)}
+                          className="hover:text-blue-500 p-1 rounded hover:bg-gray-700/40"
+                          title="Edit"
+                        >
+                          <HiPencil size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(c._id)}
+                          className="hover:text-red-500 p-1 rounded hover:bg-gray-700/40"
+                          title="Delete"
+                        >
+                          <HiTrash size={16} />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
                 {editingCommentId === c._id ? (

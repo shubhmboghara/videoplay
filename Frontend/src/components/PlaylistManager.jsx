@@ -10,6 +10,7 @@ const PlaylistManager = ({ videoId, authStatus, onPlaylistSelected, onClose }) =
   const [error, setError] = useState(null);
   const [showNewPlaylistForm, setShowNewPlaylistForm] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [newPlaylistDescription, setNewPlaylistDescription] = useState('');
   const [creating, setCreating] = useState(false);
   const [adding, setAdding] = useState(false);
   const [addingId, setAddingId] = useState(null);
@@ -27,28 +28,30 @@ const PlaylistManager = ({ videoId, authStatus, onPlaylistSelected, onClose }) =
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+   
+   
   }, [onClose]);
 
-  const handleSelectPlaylist = async (playlistId) => {
+  const isVideoInPlaylist = (playlist) => {
+    if (!playlist.videos) return false;
+    return playlist.videos.some(v => (typeof v === 'string' ? v === videoId : v._id === videoId));
+  };
+
+  const handleTogglePlaylist = async (playlistId, checked) => {
     setAdding(true);
     setAddingId(playlistId);
     try {
-      await axios.patch(`/api/playlist/add/${videoId}/${playlistId}`);
-      if (onPlaylistSelected) onPlaylistSelected(playlistId);
-      setAdding(false);
-      setAddingId(null);
-      onClose();
+      if (checked) {
+        await axios.patch(`/api/playlist/add/${videoId}/${playlistId}`);
+      } else {
+        await axios.patch(`/api/playlist/remove/${videoId}/${playlistId}`);
+      }
+      const refreshed = await axios.get('/api/playlist/user');
+      setPlaylists(refreshed.data.data?.playlist || []);
+      if (onPlaylistSelected && checked) onPlaylistSelected(playlistId);
     } catch {
-      setError('Failed to add video to playlist');
+      setError('Failed to update playlist');
+    } finally {
       setAdding(false);
       setAddingId(null);
     }
@@ -62,16 +65,16 @@ const PlaylistManager = ({ videoId, authStatus, onPlaylistSelected, onClose }) =
     try {
       const res = await axios.post('/api/playlist', {
         name: newPlaylistName,
-        description: newPlaylistName
+        description: newPlaylistDescription
       });
-      const newPlaylist = res.data?.data;
+      const newPlaylist = res.data && res.data._id ? res.data : (res.data.data && res.data.data._id ? res.data.data : null);
       if (newPlaylist && newPlaylist._id) {
-        // Refresh playlists from /api/playlist/user
         const refreshed = await axios.get('/api/playlist/user');
         setPlaylists(refreshed.data.data?.playlist || []);
         setNewPlaylistName('');
+        setNewPlaylistDescription('');
         setShowNewPlaylistForm(false);
-        await handleSelectPlaylist(newPlaylist._id);
+        await handleTogglePlaylist(newPlaylist._id, true);
       } else {
         setError('Failed to create playlist');
       }
@@ -83,7 +86,9 @@ const PlaylistManager = ({ videoId, authStatus, onPlaylistSelected, onClose }) =
   };
 
   return (
-    <div ref={dropdownRef} className="p-4">
+
+
+    <div ref={dropdownRef} className="p-4 ">
       <h3 className="text-white text-lg font-semibold mb-3">Save to Playlist</h3>
       {loading ? (
         <div className="text-gray-400 py-2">Loading...</div>
@@ -94,12 +99,20 @@ const PlaylistManager = ({ videoId, authStatus, onPlaylistSelected, onClose }) =
           {playlists.map((playlist) => (
             <li
               key={playlist._id}
-              className={`flex items-center justify-between text-gray-300 hover:text-white cursor-pointer ${addingId === playlist._id ? 'opacity-60 pointer-events-none' : ''}`}
-              onClick={() => handleSelectPlaylist(playlist._id)}
+              className={`flex items-center justify-between text-gray-300 hover:text-white cursor-pointer px-2 py-1 rounded ${addingId === playlist._id ? 'opacity-60 pointer-events-none' : ''}`}
             >
-              <span>{playlist.name}</span>
-              <span className="text-xs text-gray-500">({playlist.videos.length} videos)</span>
-              {addingId === playlist._id && <span className="ml-2 text-xs text-gray-400">Saving...</span>}
+              <label className="flex items-center gap-2 w-full cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isVideoInPlaylist(playlist)}
+                  onChange={e => handleTogglePlaylist(playlist._id, e.target.checked)}
+                  disabled={addingId === playlist._id}
+                  className="accent-blue-500"
+                />
+                <span className="truncate flex-1">{playlist.name}</span>
+                <span className="text-xs text-gray-500">({playlist.videos.length} videos)</span>
+                {addingId === playlist._id && <span className="ml-2 text-xs text-gray-400">Saving...</span>}
+              </label>
             </li>
           ))}
           <li
@@ -120,6 +133,14 @@ const PlaylistManager = ({ videoId, authStatus, onPlaylistSelected, onClose }) =
             className="w-full mb-2 bg-gray-700 border-gray-600 text-white"
             disabled={creating}
             autoFocus
+          />
+          <Input
+            type="text"
+            placeholder="Description (optional)"
+            value={newPlaylistDescription}
+            onChange={(e) => setNewPlaylistDescription(e.target.value)}
+            className="w-full mb-2 bg-gray-700 border-gray-600 text-white"
+            disabled={creating}
           />
           <Button
             type="submit"

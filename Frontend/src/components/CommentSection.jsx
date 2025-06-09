@@ -1,13 +1,14 @@
-// src/components/CommentSection.jsx
 import React, { useState, useEffect } from 'react';
 import {
   addComment,
   getVideoComments,
   deleteComment,
   updateComment,
-  } from '../hooks/comments';
+} from '../hooks/comments';
 import { HiTrash, HiPencil, HiCheck, HiX, HiOutlineThumbUp, HiThumbUp } from 'react-icons/hi';
 import { toggleLike } from '../hooks/toggleLike';
+import { getLikeCount } from '../hooks/getCount';
+import DefaultAvatar from "../assets/DefaultAvatar.png"
 
 export default function CommentSection({ videoId, showPopup }) {
   const [comments, setComments] = useState([]);
@@ -15,16 +16,22 @@ export default function CommentSection({ videoId, showPopup }) {
   const [showAllComments, setShowAllComments] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editContent, setEditContent] = useState('');
-  
+
 
   useEffect(() => {
     async function fetchComments() {
-      try { 
+      try {
         const res = await getVideoComments(videoId);
-        setComments(res.data.data.comments);
+        const commentsWithLikes = await Promise.all(
+          res.data.data.comments.map(async (comment) => {
+            const likeCount = await getLikeCount('comment', comment._id);
+            return { ...comment, likesCount: likeCount };
+          })
+        );
+        setComments(commentsWithLikes);
       } catch (err) {
         console.error('Error loading comments:', err);
-      showPopup('Failed to load comments.', 'error');
+        showPopup('Failed to load comments.', 'error');
       }
     }
     if (videoId) {
@@ -53,7 +60,7 @@ export default function CommentSection({ videoId, showPopup }) {
       console.error('Error posting comment:', err);
       showPopup('Failed to post comment.', 'error');
     }
-  };
+  }
 
   const handleDeleteComment = async (commentId) => {
     try {
@@ -64,16 +71,17 @@ export default function CommentSection({ videoId, showPopup }) {
       console.error('Error deleting comment:', err);
       showPopup('Failed to delete comment.', 'error');
     }
-  };
+  }
 
   const handleStartEditing = (comment) => {
     setEditingCommentId(comment._id);
     setEditContent(comment.content);
-  };
+  }
   const handleCancelEditing = () => {
     setEditingCommentId(null);
     setEditContent('');
-  };
+  }
+
   const handleSaveEdit = async (commentId) => {
     if (!editContent.trim()) return;
     try {
@@ -134,10 +142,11 @@ export default function CommentSection({ videoId, showPopup }) {
           {comments.map((c) => (
             <div key={c._id} className="flex items-start gap-4">
               <img
-                src={c.owner.avatar || '/default-avatar.png'}
+                src={c.owner.avatar ? c.owner.avatar : DefaultAvatar}
                 alt={c.owner.username}
                 className="w-10 h-10 rounded-full object-cover"
               />
+
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <p className="text-sm font-semibold text-white">
@@ -155,18 +164,17 @@ export default function CommentSection({ videoId, showPopup }) {
                     <button
                       onClick={async () => {
                         try {
-                          const res = await toggleLike('comment', c._id);
                           setComments((prev) =>
                             prev.map((comment) =>
                               comment._id === c._id
-                                ? { ...comment, isLiked: res.isLiked, likesCount: res.likesCount }
+                                ? { ...comment, isLiked: !comment.isLiked, likesCount: comment.likesCount + (comment.isLiked ? -1 : 1) }
                                 : comment
                             )
                           );
-                          showPopup(res.isLiked ? 'Comment liked!' : 'Comment unliked!', 'success');
+                          const res = await toggleLike('comment', c._id);
+
                         } catch (error) {
                           console.error('Error toggling like on comment:', error);
-                          showPopup('Failed to toggle like on comment.', 'error');
                         }
                       }}
                       className="hover:text-blue-500"
@@ -177,7 +185,9 @@ export default function CommentSection({ videoId, showPopup }) {
                       ) : (
                         <HiOutlineThumbUp size={16} />
                       )}
-                      <span className="ml-1 text-xs">{c.likesCount}</span>
+                      <span className="ml-1 text-xs">
+                        {typeof c.likesCount === 'number' ? c.likesCount : null}
+                      </span>
                     </button>
                     <button
                       onClick={() => handleStartEditing(c)}
@@ -230,13 +240,13 @@ export default function CommentSection({ videoId, showPopup }) {
         </div>
       </div>
 
-      
+
       {!displayAll && (
         <div className="mt-6 space-y-6 lg:hidden">
           {comments.slice(0, 1).map((c) => (
             <div key={c._id} className="flex items-start gap-4">
               <img
-                src={c.owner.avatar || '/default-avatar.png'}
+                src={c.owner.avatar && c.owner.avatar !== '' ? c.owner.avatar : DefaultAvatar}
                 alt={c.owner.username}
                 className="w-10 h-10 rounded-full object-cover"
               />
@@ -257,18 +267,17 @@ export default function CommentSection({ videoId, showPopup }) {
                     <button
                       onClick={async () => {
                         try {
-                          const res = await toggleLike('comment', c._id);
                           setComments((prev) =>
                             prev.map((comment) =>
                               comment._id === c._id
-                                ? { ...comment, isLiked: res.isLiked, likesCount: res.likesCount }
+                                ? { ...comment, isLiked: !comment.isLiked, likesCount: comment.likesCount + (comment.isLiked ? -1 : 1) }
                                 : comment
                             )
                           );
-                          showPopup(res.isLiked ? 'Comment liked!' : 'Comment unliked!', 'success');
+                          const res = await toggleLike('comment', c._id);
+
                         } catch (error) {
                           console.error('Error toggling like on comment:', error);
-                          showPopup('Failed to toggle like on comment.', 'error');
                         }
                       }}
                       className="hover:text-blue-500"
@@ -279,7 +288,9 @@ export default function CommentSection({ videoId, showPopup }) {
                       ) : (
                         <HiOutlineThumbUp size={16} />
                       )}
-                      <span className="ml-1 text-xs">{c.likesCount}</span>
+                      <span className="ml-1 text-xs">
+                        {typeof c.likesCount === 'number' ? c.likesCount : null}
+                      </span>
                     </button>
                     <button
                       onClick={() => handleStartEditing(c)}

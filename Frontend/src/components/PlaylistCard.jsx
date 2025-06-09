@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { HiLockClosed } from 'react-icons/hi';
 
 const PlaylistCard = ({ playlist, onSelect }) => {
-  const defaultThumbnail = 'https://via.placeholder.com/320x180.png?text=No+Thumbnail';
+  const defaultThumbnail = 'https://via.placeholder.com/320x180.png?text=No+Thumbnail'
   const thumbnail = playlist.videos[0]?.thumbnail || defaultThumbnail;
 
   return (

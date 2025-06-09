@@ -14,7 +14,7 @@ import { timeAgo } from '../utils';
 import { useVideo } from '../hooks/useVideos';
 import CommentSection from './CommentSection';
 import { toggleLike } from '../hooks/toggleLike';
-import { getLikeCount } from '../hooks/getLikeCount';
+import { getLikeCount,getsubscribercount } from '../hooks/getCount';
 import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
 import PlaylistManager from './PlaylistManager';
 
@@ -33,7 +33,7 @@ export default function VideoDetails({ showPopup }) {
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
 
   const playlistDropdownRef = useRef(null);
-
+ 
 
 
   useEffect(() => {
@@ -45,8 +45,9 @@ export default function VideoDetails({ showPopup }) {
       dispatch(removeVideoLike(id));
     }
 
-    getLikeCount('video', id).then(setLikesCount).catch(console.error);
-    setSubscriberCount(Number(video.owner?.subscriberCount || 0));
+    getsubscribercount(video.owner._id)
+      .then(setSubscriberCount)
+      .catch(console.error);
   }, [video, id, dispatch]);
 
   const handleVideoLike = useCallback(async () => {
@@ -189,7 +190,7 @@ export default function VideoDetails({ showPopup }) {
             <p className="mt-6 text-gray-300">{video.description}</p>
           </div>
 
-          <CommentSection videoId={id} />
+          <CommentSection videoId={id} showPopup={showPopup} />
         </div>
 
 

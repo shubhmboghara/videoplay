@@ -10,6 +10,7 @@ import subscriptionRouter from "./routes/subscription.routes.js"
 import dashboardRouter from "./routes/dashboard.routes.js"
 import playlistRouter from "./routes/playlist.routes.js"
 import getlikecount from "./routes/getlikecount.routes.js"
+import subscribercount from "./routes/subscribercount.routes.js"
 const app = express()
 
 app.use(
@@ -34,6 +35,8 @@ app.use("/api/v1/subscriptions", subscriptionRouter)
 app.use("/api/v1/dashboard", dashboardRouter)
 app.use("/api/v1/playlist", playlistRouter)
 app.use('/api/v1/likes/count' ,getlikecount)
+app.use('/api/v1/subscriber/subscribercount' ,subscribercount)
+
 
 
 

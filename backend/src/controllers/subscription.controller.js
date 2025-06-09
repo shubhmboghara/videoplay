@@ -4,6 +4,19 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { Subscription } from "../models/Subscription.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
+
+
+const getChannelSubscriberCount = asyncHandler(async (req, res) => {
+    const { channelId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(channelId)) {
+        throw new ApiError(400, "Invalid channel ID");
+    }
+
+    const count = await Subscription.countDocuments({ channel: channelId });
+    return res.json(new ApiResponse(200, { count }, "Fetched subscriber count"));
+});
+
 const toggleSubscription = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
     const subscriberId = req.user._id;
@@ -105,5 +118,6 @@ const getUserSubscriptions = asyncHandler(async (req, res) => {
 export {
     toggleSubscription,
     getChannelSubscribers,
-    getUserSubscriptions
+    getUserSubscriptions,
+    getChannelSubscriberCount
 };

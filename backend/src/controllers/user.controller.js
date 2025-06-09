@@ -50,16 +50,20 @@ const registerUser = asyncHandler(async (req, res) => {
     if (existedUser) {
         throw new ApiError(409, "User  with email or username  already exists ")
     }
-    const avatarLocalPath = req.files?.avatar[0]?.path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+    const avatarLocalPath = req.files?.avatar?.[0]?.path
+    const coverImageLocalPath = req.files?.coverImage?.[0]?.path
 
-    //    if(!avatarLocalPath){
-    //      throw new ApiError(400,"Avatar file is  required")
-    //    }
+    let avatar , coverImage 
 
+    if (avatarLocalPath) {
+        avatar = await uploadOnCloudinary(avatarLocalPath)
 
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    }
+
+    if (coverImageLocalPath) {
+        coverImage = await uploadOnCloudinary(coverImageLocalPath)
+
+    }
 
     const user = await User.create({
         fullname,
@@ -487,51 +491,51 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 })
 
 const watchHistory = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
+    const userId = req.user._id;
 
-  const [user] = await User.aggregate([
-    { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+    const [user] = await User.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(userId) } },
 
-    {
-      $lookup: {
-        from: "videos",
-        localField: "watchHistory",    
-        foreignField: "_id",
-        as: "watchedVideos",
-        pipeline: [
-          {
+        {
             $lookup: {
-              from: "users",
-              localField: "owner",
-              foreignField: "_id",
-              as: "owner",
-              pipeline: [
-                { $project: { fullname: 1, username: 1, avatar: 1 } },
-                { $addFields: { owner: { $first: "$owner" } } }
-              ]
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchedVideos",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
+                                { $project: { fullname: 1, username: 1, avatar: 1 } },
+                                { $addFields: { owner: { $first: "$owner" } } }
+                            ]
+                        }
+                    }
+                ]
             }
-          }
-        ]
-      }
-    },
+        },
 
-    {
-      $project: {
-        _id: 0,
-        watchedVideos: 1
-      }
-    }
-  ]);
+        {
+            $project: {
+                _id: 0,
+                watchedVideos: 1
+            }
+        }
+    ]);
 
-  
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      user?.watchedVideos || [],
-      "Watch history fetched successfully"
-    )
-  );
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            user?.watchedVideos || [],
+            "Watch history fetched successfully"
+        )
+    );
 });
 
 

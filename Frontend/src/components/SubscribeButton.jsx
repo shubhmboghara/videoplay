@@ -30,7 +30,7 @@ export default function SubscribeButton({
 
                 let newCount = currentCount;
                 if (subscribed) {
-                    newCount = currentCount;
+                    newCount = currentCount + 1;
                 } else if (currentCount > 0) {
                     newCount = currentCount - 1;
                 }

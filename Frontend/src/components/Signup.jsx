@@ -122,8 +122,14 @@ export default function MultiStepSignup({ showPopup }) {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     {step === 1 && (
                         <div className="space-y-4">
-                            <Input label="Full Name" {...register('fullname', { required: true })} value={form.fullname} onChange={e => setValue('fullname', e.target.value)} placeholder="Your full name" required error={errors.fullname} />
-                            <Input label="Username" {...register('username', { required: true })} value={form.username} onChange={e => setValue('username', e.target.value)} placeholder="Choose a username" required error={errors.username} />
+                            <Input label="Full Name" {...register('fullname', { required: 'Full name is required' })} value={form.fullname} onChange={e => setValue('fullname', e.target.value)} placeholder="Your full name" required error={errors.fullname} />
+                            {errors.fullname && (
+                                <div className="text-red-500 text-xs mt-1">{errors.fullname.message}</div>
+                            )}
+                            <Input label="Username" {...register('username', { required: 'Username is required' })} value={form.username} onChange={e => setValue('username', e.target.value)} placeholder="Choose a username" required error={errors.username} />
+                            {errors.username && (
+                                <div className="text-red-500 text-xs mt-1">{errors.username.message}</div>
+                            )}
                             <Input label="Email" type="email" {...register('email', {
                                 required: 'Email is required',
                                 pattern: {
@@ -140,12 +146,17 @@ export default function MultiStepSignup({ showPopup }) {
                             {errors.email && (
                                 <div className="text-red-500 text-xs mt-1">{errors.email.message}</div>
                             )}
-                            <Input label="Password" type="password" {...register('password', { required: true })} value={form.password} onChange={e => setValue('password', e.target.value)} placeholder="Choose a password" required error={errors.password} />
+                            <Input label="Password" type="password" {...register('password', { required: 'Password is required' })} value={form.password} onChange={e => setValue('password', e.target.value)} placeholder="Choose a password" required error={errors.password} />
+                            {errors.password && (
+                                <div className="text-red-500 text-xs mt-1">{errors.password.message}</div>
+                            )}
                             <Button
                                 type="button"
                                 className="w-full mt-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold"
-                                onClick={nextStep}
-                                disabled={!form.fullname || !form.username || !form.email || !form.password}
+                                onClick={() => {
+                                    handleSubmit(() => nextStep())();
+                                }}
+                                disabled={submitting}
                             >
                                 Continue
                             </Button>

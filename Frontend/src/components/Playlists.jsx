@@ -120,8 +120,8 @@ function PlaylistsComponent({ onPlaylistSelected }) {
   };
 
   const handleRequestDelete = (playlist) => {
-    setDeletingId(playlist._id);
-    setDeleteName(playlist.name);
+    setDeletingId(playlist._id)
+    setDeleteName(playlist.name) 
     setShowDeleteModal(true);
   };
 
@@ -134,7 +134,6 @@ function PlaylistsComponent({ onPlaylistSelected }) {
       setDeletingId(null);
       setDeleteName('');
     } catch {
-      // Optionally show error
     } finally {
       setDeleteLoading(false);
     }

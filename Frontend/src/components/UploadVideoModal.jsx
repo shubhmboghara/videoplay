@@ -99,7 +99,7 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2">
-      <div className="bg-[#1a1a1a] w-full max-w-3xl rounded-lg p-6 relative top-10">
+      <div className="bg-[#1a1a1a] w-full max-w-3xl rounded-lg p-6 relative top-10  xl:left-23">
         <button
           onClick={handleClose}
           className="absolute top-3 right-4 text-gray-400 hover:text-white text-2xl"

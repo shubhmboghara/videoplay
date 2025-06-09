@@ -22,7 +22,7 @@ export default function DeleteConfirmationModal({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-opacity-60 transition-opacity backdrop-blur-sm "/>
+          <div className="fixed inset-0 bg-opacity-60 transition-opacity backdrop-blur-sm bg-black/60"/>
         </Transition.Child>
 
         <div className="fixed inset-0 z-50 overflow-y-auto   xl:left-50">

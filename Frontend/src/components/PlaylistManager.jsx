@@ -71,7 +71,6 @@ const PlaylistManager = ({ videoId, authStatus, onPlaylistSelected, onClose }) =
         setPlaylists(refreshed.data.data?.playlist || []);
         setNewPlaylistName('');
         setShowNewPlaylistForm(false);
-        // Add video to new playlist
         await handleSelectPlaylist(newPlaylist._id);
       } else {
         setError('Failed to create playlist');

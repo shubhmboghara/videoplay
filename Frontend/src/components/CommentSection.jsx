@@ -233,19 +233,17 @@ export default function CommentSection({ videoId, showPopup }) {
                     <div className="flex gap-2 mt-2 justify-end">
                       <button
                         onClick={() => handleSaveEdit(c._id)}
-                        className="flex items-center gap-1 text-green-500 hover:text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded-lg font-semibold transition-all shadow"
+                        className="text-green-500 hover:text-green-600 bg-gray-800 px-3 py-1 rounded-lg font-semibold"
                         title="Save"
                       >
-                        <HiCheck size={18} />
-                        <span>Save</span>
+                        <HiCheck size={20} />
                       </button>
                       <button
                         onClick={handleCancelEditing}
-                        className="flex items-center gap-1 text-red-400 hover:text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-lg font-semibold transition-all shadow"
+                        className="text-red-400 hover:text-red-500 bg-gray-800 px-3 py-1 rounded-lg font-semibold"
                         title="Cancel"
                       >
-                        <HiX size={18} />
-                        <span>Cancel</span>
+                        <HiX size={20} />
                       </button>
                     </div>
                   </div>
@@ -342,19 +340,17 @@ export default function CommentSection({ videoId, showPopup }) {
                     <div className="flex gap-2 mt-2 justify-end">
                       <button
                         onClick={() => handleSaveEdit(c._id)}
-                        className="flex items-center gap-1 text-green-500 hover:text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded-lg font-semibold transition-all shadow"
+                        className="text-green-500 hover:text-green-600 bg-gray-800 px-3 py-1 rounded-lg font-semibold"
                         title="Save"
                       >
-                        <HiCheck size={18} />
-                        <span>Save</span>
+                        <HiCheck size={20} />
                       </button>
                       <button
                         onClick={handleCancelEditing}
-                        className="flex items-center gap-1 text-red-400 hover:text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-lg font-semibold transition-all shadow"
+                        className="text-red-400 hover:text-red-500 bg-gray-800 px-3 py-1 rounded-lg font-semibold"
                         title="Cancel"
                       >
-                        <HiX size={18} />
-                        <span>Cancel</span>
+                        <HiX size={20} />
                       </button>
                     </div>
                   </div>

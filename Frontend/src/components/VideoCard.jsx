@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { timeAgo } from "../utils";
+import DefaultAvatar from "../assets/DefaultAvatar.png"
 
 function formatDuration(durationInSeconds) {
   const totalSeconds = Math.floor(durationInSeconds);
@@ -25,7 +26,7 @@ export default function VideoCard({
         <Link to={`/video/${id}`}>
           <div className="relative bg-[#18181b]">
             <img
-              src={thumbnail}
+              src={thumbnail} DefaultAvatar
               alt={title}
               className="w-full h-full object-cover"
             />
@@ -37,9 +38,10 @@ export default function VideoCard({
 
         <div className="p-3 flex gap-3">
           <img
-            src={avatar}
+            src={avatar && avatar.trim() !== "" ? avatar : DefaultAvatar}
             alt="channel avatar"
             className="w-10 h-10 rounded-full"
+            onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
           />
 
           <div className="flex-1">

@@ -41,12 +41,12 @@ const UserWatchHistory = ({ showPopup }) => {
             <div key={video._id}>
               <VideoCard
                 classNameImg="w-full"
-                key={video._id}
+                key={video._id} 
                 id={video._id}
                 thumbnail={video.thumbnail}
                 title={video.title}
                 channel={video.owner[0].username}
-                avatar={video.owner[0].avatar}
+                avatar={video.owner[0].avatar }
                 views={video.views}
                 time={video.createdAt}
                 duration={video.duration}

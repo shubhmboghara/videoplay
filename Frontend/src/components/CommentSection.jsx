@@ -8,6 +8,7 @@ import {
 import { HiTrash, HiPencil, HiCheck, HiX, HiOutlineThumbUp, HiThumbUp } from 'react-icons/hi';
 import { toggleLike } from '../hooks/toggleLike';
 import DefaultAvatar from "../assets/DefaultAvatar.png"
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 
 export default function CommentSection({ videoId, showPopup }) {
   const [comments, setComments] = useState([]);
@@ -15,6 +16,8 @@ export default function CommentSection({ videoId, showPopup }) {
   const [showAllComments, setShowAllComments] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editContent, setEditContent] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState(null);
 
 
   useEffect(() => {
@@ -37,28 +40,19 @@ export default function CommentSection({ videoId, showPopup }) {
   const handlePostComment = async () => {
     console.log('▶️ handlePostComment clicked, newComment =', newComment);
     if (!newComment.trim()) {
-      ('✋ newComment is empty, doing nothing.');
       return;
     }
 
     try {
-      const res = await addComment(videoId, { content: newComment });
-      const newC = res.data.data;
-      let likeCount = await getLikeCount('comment', newC._id);
-      likeCount = Number.isNaN(Number(likeCount)) ? 0 : Number(likeCount);
-      let isLiked = false;
-      try {
-        const likeRes = await toggleLike('comment', newC._id, true)
-        isLiked = likeRes?.data?.data?.isLiked || false
-      } catch (e) { }
-      const newCommentWithLikes = { ...newC, likesCount: likeCount, isLiked }
-      setComments([newCommentWithLikes, ...comments])
-      setNewComment('')
-      setShowAllComments(true)
-      showPopup('Comment posted successfully!', 'success')
+      await addComment(videoId, { content: newComment });
+      const res = await getVideoComments(videoId);
+      setComments(res.data.data.comments);
+      setNewComment('');
+      setShowAllComments(true);
+      showPopup('Comment posted successfully!', 'success');
     } catch (err) {
-      console.error('Error posting comment:', err)
-      showPopup('Failed to post comment.', 'error')
+      console.error('Error posting comment:', err);
+      showPopup('Failed to post comment.', 'error');
     }
   }
 
@@ -96,6 +90,24 @@ export default function CommentSection({ videoId, showPopup }) {
       console.error('Error updating comment:', err);
       showPopup('Failed to update comment.', 'error');
     }
+  };
+
+  const handleDeleteClick = (commentId) => {
+    setCommentToDelete(commentId);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (commentToDelete) {
+      await handleDeleteComment(commentToDelete);
+      setShowDeleteModal(false);
+      setCommentToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setCommentToDelete(null);
   };
 
   const displayAll = !window.matchMedia('(max-width: 1023px)').matches || showAllComments;
@@ -198,7 +210,7 @@ export default function CommentSection({ videoId, showPopup }) {
                       <HiPencil size={16} />
                     </button>
                     <button
-                      onClick={() => handleDeleteComment(c._id)}
+                      onClick={() => handleDeleteClick(c._id)}
                       className="hover:text-red-500"
                       title="Delete"
                     >
@@ -302,7 +314,7 @@ export default function CommentSection({ videoId, showPopup }) {
                       <HiPencil size={16} />
                     </button>
                     <button
-                      onClick={() => handleDeleteComment(c._id)}
+                      onClick={() => handleDeleteClick(c._id)}
                       className="hover:text-red-500"
                       title="Delete"
                     >
@@ -344,6 +356,14 @@ export default function CommentSection({ videoId, showPopup }) {
           ))}
         </div>
       )}
+
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={handleCancelDelete}
+        onDelete={handleConfirmDelete}
+        itemName="comment"
+        itemtype="comment"
+      />
     </div>
   );
 }

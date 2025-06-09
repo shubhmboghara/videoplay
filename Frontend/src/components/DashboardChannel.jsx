@@ -4,6 +4,7 @@ import { deleteVideo, updateVideo } from '../hooks/video';
 import Loader from './Loader';
 import UploadVideoModal from './UploadVideoModal';
 import EditVideoModal from './EditVideoModal';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 import {
   TrashIcon,
   PencilSquareIcon,
@@ -20,6 +21,10 @@ function DashboardChannel({ showPopup }) {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteName, setDeleteName] = useState('');
 
   const fetchData = async () => {
     try {
@@ -54,15 +59,25 @@ function DashboardChannel({ showPopup }) {
     }
   };
 
-  const handleDeleteVideo = async (videoId) => {
-    if (window.confirm('Are you sure you want to delete this video?')) {
-      try {
-        await deleteVideo(videoId);
-        setVideos(prevVideos => prevVideos.filter(video => video._id !== videoId));
-        showPopup('success', 'Video deleted successfully!');
-      } catch (err) {
-        showPopup('error', 'Failed to delete video.');
-      }
+  const handleRequestDeleteVideo = (video) => {
+    setDeletingId(video._id);
+    setDeleteName(video.title);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDeleteVideo = async () => {
+    setDeleteLoading(true);
+    try {
+      await deleteVideo(deletingId);
+      setVideos(prevVideos => prevVideos.filter(video => video._id !== deletingId));
+      setShowDeleteModal(false);
+      setDeletingId(null);
+      setDeleteName('');
+      showPopup('success', 'Video deleted successfully!');
+    } catch (err) {
+      showPopup('error', 'Failed to delete video.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -187,7 +202,7 @@ function DashboardChannel({ showPopup }) {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{new Date(video.createdAt).toLocaleDateString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 
-                    <button onClick={() => handleDeleteVideo(video._id)} className="text-purple-400 hover:text-purple-500 mr-3">
+                    <button onClick={() => handleRequestDeleteVideo(video)} className="text-purple-400 hover:text-purple-500 mr-3">
                       <TrashIcon className="w-5 h-5  text-gray-420" />
 
                     </button>
@@ -223,6 +238,14 @@ function DashboardChannel({ showPopup }) {
           onVideoUpdated={handleVideoUpdated}
         />
       )}
+
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDelete={handleConfirmDeleteVideo}
+        itemName={deleteName}
+        loading={deleteLoading}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import folderImg from '../assets/folder.png';
 import VideoCard from './VideoCard';
 import Loader from './Loader';
 import {Button,Input} from './index';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 const API_BASE = '/api/playlist';
 
@@ -21,6 +22,10 @@ function PlaylistsComponent({ onPlaylistSelected }) {
   const [newPlaylistDescription, setNewPlaylistDescription] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteName, setDeleteName] = useState('');
 
   useEffect(() => {
     const fetchUserPlaylists = async () => {
@@ -111,6 +116,27 @@ function PlaylistsComponent({ onPlaylistSelected }) {
       setCreateError('Failed to create playlist');
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleRequestDelete = (playlist) => {
+    setDeletingId(playlist._id);
+    setDeleteName(playlist.name);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setDeleteLoading(true);
+    try {
+      await deletePlaylist(deletingId);
+      setPlaylists(pls => pls.filter(pl => pl._id !== deletingId));
+      setShowDeleteModal(false);
+      setDeletingId(null);
+      setDeleteName('');
+    } catch {
+      // Optionally show error
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -265,19 +291,16 @@ function PlaylistsComponent({ onPlaylistSelected }) {
                               {playlist.name}
                             </span>
                           )}
-                          <Button
-                            className="ml-2 text-xs text-gray-400  bg-red-600"
+                          <button
+                            className="ml-2 text-xs text-gray-400 hover:text-red-500"
                             title="Delete playlist"
-                            onClick={async (e) => {
+                            onClick={e => {
                               e.stopPropagation();
-                              if (window.confirm('Delete this playlist?')) {
-                                await deletePlaylist(playlist._id);
-                                setPlaylists(pls => pls.filter(pl => pl._id !== playlist._id));
-                              }
+                              handleRequestDelete(playlist);
                             }}
                           >
                             Delete
-                          </Button>
+                          </button>
                         </h3>
 
                         <a
@@ -302,6 +325,13 @@ function PlaylistsComponent({ onPlaylistSelected }) {
           </div>
         )}
       </div>
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDelete={handleConfirmDelete}
+        itemName={deleteName}
+        loading={deleteLoading}
+      />
     </div>
   );
 }

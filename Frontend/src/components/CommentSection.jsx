@@ -142,9 +142,10 @@ export default function CommentSection({ videoId, showPopup }) {
           {comments.map((c) => (
             <div key={c._id} className="flex items-start gap-4">
               <img
-                src={c.owner.avatar ? c.owner.avatar : DefaultAvatar}
+                src={c.owner.avatar && c.owner.avatar.trim() !== '' ? c.owner.avatar : DefaultAvatar}
                 alt={c.owner.username}
                 className="w-10 h-10 rounded-full object-cover"
+                onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
               />
 
               <div className="flex-1">
@@ -246,9 +247,10 @@ export default function CommentSection({ videoId, showPopup }) {
           {comments.slice(0, 1).map((c) => (
             <div key={c._id} className="flex items-start gap-4">
               <img
-                src={c.owner.avatar && c.owner.avatar !== '' ? c.owner.avatar : DefaultAvatar}
+                src={c.owner.avatar && c.owner.avatar.trim() !== '' ? c.owner.avatar : DefaultAvatar}
                 alt={c.owner.username}
                 className="w-10 h-10 rounded-full object-cover"
+                onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
               />
               <div className="flex-1">
                 <div className="flex justify-between items-start">

@@ -9,6 +9,7 @@ import { HiTrash, HiPencil, HiCheck, HiX, HiOutlineThumbUp, HiThumbUp } from 're
 import { toggleLike } from '../hooks/toggleLike';
 import DefaultAvatar from "../assets/DefaultAvatar.png"
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import { useSelector } from 'react-redux';
 
 export default function CommentSection({ videoId, showPopup }) {
   const [comments, setComments] = useState([]);
@@ -19,6 +20,7 @@ export default function CommentSection({ videoId, showPopup }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
 
+  const currentUserId = useSelector(state => state.auth?.user?._id);
 
   useEffect(() => {
     async function fetchComments() {
@@ -205,20 +207,25 @@ export default function CommentSection({ videoId, showPopup }) {
                         {typeof c.likesCount === 'number' && c.likesCount >= 0 ? c.likesCount : ''}
                       </span>
                     </button>
-                    <button
-                      onClick={() => handleStartEditing(c)}
-                      className="hover:text-blue-500 p-1 rounded hover:bg-gray-700/40"
-                      title="Edit"
-                    >
-                      <HiPencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(c._id)}
-                      className="hover:text-red-500 p-1 rounded hover:bg-gray-700/40"
-                      title="Delete"
-                    >
-                      <HiTrash size={16} />
-                    </button>
+                    {/* Only show edit/delete if current user is owner */}
+                    {String(c.owner._id) === String(currentUserId) && (
+                      <>
+                        <button
+                          onClick={() => handleStartEditing(c)}
+                          className="hover:text-blue-500 p-1 rounded hover:bg-gray-700/40"
+                          title="Edit"
+                        >
+                          <HiPencil size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(c._id)}
+                          className="hover:text-red-500 p-1 rounded hover:bg-gray-700/40"
+                          title="Delete"
+                        >
+                          <HiTrash size={16} />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
                 {editingCommentId === c._id ? (
@@ -233,17 +240,19 @@ export default function CommentSection({ videoId, showPopup }) {
                     <div className="flex gap-2 mt-2 justify-end">
                       <button
                         onClick={() => handleSaveEdit(c._id)}
-                        className="text-green-500 hover:text-green-600 bg-gray-800 px-3 py-1 rounded-lg font-semibold"
+                        className="flex items-center gap-1 text-green-500 hover:text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded-lg font-semibold transition-all shadow"
                         title="Save"
                       >
-                        <HiCheck size={20} />
+                        <HiCheck size={18} />
+                        <span>Save</span>
                       </button>
                       <button
                         onClick={handleCancelEditing}
-                        className="text-red-400 hover:text-red-500 bg-gray-800 px-3 py-1 rounded-lg font-semibold"
+                        className="flex items-center gap-1 text-red-400 hover:text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-lg font-semibold transition-all shadow"
                         title="Cancel"
                       >
-                        <HiX size={20} />
+                        <HiX size={18} />
+                        <span>Cancel</span>
                       </button>
                     </div>
                   </div>
@@ -340,17 +349,19 @@ export default function CommentSection({ videoId, showPopup }) {
                     <div className="flex gap-2 mt-2 justify-end">
                       <button
                         onClick={() => handleSaveEdit(c._id)}
-                        className="text-green-500 hover:text-green-600 bg-gray-800 px-3 py-1 rounded-lg font-semibold"
+                        className="flex items-center gap-1 text-green-500 hover:text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded-lg font-semibold transition-all shadow"
                         title="Save"
                       >
-                        <HiCheck size={20} />
+                        <HiCheck size={18} />
+                        <span>Save</span>
                       </button>
                       <button
                         onClick={handleCancelEditing}
-                        className="text-red-400 hover:text-red-500 bg-gray-800 px-3 py-1 rounded-lg font-semibold"
+                        className="flex items-center gap-1 text-red-400 hover:text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-lg font-semibold transition-all shadow"
                         title="Cancel"
                       >
-                        <HiX size={20} />
+                        <HiX size={18} />
+                        <span>Cancel</span>
                       </button>
                     </div>
                   </div>

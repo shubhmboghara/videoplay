@@ -205,9 +205,75 @@ const deleteComment = asyncHandler(async (req, res) => {
 
 })
 
+const getUserComments = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+    const userId = req.user._id;
+
+    const comments = await Comment.aggregate([
+        { $match: { owner: new mongoose.Types.ObjectId(userId) } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    { $project: { username: 1, avatar: 1 } }
+                ]
+            }
+        },
+        { $addFields: { owner: { $first: "$owner" } } },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "comment",
+                as: "likes"
+            }
+        },
+        {
+            $addFields: {
+                likesCount: { $size: "$likes" },
+                isLiked: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$likes.likedBy"] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                content: 1,
+                createdAt: 1,
+                owner: 1,
+                likesCount: 1,
+                isLiked: 1,
+                video: 1
+            }
+        },
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit }
+    ]);
+
+    const totalComments = await Comment.countDocuments({ owner: userId });
+    return res.status(200).json(
+        new ApiResponse(200, {
+            totalComments,
+            page,
+            limit,
+            comments
+        }, "User comments fetched")
+    );
+});
+
 export {
     getVideoComments,
     addComment,
     updateComment,
-    deleteComment
+    deleteComment,
+    getUserComments
 }

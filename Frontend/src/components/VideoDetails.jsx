@@ -17,6 +17,7 @@ import { toggleLike } from '../hooks/toggleLike';
 import { getLikeCount,getsubscribercount } from '../hooks/getCount';
 import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
 import PlaylistManager from './PlaylistManager';
+import DefaultAvatar from "../assets/DefaultAvatar.png";
 
 export default function VideoDetails({ showPopup }) {
   const { id } = useParams();
@@ -170,9 +171,10 @@ export default function VideoDetails({ showPopup }) {
 
             <div className="mt-6 flex items-center gap-4">
               <img
-                src={video.owner.avatar}
+                src={video.owner.avatar && video.owner.avatar.trim() !== '' ? video.owner.avatar : DefaultAvatar}
                 alt={video.owner.username}
                 className="w-12 h-12 rounded-full"
+                onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
               />
               <div>
                 <h2 className="font-medium">{video.owner.username}</h2>

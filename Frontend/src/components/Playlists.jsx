@@ -121,7 +121,8 @@ function PlaylistsComponent({ onPlaylistSelected }) {
 
   const handleRequestDelete = (playlist) => {
     setDeletingId(playlist._id)
-    setDeleteName(playlist.name) 
+    setDeleteName(`${playlist.name} playlist`) 
+
     setShowDeleteModal(true);
   };
 
@@ -330,6 +331,8 @@ function PlaylistsComponent({ onPlaylistSelected }) {
         onDelete={handleConfirmDelete}
         itemName={deleteName}
         loading={deleteLoading}
+        itemtype="playlist"
+
       />
     </div>
   );

@@ -7,6 +7,7 @@ export default function DeleteConfirmationModal({
   onClose,
   onDelete,
   itemName = 'this item',
+  itemtype = "file",
   loading = false,
   icon: Icon = ExclamationTriangleIcon,
 }) {
@@ -45,7 +46,7 @@ export default function DeleteConfirmationModal({
                     Delete "{itemName}"
                   </Dialog.Title>
                   <p className="text-gray-300 text-base mb-6 text-center">
-                    Are you sure you want to delete this <span className="font-semibold text-white">{itemName}</span>? Once deleted, it cannot be recovered.
+                    Are you sure you want to delete this <span className="font-semibold text-white">{itemtype}</span>? Once deleted, it cannot be recovered.
                   </p>
                 </div>
                 <div className="flex gap-3 w-full mt-2">

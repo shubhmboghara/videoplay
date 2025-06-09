@@ -25,6 +25,8 @@ function DashboardChannel({ showPopup }) {
     const [deletingId, setDeletingId] = useState(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [deleteName, setDeleteName] = useState('');
+    const [itemtype, setItemtype] = useState()
+    const [deleteThumbnail, setDeleteThumbnail] = useState("");
 
     const fetchData = async () => {
         try {
@@ -61,7 +63,8 @@ function DashboardChannel({ showPopup }) {
 
     const handleRequestDeleteVideo = (video) => {
         setDeletingId(video._id);
-        setDeleteName(video.title);
+        setDeleteName(`${video.title} video`);
+        setDeleteThumbnail(video.thumbnail || "");
         setShowDeleteModal(true);
     };
 
@@ -245,6 +248,7 @@ function DashboardChannel({ showPopup }) {
                 onClose={() => setShowDeleteModal(false)}
                 onDelete={handleConfirmDeleteVideo}
                 itemName={deleteName}
+                itemtype="video"
                 loading={deleteLoading}
             />
         </div>

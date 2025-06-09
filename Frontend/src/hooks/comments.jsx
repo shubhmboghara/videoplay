@@ -22,3 +22,8 @@ export const updateComment = (commentId, updatedData) => {
   return  API.patch(`/c/${commentId}`, updatedData);
 };
 
+
+export const getUserComments = () =>{
+    return  API.get(`/user/all`, updatedData);
+
+}

@@ -25,7 +25,7 @@ export default function MultiStepSignup({ showPopup }) {
     coverPreview: DefaultCover,
     avatarIsDefault: true,
     coverIsDefault: true,
-    password: '', // Add password field
+    password: '', 
   });
   const [submitting, setSubmitting] = useState(false);
   const dispatch = useDispatch();
@@ -35,29 +35,29 @@ export default function MultiStepSignup({ showPopup }) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e, type) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setForm(f => ({
-          ...f,
-          [type]: file,
-          [`${type}Preview`]: reader.result,
-          [`${type}IsDefault`]: false,
-        }));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      // If no file selected, do not change preview
+ const handleImageChange = (e, type) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
       setForm(f => ({
         ...f,
-        [type]: null,
-        [`${type}IsDefault`]: true,
-        [`${type}Preview`]: type === 'avatar' ? DefaultAvatar : DefaultCover,
+        [type]: file,
+        [`${type === 'avatar' ? 'avatarPreview' : 'coverPreview'}`]: reader.result,
+        [`${type === 'avatar' ? 'avatarIsDefault' : 'coverIsDefault'}`]: false,
       }));
-    }
-  };
+    };
+    reader.readAsDataURL(file);
+  } else {
+    setForm(f => ({
+      ...f,
+      [type]: null,
+      [`${type === 'avatar' ? 'avatarPreview' : 'coverPreview'}`]: type === 'avatar' ? DefaultAvatar : DefaultCover,
+      [`${type === 'avatar' ? 'avatarIsDefault' : 'coverIsDefault'}`]: true,
+    }));
+  } 
+};
+
 
   const handleUseDefault = type => {
     setForm(f => ({

@@ -332,8 +332,15 @@ const updateAvatar = asyncHandler(async (req, res) => {
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is missing")
     }
-         
+    
     const USER = await User.findById(req.user?._id)
+    if (!USER) {
+        throw new ApiError(404, "User not found")
+    }
+
+    if (req.user?._id.toString() !== USER._id.toString()) {
+        throw new ApiError(403, "You are not authorized to update this avatar")
+    }
 
     if (USER?.avatar) {
         const id = publicId(USER.avatar);
@@ -356,7 +363,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
             }
         },
         { new: true }
-    ).select("-password")
+    ).select("-password -refreshToken -email -watchHistory -__v") 
 
     return res
         .status(200)

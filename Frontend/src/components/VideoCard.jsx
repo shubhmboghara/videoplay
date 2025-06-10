@@ -21,10 +21,10 @@ export default function VideoCard({
   duration,
 }) {
   return (
-    <div className="block ">
-      <div className="w-full rounded-lg overflow-hidden cursor-pointer bg-[#18181b]">
+    <div className="block bg-[#18181b] ">
+      <div className="w-full rounded-lg overflow-hidden cursor-pointer ">
         <Link to={`/video/${id}`}>
-          <div className="relative bg-[#18181b]">
+          <div className="relative ">
             <img
               src={thumbnail} 
               alt={title}

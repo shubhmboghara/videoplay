@@ -6,6 +6,7 @@ import Button from "./Button";
 import Input from "./Input";
 import { getChannelVideos } from "../hooks/getdashboard";
 import VideoCard from "./VideoCard";
+import SubscribeButton from "./SubscribeButton";
 
 export default function Profile({ username: propUsername, loggedInUser }) {
   const { id: routeUsername } = useParams();
@@ -79,37 +80,61 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 bg-[#1f1f25] rounded-xl shadow-xl overflow-hidden border border-gray-800">
+    <div className="max-w-4xl mx-auto mt-10  overflow-hidden  ">
       {/* Banner */}
-      <div className="relative h-52 bg-gray-900">
+      <div className="relative h-52 bg-gradient-to-r from-[#23232b] to-[#1f1f25]">
         <img
           src={profile.coverImage || "https://via.placeholder.com/800x200.png?text=No+Cover"}
           alt="cover"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover opacity-70"
         />
-        <div className="absolute left-6 -bottom-14 flex items-end gap-4">
-          <label htmlFor="avatarUpload">
+        <div className="absolute left-6 -bottom-14 flex items-end gap-6">
+          {isOwner ? (
+            <>
+              <label htmlFor="avatarUpload" className="relative group">
+                <img
+                  src={profile.avatar || DefaultAvatar}
+                  alt="avatar"
+                  className="w-32 h-32 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-xl cursor-pointer group-hover:brightness-90 transition"
+                  title="Click to change avatar"
+                />
+                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-purple-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">Change</span>
+              </label>
+              <input id="avatarUpload" type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+            </>
+          ) : (
             <img
               src={profile.avatar || DefaultAvatar}
               alt="avatar"
-              className="w-28 h-28 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-lg cursor-pointer"
-              title="Click to change avatar"
+              className="w-32 h-32 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-xl"
             />
-          </label>
-          <input id="avatarUpload" type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
-
-          <div className="mt-16 text-white">
-            <h2 className="text-2xl font-bold">{profile.fullname}</h2>
+          )}
+          <div className="mt-20 text-white flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-bold">{profile.fullname}</h2>
+              {isOwner && (
+                <span className="bg-green-600 text-white text-xs px-2 py-1 rounded shadow-lg">You</span>
+              )}
+            </div>
             <p className="text-purple-400 font-mono">@{profile.username}</p>
-            <div className="text-gray-400 text-sm mt-1 flex gap-6">
+            <div className="text-gray-400 text-sm flex gap-6">
               <span><strong>{profile.subscribersCount}</strong> Subscribers</span>
               <span><strong>{profile.channelsSubscribedToCount}</strong> Subscribed</span>
             </div>
+            {!isOwner && (
+              <div className="mt-2">
+                <SubscribeButton
+                  channelId={profile._id}
+                  isSubscribed={profile.isSubscribed}
+                  loggedInUser={loggedInUser}
+                  onSubscribeChange={() => api.getProfile(username).then(setProfile)}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Cover Upload Button */}
       {isOwner && (
         <div className="flex justify-end px-6 pt-20">
           <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded cursor-pointer">
@@ -119,7 +144,6 @@ export default function Profile({ username: propUsername, loggedInUser }) {
         </div>
       )}
 
-      {/* Posts */}
       <div className="px-6 pb-10 pt-6">
         {isOwner && (
           <div className="mb-6">
@@ -174,7 +198,6 @@ export default function Profile({ username: propUsername, loggedInUser }) {
         )}
       </div>
 
-      {/* Videos */}
       <div className="px-6 pb-10">
         <h3 className="text-xl font-bold text-white mb-4">Videos</h3>
         {Array.isArray(videos) && videos.length > 0 ? (

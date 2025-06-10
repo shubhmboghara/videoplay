@@ -34,14 +34,14 @@ export const useProfileApi = () => {
   };
 
   const updateAvatar = async (formData) => {
-    const res = await axios.put(`/api/users/update-avatar`, formData, {
+    const res = await axios.patch(`/api/users/update-avatar`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return res.data.data;
   };
 
   const updateCoverImage = async (formData) => {
-    const res = await axios.put(`api/users/updatecover-image`, formData, {
+    const res = await axios.patch(`api/users/updatecover-image`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return res.data.data;

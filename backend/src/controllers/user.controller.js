@@ -332,7 +332,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is missing")
     }
-
+         
     const USER = await User.findById(req.user?._id)
 
     if (USER?.avatar) {

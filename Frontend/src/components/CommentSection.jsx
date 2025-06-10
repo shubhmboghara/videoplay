@@ -40,7 +40,6 @@ export default function CommentSection({ videoId, showPopup }) {
   }, [videoId]);
 
   const handlePostComment = async () => {
-    console.log('▶️ handlePostComment clicked, newComment =', newComment);
     if (!newComment.trim()) {
       return;
     }
@@ -207,6 +206,8 @@ export default function CommentSection({ videoId, showPopup }) {
                         {typeof c.likesCount === 'number' && c.likesCount >= 0 ? c.likesCount : ''}
                       </span>
                     </button>
+
+                    {/* Only show edit delete if current user owns the comment */}
                     {String(c.owner._id) === String(currentUserId) && (
                       <>
                         <button

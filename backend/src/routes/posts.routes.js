@@ -8,10 +8,9 @@ import {
 import { VerifyJwt } from "../middlewares/auth.middleware.js";
 
 const router = Router();
-router.use(VerifyJwt); 
 
-router.route("/").post(createPosts);
+router.route("/").post(VerifyJwt,createPosts);
 router.route("/user/:userId").get(getUserPosts);
-router.route("/:id").patch(updatePosts).delete(deletePosts);    
+router.route("/:id").patch(VerifyJwt,updatePosts).delete(VerifyJwt,deletePosts);    
 
-export default router
+export default router   

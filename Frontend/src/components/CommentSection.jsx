@@ -157,28 +157,26 @@ export default function CommentSection({ videoId, showPopup }) {
 
         <div className="mt-6 space-y-6">
           {comments.map((c) => (
-            <div key={c._id} className="flex items-start gap-4 bg-[#23232b] rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
+            <div key={c._id} className="flex items-start gap-3 bg-[#23232b] rounded-xl p-3 shadow-md border border-purple-900/10 hover:shadow-purple-900/20 transition-all group">
               <img
                 src={c.owner.avatar && c.owner.avatar.trim() !== '' ? c.owner.avatar : DefaultAvatar}
                 alt={c.owner.username}
-                className="w-12 h-12 rounded-full object-cover border-2 border-purple-700 shadow"
+                className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-purple-700 shadow group-hover:scale-105 transition-transform duration-200"
                 onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
               />
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-base font-semibold text-white flex items-center gap-2">
-                      {c.owner.username}
-                      <span className="text-gray-400 text-xs ml-2">
-                        • {new Date(c.createdAt).toLocaleDateString(undefined, {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </span>
-                    </p>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                  <div className="truncate">
+                    <span className="text-base sm:text-lg font-semibold text-white truncate">{c.owner.username}</span>
+                    <span className="text-gray-400 text-xs ml-2">
+                      • {new Date(c.createdAt).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-400">
+                  <div className="flex items-center gap-2 text-gray-400 mt-1 sm:mt-0">
                     <button
                       onClick={async () => {
                         try {
@@ -202,12 +200,10 @@ export default function CommentSection({ videoId, showPopup }) {
                       ) : (
                         <HiOutlineThumbUp size={18} />
                       )}
-                      <span className="ml-1 text-xs font-medium">
+                      <span className="ml-1 text-xs font-semibold">
                         {typeof c.likesCount === 'number' && c.likesCount >= 0 ? c.likesCount : ''}
                       </span>
                     </button>
-
-                    {/* Only show edit delete if current user owns the comment */}
                     {String(c.owner._id) === String(currentUserId) && (
                       <>
                         <button
@@ -215,21 +211,21 @@ export default function CommentSection({ videoId, showPopup }) {
                           className="hover:text-blue-500 p-1 rounded hover:bg-gray-700/40"
                           title="Edit"
                         >
-                          <HiPencil size={16} />
+                          <HiPencil size={18} />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(c._id)}
                           className="hover:text-red-500 p-1 rounded hover:bg-gray-700/40"
                           title="Delete"
                         >
-                          <HiTrash size={16} />
+                          <HiTrash size={18} />
                         </button>
                       </>
                     )}
                   </div>
                 </div>
                 {editingCommentId === c._id ? (
-                  <div className="mt-2 bg-[#181824] border-2 border-purple-700 rounded-lg shadow-lg p-3 animate-fade-in">
+                  <div className="mt-2 bg-[#181824] border-2 border-purple-700 rounded-xl shadow-lg p-2 sm:p-4 animate-fade-in">
                     <textarea
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
@@ -238,6 +234,7 @@ export default function CommentSection({ videoId, showPopup }) {
                       maxLength={500}
                       autoFocus
                       placeholder="Edit your comment..."
+                      style={{ minHeight: 60 }}
                     />
                     <div className="flex gap-2 mt-3 justify-end">
                       <button
@@ -259,7 +256,7 @@ export default function CommentSection({ videoId, showPopup }) {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-gray-300 text-base mt-2 whitespace-pre-line border-l-4 border-purple-700 pl-3 bg-[#23232b] rounded">
+                  <p className="text-gray-100 text-[1.08rem] mt-3 whitespace-pre-line border-l-4 border-purple-700/60 pl-4 bg-[#23232b] rounded-lg shadow-inner group-hover:bg-[#23232b]/90 transition-all min-h-[44px] flex items-center">
                     {c.content}
                   </p>
                 )}
@@ -273,11 +270,11 @@ export default function CommentSection({ videoId, showPopup }) {
       {!displayAll && (
         <div className="mt-6 space-y-6 lg:hidden">
           {comments.slice(0, 1).map((c) => (
-            <div key={c._id} className="flex items-start gap-4">
+            <div key={c._id} className="flex items-start gap-3 bg-[#23232b] rounded-xl p-3 shadow-md border border-purple-900/10 hover:shadow-purple-900/20 transition-all group">
               <img
                 src={c.owner.avatar && c.owner.avatar.trim() !== '' ? c.owner.avatar : DefaultAvatar}
                 alt={c.owner.username}
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-purple-700 shadow group-hover:scale-105 transition-transform duration-200"
                 onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
               />
               <div className="flex-1">
@@ -293,7 +290,7 @@ export default function CommentSection({ videoId, showPopup }) {
                       })}
                     </span>
                   </p>
-                  <div className="flex items-center gap-2 text-gray-400">
+                  <div className="flex items-center gap-2 text-gray-400 mt-1 sm:mt-0">
                     <button
                       onClick={async () => {
                         try {
@@ -310,32 +307,40 @@ export default function CommentSection({ videoId, showPopup }) {
                           console.error('Error toggling like on comment:', error);
                         }
                       }}
-                      className="hover:text-blue-500"
+                      className={`hover:text-blue-500 flex items-center px-2 py-1 rounded transition ${c.isLiked ? 'bg-blue-900/30' : 'hover:bg-gray-700/40'}`}
                       title="Like"
+
                     >
                       {c.isLiked ? (
-                        <HiThumbUp size={16} className="text-blue-500" />
+                        <HiThumbUp size={18} className="text-blue-500" />
                       ) : (
-                        <HiOutlineThumbUp size={16} />
+                        <HiOutlineThumbUp size={18} />
                       )}
-                      <span className="ml-1 text-xs">
+                      <span className="ml-1 text-xs font-semibold">
                         {typeof c.likesCount === 'number' && c.likesCount >= 0 ? c.likesCount : ''}
                       </span>
+
                     </button>
-                    <button
-                      onClick={() => handleStartEditing(c)}
-                      className="hover:text-blue-500"
-                      title="Edit"
-                    >
-                      <HiPencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(c._id)}
-                      className="hover:text-red-500"
-                      title="Delete"
-                    >
-                      <HiTrash size={16} />
-                    </button>
+                    
+            {String(c.owner._id) === String(currentUserId) && (
+                      <>
+                        <button
+                          onClick={() => handleStartEditing(c)}
+                          className="hover:text-blue-500 p-1 rounded hover:bg-gray-700/40"
+                          title="Edit"
+                        >
+                          <HiPencil size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(c._id)}
+                          className="hover:text-red-500 p-1 rounded hover:bg-gray-700/40"
+                          title="Delete"
+                        >
+                          <HiTrash size={18} />
+                        </button>
+                      </>
+                    )}
+
                   </div>
                 </div>
 

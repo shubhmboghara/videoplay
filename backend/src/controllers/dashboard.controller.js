@@ -24,7 +24,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     const videoids = uservideos.map(video => video._id)
 
     const totalLikes = await Like.countDocuments({ video: { $in: videoids } })
-    
+
     return res.json(new ApiResponse(200, {
         totalVideos,
         totalViews,
@@ -36,16 +36,17 @@ const getChannelStats = asyncHandler(async (req, res) => {
 })
 
 const getChannelVideos = asyncHandler(async (req, res) => {
-        const id = req.user._id;
+    const id = req.user._id;
 
-        const video = await Video.find({owner:id,}).select("-VideoFile -description -duration -updatedAt").sort({ createdAt: -1 })
+    const video = await Video.find({ owner: id }, 'thumbnail title views isPublished createdAt duration')
+        .sort({ createdAt: -1 });
 
-        return res
+
+    return res
         .status(200)
         .json(
-            new ApiResponse(200,video,"Channel videos fetched successfully")
-        )
-
+            new ApiResponse(200, video, "Channel videos fetched successfully")
+        );
 })
 
 export {

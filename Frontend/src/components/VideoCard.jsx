@@ -26,7 +26,7 @@ export default function VideoCard({
         <Link to={`/video/${id}`}>
           <div className="relative bg-[#18181b]">
             <img
-              src={thumbnail} DefaultAvatar
+              src={thumbnail} 
               alt={title}
               className="w-full h-full object-cover"
             />
@@ -37,11 +37,12 @@ export default function VideoCard({
         </Link>
 
         <div className="p-3 flex gap-3">
-          <Link to={`/profile/${channel}`}>
+          <Link to={channel ? `/profile/${channel}` : "#"}>
             <img  
               src={avatar && avatar.trim() !== "" ? avatar : DefaultAvatar}
               alt="channel avatar"
-              className="w-10 h-10 rounded-full cursor-pointer"
+              className="w-10 h-10 rounded-full cursor-pointer bg-gray-800 border border-gray-700 object-cover"
+              style={{ backgroundColor: !avatar || avatar.trim() === "" ? '#23232b' : undefined }}
               onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
             />
           </Link>

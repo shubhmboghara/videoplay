@@ -5,13 +5,9 @@ import Loader from './Loader';
 import UploadVideoModal from './UploadVideoModal';
 import EditVideoModal from './EditVideoModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
-import {
-    TrashIcon,
-    PencilSquareIcon,
-} from "@heroicons/react/24/outline";
+import {TrashIcon,PencilSquareIcon} from "@heroicons/react/24/outline";
 import { AiOutlineEye, AiOutlineLike } from 'react-icons/ai';
 import { HiUserGroup } from 'react-icons/hi';
-import AuthLoader from './AuthLoader';
 
 function DashboardChannel({ showPopup }) {
     const [stats, setStats] = useState(null);

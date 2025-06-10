@@ -6,14 +6,14 @@ import DefaultAvatar from "../assets/DefaultAvatar.png";
 
 export default function Subscriptionss() {
   const [subscriptions, setSubscriptions] = useState([]);
-  const [loading, setLoading]         = useState(true);
-  const [error, setError]             = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
         const response = await getsubscriptions();
-       
+
         setSubscriptions(response.data);
       } catch (err) {
         setError('Failed to fetch subscriptions.');
@@ -43,7 +43,7 @@ export default function Subscriptionss() {
   };
 
   if (loading) {
-      return <Loader message="Loading subscriptions..." />;
+    return <Loader message="Loading subscriptions..." />;
   }
 
   if (error) {

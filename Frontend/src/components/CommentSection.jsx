@@ -321,8 +321,8 @@ export default function CommentSection({ videoId, showPopup }) {
                       </span>
 
                     </button>
-                    
-            {String(c.owner._id) === String(currentUserId) && (
+
+                    {String(c.owner._id) === String(currentUserId) && (
                       <>
                         <button
                           onClick={() => handleStartEditing(c)}

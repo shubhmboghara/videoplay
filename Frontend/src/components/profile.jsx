@@ -85,7 +85,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   const socialLinks = profile?.socialLinks || [];
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 bg-[#1f1f25] rounded-xl shadow-xl overflow-hidden border border-gray-800">
+    <div className="max-w-356 mx-auto mt-10  rounded-xl shadow-xl overflow-hidden   relative left-33 ">
       <div className="relative h-52 bg-gradient-to-r from-[#23232b] to-[#1f1f25]">
         <img
           src={profile.coverImage || "https://via.placeholder.com/800x200.png?text=No+Cover"}

@@ -7,6 +7,7 @@ import Input from "./Input";
 import { getChannelVideos } from "../hooks/getdashboard";
 import VideoCard from "./VideoCard";
 import SubscribeButton from "./SubscribeButton";
+import { Tab } from "@headlessui/react";
 
 export default function Profile({ username: propUsername, loggedInUser }) {
   const { id: routeUsername } = useParams();
@@ -17,6 +18,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   const [posts, setPosts] = useState([]);
   const [videos, setVideos] = useState([]);
   const [newPost, setNewPost] = useState("");
+  const [activeTab, setActiveTab] = useState(0);
 
   useEffect(() => {
     api.getProfile(username).then(setProfile);
@@ -79,9 +81,11 @@ export default function Profile({ username: propUsername, loggedInUser }) {
     );
   }
 
+  const channelDescription = profile?.bio || "This user hasn't added a channel description yet.";
+  const socialLinks = profile?.socialLinks || [];
+
   return (
-    <div className="max-w-4xl mx-auto mt-10  overflow-hidden  ">
-      {/* Banner */}
+    <div className="max-w-4xl mx-auto mt-10 bg-[#1f1f25] rounded-xl shadow-xl overflow-hidden border border-gray-800">
       <div className="relative h-52 bg-gradient-to-r from-[#23232b] to-[#1f1f25]">
         <img
           src={profile.coverImage || "https://via.placeholder.com/800x200.png?text=No+Cover"}
@@ -95,7 +99,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
                 <img
                   src={profile.avatar || DefaultAvatar}
                   alt="avatar"
-                  className="w-32 h-32 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-xl cursor-pointer group-hover:brightness-90 transition"
+                  className="w-42 h-30 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-xl cursor-pointer group-hover:brightness-90 transition"
                   title="Click to change avatar"
                 />
                 <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-purple-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">Change</span>
@@ -106,21 +110,32 @@ export default function Profile({ username: propUsername, loggedInUser }) {
             <img
               src={profile.avatar || DefaultAvatar}
               alt="avatar"
-              className="w-32 h-32 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-xl"
+              className="w-42 h-30 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-xl"
             />
           )}
-          <div className="mt-20 text-white flex flex-col gap-2">
-            <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-bold">{profile.fullname}</h2>
+          <div className="mt-20 text-white flex flex-col gap-2 w-full">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h2 className="text-2xl font-bold break-all">{profile.fullname}</h2>
               {isOwner && (
                 <span className="bg-green-600 text-white text-xs px-2 py-1 rounded shadow-lg">You</span>
               )}
             </div>
-            <p className="text-purple-400 font-mono">@{profile.username}</p>
-            <div className="text-gray-400 text-sm flex gap-6">
+            <p className="text-purple-400 font-mono break-all">@{profile.username}</p>
+            <div className="text-gray-400 text-sm flex gap-6 flex-wrap">
               <span><strong>{profile.subscribersCount}</strong> Subscribers</span>
               <span><strong>{profile.channelsSubscribedToCount}</strong> Subscribed</span>
             </div>
+            <div className="mt-2 text-gray-300 text-sm max-w-2xl break-words">{channelDescription}</div>
+            {socialLinks.length > 0 && (
+              <div className="flex gap-3 mt-2">
+                {socialLinks.map((link, i) => (
+                  <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
+                    <span>{link.icon ? <img src={link.icon} alt="" className="w-4 h-4 inline" /> : null}</span>
+                    {link.label || link.url}
+                  </a>
+                ))}
+              </div>
+            )}
             {!isOwner && (
               <div className="mt-2">
                 <SubscribeButton
@@ -135,6 +150,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
         </div>
       </div>
 
+      {/* Cover Upload Button */}
       {isOwner && (
         <div className="flex justify-end px-6 pt-20">
           <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded cursor-pointer">
@@ -144,81 +160,95 @@ export default function Profile({ username: propUsername, loggedInUser }) {
         </div>
       )}
 
-      <div className="px-6 pb-10 pt-6">
-        {isOwner && (
-          <div className="mb-6">
-            <Input
-              as="textarea"
-              rows={3}
-              value={newPost}
-              maxLength={500}
-              onChange={(e) => setNewPost(e.target.value)}
-              placeholder="What's on your mind?"
-              className="w-full bg-[#2a2a33] text-white border-2 border-purple-700 focus:ring-2 focus:ring-purple-500 p-3 rounded-lg resize-none placeholder-gray-400 shadow-md focus:shadow-lg"
-            />
-            <div className="flex justify-end mt-2">
-              <Button
-                onClick={handleCreatePost}
-                disabled={!newPost.trim()}
-                className="bg-gradient-to-r from-purple-700 to-purple-500 text-white px-6 py-2 rounded-lg shadow hover:from-purple-800 hover:to-purple-600"
-              >
-                Post
-              </Button>
-            </div>
-          </div>
-        )}
-
-        <h3 className="text-xl font-bold text-white mb-4">Posts</h3>
-        {posts.length === 0 ? (
-          <p className="text-center text-gray-400 py-6">No posts yet.</p>
-        ) : (
-          <div className="space-y-6">
-            {posts.map((post) => (
-              <div
-                key={post._id}
-                className="bg-[#292932] rounded-lg p-4 border border-purple-900/20 hover:shadow-md transition"
-              >
-                <p className="text-white mb-3 whitespace-pre-line">{post.content}</p>
-                <div className="flex items-center gap-4 text-sm text-gray-400">
-                  <span>Likes: {post.likeby.length}</span>
-                  <Button onClick={() => handleLikePost(post._id)} className="text-purple-400 hover:text-purple-600">Like</Button>
-                  {isOwner && (
-                    <>
-                      <Button onClick={() => {
-                        const updated = prompt("Edit post:", post.content);
-                        if (updated) handleUpdatePost(post._id, updated);
-                      }} className="text-blue-400 hover:text-blue-600">Edit</Button>
-                      <Button onClick={() => handleDeletePost(post._id)} className="text-red-400 hover:text-red-600">Delete</Button>
-                    </>
-                  )}
+      {/* Tabs for Videos and Posts */}
+      <div className="px-6 pt-8">
+        <Tab.Group selectedIndex={activeTab} onChange={setActiveTab}>
+          <Tab.List className="flex gap-4 border-b border-gray-700 mb-6">
+            <Tab className={({ selected }) =>
+              `px-4 py-2 text-lg font-semibold focus:outline-none transition border-b-2 ${selected ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-400 hover:text-white'}`
+            }>Videos</Tab>
+            <Tab className={({ selected }) =>
+              `px-4 py-2 text-lg font-semibold focus:outline-none transition border-b-2 ${selected ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-400 hover:text-white'}`
+            }>Posts</Tab>
+          </Tab.List>
+          <Tab.Panels>
+            <Tab.Panel>
+              {/* Videos Section */}
+              {Array.isArray(videos) && videos.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {videos.map((video) => (
+                    <VideoCard
+                      key={video._id}
+                      id={video._id}
+                      thumbnail={video.thumbnail}
+                      title={video.title}
+                      channel={profile.username}
+                      avatar={profile.avatar}
+                      views={video.views}
+                      time={video.createdAt}
+                      duration={video.duration || 0}
+                    />
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="px-6 pb-10">
-        <h3 className="text-xl font-bold text-white mb-4">Videos</h3>
-        {Array.isArray(videos) && videos.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.map((video) => (
-              <VideoCard
-                key={video._id}
-                id={video._id}
-                thumbnail={video.thumbnail}
-                title={video.title}
-                channel={profile.username}
-                avatar={profile.avatar}
-                views={video.views}
-                time={video.createdAt}
-                duration={video.duration || 0}
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-gray-400 py-6">No videos found.</p>
-        )}
+              ) : (
+                <p className="text-center text-gray-400 py-6">No videos found.</p>
+              )}
+            </Tab.Panel>
+            <Tab.Panel>
+              {/* Posts Section */}
+              {isOwner && (
+                <div className="mb-6">
+                  <Input
+                    as="textarea"
+                    rows={3}
+                    value={newPost}
+                    maxLength={500}
+                    onChange={(e) => setNewPost(e.target.value)}
+                    placeholder="What's on your mind?"
+                    className="w-full bg-[#2a2a33] text-white border-2 border-purple-700 focus:ring-2 focus:ring-purple-500 p-3 rounded-lg resize-none placeholder-gray-400 shadow-md focus:shadow-lg"
+                  />
+                  <div className="flex justify-end mt-2">
+                    <Button
+                      onClick={handleCreatePost}
+                      disabled={!newPost.trim()}
+                      className="bg-gradient-to-r from-purple-700 to-purple-500 text-white px-6 py-2 rounded-lg shadow hover:from-purple-800 hover:to-purple-600"
+                    >
+                      Post
+                    </Button>
+                  </div>
+                </div>
+              )}
+              <h3 className="text-xl font-bold text-white mb-4">Posts</h3>
+              {posts.length === 0 ? (
+                <p className="text-center text-gray-400 py-6">No posts yet.</p>
+              ) : (
+                <div className="space-y-6">
+                  {posts.map((post) => (
+                    <div
+                      key={post._id}
+                      className="bg-[#292932] rounded-lg p-4 border border-purple-900/20 hover:shadow-md transition"
+                    >
+                      <p className="text-white mb-3 whitespace-pre-line">{post.content}</p>
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
+                        <span>Likes: {post.likeby.length}</span>
+                        <Button onClick={() => handleLikePost(post._id)} className="text-purple-400 hover:text-purple-600">Like</Button>
+                        {isOwner && (
+                          <>
+                            <Button onClick={() => {
+                              const updated = prompt("Edit post:", post.content);
+                              if (updated) handleUpdatePost(post._id, updated);
+                            }} className="text-blue-400 hover:text-blue-600">Edit</Button>
+                            <Button onClick={() => handleDeletePost(post._id)} className="text-red-400 hover:text-red-600">Delete</Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Tab.Panel>
+          </Tab.Panels>
+        </Tab.Group>
       </div>
     </div>
   );

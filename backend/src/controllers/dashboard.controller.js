@@ -41,7 +41,6 @@ const getChannelVideos = asyncHandler(async (req, res) => {
     const video = await Video.find({ owner: id }, 'thumbnail title views isPublished createdAt duration')
         .sort({ createdAt: -1 });
 
-
     return res
         .status(200)
         .json(

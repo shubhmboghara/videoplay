@@ -47,6 +47,13 @@ export const useProfileApi = () => {
     return res.data.data;
   };
 
+
+
+  const getideoByuser = async (userId) => {
+    const res = await axios.get(`/api/video/u/${userId}`);
+    return res.data.data;
+  };
+
   return {
     getProfile,
     getUserPosts,
@@ -56,5 +63,6 @@ export const useProfileApi = () => {
     likePost,
     updateAvatar,
     updateCoverImage,
+    getideoByuser
   };
 };

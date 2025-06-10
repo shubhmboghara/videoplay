@@ -167,6 +167,30 @@ const publishAVideo = asyncHandler(async (req, res) => {
     }
 })
 
+const getVideoByuser = asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const skip = (page - 1) * limit;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new ApiError(400, "Invalid user ID");
+    }
+
+    const videos = await Video.find({ owner: userId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select("title thumbnail views duration createdAt");
+
+    const total = await Video.countDocuments({ owner: userId });
+
+    return res.status(200).json(
+        new ApiResponse(200, { videos, total, page, limit }, "Videos by user fetched successfully")
+    );
+});
+
+
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     const userId = req.user?._id;
@@ -466,6 +490,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 export {
     getAllVideos,
     publishAVideo,
+    getVideoByuser,
     getVideoById,
     updateVideo,
     deleteVideo,

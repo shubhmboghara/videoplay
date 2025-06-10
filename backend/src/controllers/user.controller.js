@@ -363,7 +363,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
             }
         },
         { new: true }
-    ).select("-password -refreshToken -email -watchHistory -__v") 
+    ).select("-password -refreshToken -email -watchHistory -__v")   
 
     return res
         .status(200)

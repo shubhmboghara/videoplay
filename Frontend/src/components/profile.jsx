@@ -4,9 +4,9 @@ import { useProfileApi } from "../hooks/profile";
 import DefaultAvatar from "../assets/DefaultAvatar.png";
 import Button from "./Button";
 import Input from "./Input";
-import { getChannelVideos } from "../hooks/getdashboard";
 import VideoCard from "./VideoCard";
 import SubscribeButton from "./SubscribeButton";
+import DefaultCoverImage  from "../assets/DefaultCoverImage.png"
 import { Tab } from "@headlessui/react";
 
 export default function Profile({ username: propUsername, loggedInUser }) {
@@ -19,17 +19,22 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   const [videos, setVideos] = useState([]);
   const [newPost, setNewPost] = useState("");
   const [activeTab, setActiveTab] = useState(0);
+  const [editingPostId, setEditingPostId] = useState(null);
+  const [editText, setEditText] = useState("");
 
   useEffect(() => {
     api.getProfile(username).then(setProfile);
-    getChannelVideos().then((res) => setVideos(res.data));
   }, [username]);
 
   useEffect(() => {
     if (profile?._id) {
       api.getUserPosts(profile._id).then(setPosts);
+      api.getideoByuser(profile._id).then((res = {}) => {
+        const videos = res.videos || [];
+        setVideos(videos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      });
     }
-  }, [profile]);
+  }, [profile?._id]);
 
   const isOwner = loggedInUser?.username === profile?.username;
 
@@ -85,7 +90,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   const socialLinks = profile?.socialLinks || [];
 
   return (
-    <div className="max-w-356 mx-auto mt-10  rounded-xl shadow-xl overflow-hidden   relative left-33 ">
+    <div className="max-w-356 mx-auto mt-10  rounded-xl shadow-xl overflow-hidden   relative lg:left-33 ">
       <div className="relative h-52 bg-gradient-to-r from-[#23232b] to-[#1f1f25]">
         <img
           src={profile.coverImage || "https://via.placeholder.com/800x200.png?text=No+Cover"}
@@ -115,7 +120,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
           )}
           <div className="mt-20 text-white flex flex-col gap-2 w-full">
             <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-2xl font-bold break-all">{profile.fullname}</h2>
+              <h2 className="text-2xl font-bold break-all">{profile.fullname || profile.username}</h2>
               {isOwner && (
                 <span className="bg-green-600 text-white text-xs px-2 py-1 rounded shadow-lg">You</span>
               )}
@@ -150,7 +155,6 @@ export default function Profile({ username: propUsername, loggedInUser }) {
         </div>
       </div>
 
-      {/* Cover Upload Button */}
       {isOwner && (
         <div className="flex justify-end px-6 pt-20">
           <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded cursor-pointer">
@@ -160,7 +164,6 @@ export default function Profile({ username: propUsername, loggedInUser }) {
         </div>
       )}
 
-      {/* Tabs for Videos and Posts */}
       <div className="px-6 pt-8">
         <Tab.Group selectedIndex={activeTab} onChange={setActiveTab}>
           <Tab.List className="flex gap-4 border-b border-gray-700 mb-6">
@@ -173,7 +176,6 @@ export default function Profile({ username: propUsername, loggedInUser }) {
           </Tab.List>
           <Tab.Panels>
             <Tab.Panel>
-              {/* Videos Section */}
               {Array.isArray(videos) && videos.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {videos.map((video) => (

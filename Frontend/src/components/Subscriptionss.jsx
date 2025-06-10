@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SubscribeButton from './SubscribeButton';
 import { getsubscriptions } from '../hooks/getsubscriptions';
 import Loader from './Loader';
+import { Link } from 'react-router-dom';
 import DefaultAvatar from "../assets/DefaultAvatar.png";
 
 export default function Subscriptionss() {
@@ -63,12 +64,15 @@ export default function Subscriptionss() {
               className="bg-[#2a2a31] hover:bg-[#33333b] transition-colors rounded-lg overflow-hidden shadow-md flex flex-col h-full"
             >
               <div className="flex items-center p-4 space-x-4">
-                <img
-                  src={data.avatar && data.avatar.trim() !== '' ? data.avatar : DefaultAvatar}
-                  alt={data.username}
-                  className="w-14 h-14 rounded-full object-cover border-2 border-[#444] flex-shrink-0"
-                  onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
-                />
+                <Link to={`/profile/${data.username}`}>
+                  <img
+                    src={data.avatar && data.avatar.trim() !== '' ? data.avatar : DefaultAvatar}
+                    alt={data.username}
+                    className="w-14 h-14 rounded-full object-cover border-2 border-[#444] flex-shrink-0"
+                    onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
+                  />  
+                </Link>
+
                 <div className="flex-1 flex flex-col justify-center min-w-0">
                   <h2 className="text-lg font-semibold text-white truncate">
                     {data.fullname}

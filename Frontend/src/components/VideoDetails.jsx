@@ -173,8 +173,9 @@ export default function VideoDetails({ showPopup }) {
               <img
                 src={video.owner.avatar && video.owner.avatar.trim() !== '' ? video.owner.avatar : DefaultAvatar}
                 alt={video.owner.username}
-                className="w-12 h-12 rounded-full"
+                className="w-12 h-12 rounded-full cursor-pointer"
                 onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
+                onClick={() => navigate(`/profile/${video.owner.username}`)}
               />
               <div>
                 <h2 className="font-medium">{video.owner.username}</h2>

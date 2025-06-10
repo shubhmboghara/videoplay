@@ -37,13 +37,14 @@ export default function VideoCard({
         </Link>
 
         <div className="p-3 flex gap-3">
-          <img
-            src={avatar && avatar.trim() !== "" ? avatar : DefaultAvatar}
-            alt="channel avatar"
-            className="w-10 h-10 rounded-full"
-            onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
-          />
-
+          <Link to={`/profile/${channel}`}>
+            <img  
+              src={avatar && avatar.trim() !== "" ? avatar : DefaultAvatar}
+              alt="channel avatar"
+              className="w-10 h-10 rounded-full cursor-pointer"
+              onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
+            />
+          </Link>
           <div className="flex-1">
             <h3 className="text-white font-semibold truncate">{title}</h3>
             <div className="flex items-center text-gray-400 text-sm mt-1">

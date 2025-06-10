@@ -13,7 +13,7 @@ import {
     HiUsers
 } from "react-icons/hi";
 
-const Sidebar = ({ className }) => {
+const Sidebar = ({ className, loggedInUser }) => {
     const location = useLocation();
     const hideLabels = location.pathname.startsWith("/video/");
     const Width = hideLabels ? 'w-25' : 'w-64';
@@ -29,16 +29,38 @@ const Sidebar = ({ className }) => {
     ];
 
     const smItems = [
-        { label: "Home", icon: <HiHome size={25} />, slug: "/" },
+         { label: "Home", icon: <HiHome size={25} />, slug: "/" },
+        { label: "Liked Videos", icon: <HiThumbUp size={25} />, slug: "/likedvideos" },
         { label: "History", icon: <HiClock size={25} />, slug: "/history" },
+        { label: "My content", icon: <HiVideoCamera size={25} />, slug: "/my-content" },
         { label: "playlists", icon: <HiFolder size={25} />, slug: "/playlists" },
-        { label: "Subscribers", icon: <HiUsers size={25} />, slug: "/subscriptions" }
+        { label: "Subscriptions", icon: <HiUsers size={25} />, slug: "/subscriptions" },
+        { label: "Settings", icon: <HiCog size={25} />, slug: "/settings" }
     ];
 
     return (
         <div className={className}>
             <div className="hidden lg:block border-r fixed border-gray-700 bg-[#18181b] z-200">
                 <div className={`h-screen text-white flex flex-col ${Width} z-50 p-4`}>
+                    {loggedInUser && (
+                        <Link to={`/profile/${loggedInUser.username}`}>
+                            <div className="flex items-center mb-6 cursor-pointer">
+                            <img
+                                src={loggedInUser.avatar}
+                                alt={loggedInUser.fullname}
+                                className="w-12 h-12 rounded-full border-2 border-purple-400"
+                            />
+                            {!hideLabels && (
+                                <div className="ml-3">
+                                    <div className="font-semibold">{loggedInUser.fullname}</div>
+                                    <div className="text-xs text-gray-400">@{loggedInUser.username}</div>
+                                </div>
+                            )}
+                        </div>
+                        </Link>
+                        
+                    )}
+
                     <div className="space-y-2 my-4">
                         {navItems.map((item) => {
                             const isActive = location.pathname === item.slug;

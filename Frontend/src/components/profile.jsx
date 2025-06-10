@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useProfileApi } from "../hooks/profile";
-export default function Profile({ username, loggedInUser }) {
+
+import { useParams,useNavigate } from "react-router-dom";
+export default function Profile({ username: propUsername, loggedInUser }) {
+  const { id: routeUsername } = useParams();
+  const username = propUsername || routeUsername;
   const api = useProfileApi();
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);

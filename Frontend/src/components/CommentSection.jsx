@@ -10,6 +10,7 @@ import { toggleLike } from '../hooks/toggleLike';
 import DefaultAvatar from "../assets/DefaultAvatar.png"
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 export default function CommentSection({ videoId, showPopup }) {
   const [comments, setComments] = useState([]);
@@ -158,12 +159,14 @@ export default function CommentSection({ videoId, showPopup }) {
         <div className="mt-6 space-y-6">
           {comments.map((c) => (
             <div key={c._id} className="flex items-start gap-3 bg-[#23232b] rounded-xl p-3 shadow-md border border-purple-900/10 hover:shadow-purple-900/20 transition-all group">
-              <img
-                src={c.owner.avatar && c.owner.avatar.trim() !== '' ? c.owner.avatar : DefaultAvatar}
-                alt={c.owner.username}
-                className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-purple-700 shadow group-hover:scale-105 transition-transform duration-200"
-                onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
-              />
+              <Link to={`/profile/${c.owner.username}`}>
+                <img
+                  src={c.owner.avatar && c.owner.avatar.trim() !== '' ? c.owner.avatar : DefaultAvatar}
+                  alt={c.owner.username}
+                  className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-purple-700 shadow group-hover:scale-105 transition-transform duration-200 cursor-pointer"
+                  onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
+                />
+              </Link>
               <div className="flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                   <div className="truncate">
@@ -271,12 +274,14 @@ export default function CommentSection({ videoId, showPopup }) {
         <div className="mt-6 space-y-6 lg:hidden">
           {comments.slice(0, 1).map((c) => (
             <div key={c._id} className="flex items-start gap-3 bg-[#23232b] rounded-xl p-3 shadow-md border border-purple-900/10 hover:shadow-purple-900/20 transition-all group">
-              <img
-                src={c.owner.avatar && c.owner.avatar.trim() !== '' ? c.owner.avatar : DefaultAvatar}
-                alt={c.owner.username}
-                className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-purple-700 shadow group-hover:scale-105 transition-transform duration-200"
-                onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
-              />
+              <Link to={`/profile/${c.owner.username}`}>
+                <img
+                  src={c.owner.avatar && c.owner.avatar.trim() !== '' ? c.owner.avatar : DefaultAvatar}
+                  alt={c.owner.username}
+                  className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-purple-700 shadow group-hover:scale-105 transition-transform duration-200 cursor-pointer"
+                  onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
+                />
+              </Link>
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <p className="text-sm font-semibold text-white">

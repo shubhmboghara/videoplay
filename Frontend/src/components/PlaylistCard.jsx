@@ -31,13 +31,25 @@ const PlaylistCard = ({ playlist, onSelect }) => {
           </div>
         )}
       </div>
-      <div className="px-3 py-2">
-        <h3 className="text-white font-semibold text-base truncate">{playlist.name}</h3>
-        {playlist.description && (
-          <p className="text-gray-400 text-sm line-clamp-2">
-            {playlist.description}
-          </p>
+      <div className="px-3 py-2 flex items-center gap-2">
+        {playlist.owner && (
+          <Link to={`/profile/${playlist.owner.username}`}>
+            <img
+              src={playlist.owner.avatar && playlist.owner.avatar.trim() !== '' ? playlist.owner.avatar : 'https://via.placeholder.com/40x40.png?text=User'}
+              alt={playlist.owner.username}
+              className="w-8 h-8 rounded-full border-2 border-purple-400 object-cover cursor-pointer"
+              onError={e => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/40x40.png?text=User'; }}
+            />
+          </Link>
         )}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-white font-semibold text-base truncate">{playlist.name}</h3>
+          {playlist.description && (
+            <p className="text-gray-400 text-sm line-clamp-2">
+              {playlist.description}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

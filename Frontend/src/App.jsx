@@ -16,13 +16,14 @@ import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import PlaylistsPage from './pages/PlaylistsPage'
 import Profilepage from './pages/Profilepage'
-
+import { useSelector } from 'react-redux'
 
 
 function App() {
   const [loading, setLoading] = useState(false);
   const [popupMessage, setPopupMessage] = useState(null);
   const [popupType, setPopupType] = useState('error');
+  const loggedInUser = useSelector((state) => state.auth.user);
 
   const showPopup = (message, type = 'error') => {
     setPopupMessage(message);
@@ -40,10 +41,8 @@ function App() {
         <div className="w-full">
           <Navbar />
           <div className="mb-20 mt-16">
-            <Sidebar />
-
+            <Sidebar loggedInUser={loggedInUser} />
           </div>
-
           <main>
 
             <Routes>
@@ -58,7 +57,7 @@ function App() {
               <Route path="/subscriptions" element={<ProtectedRoute>  <Subscriptions showPopup={showPopup} /></ProtectedRoute>} />
               <Route path="/my-content" element={<ProtectedRoute>  <Dashboard showPopup={showPopup} /></ProtectedRoute>} />
               <Route path="/playlists" element={<ProtectedRoute>  <PlaylistsPage showPopup={showPopup} /></ProtectedRoute>} />
-              <Route path="/Profile/:id" element={<ProtectedRoute>  <Profilepage showPopup={showPopup} /></ProtectedRoute>} />
+              <Route path="/profile/:id" element={<ProtectedRoute>  <Profilepage showPopup={showPopup} /></ProtectedRoute>} />
 
 
             </Routes>

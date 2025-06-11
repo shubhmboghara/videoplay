@@ -6,6 +6,12 @@ import ApiResponse from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { uploadOnCloudinary, deleteFromCloudinary, publicId, generateVideoThumbnail } from "../utils/cloudinaryvideo.js"
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime.js";
+
+dayjs.extend(relativeTime);
+
+const timeAgo = (date) => dayjs(date).fromNow();
+
 
 
 const getAllVideos = asyncHandler(async (req, res) => {

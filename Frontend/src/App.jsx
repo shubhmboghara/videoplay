@@ -24,6 +24,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [popupMessage, setPopupMessage] = useState(null);
   const [popupType, setPopupType] = useState('error');
+  const [searchResults, setSearchResults] = useState([]); 
+  const [searchLoading, setSearchLoading] = useState(false);
   const loggedInUser = useSelector((state) => state.auth.user);
 
   const showPopup = (message, type = 'error') => {
@@ -40,7 +42,12 @@ function App() {
 
       <div className="min-h-screen flex flex-wrap content-between  items-center ">
         <div className="w-full">
-          <Navbar />
+
+          <Navbar
+            onSearchResults={setSearchResults}
+            onSearching={setSearchLoading}
+          />
+
           <div className="mb-20 mt-16">
             <Sidebar loggedInUser={loggedInUser} />
           </div>
@@ -48,7 +55,17 @@ function App() {
 
             <Routes>
 
-              <Route path='/' element={<Home showPopup={showPopup} />} />
+              <Route path='/'
+              element={<Home videosFromSearch={searchResults}
+              searching={searchLoading || searchResults.length > 0}
+              searchLoading={searchLoading}
+              showPopup={showPopup}
+              onClearSearch={() => {
+                setSearchResults([]);
+                setSearchLoading(false);
+              }}
+              />} />
+
               <Route path='/login' element={<Loginpage showPopup={showPopup} />} />
               <Route path='/signup' element={<Signuppage showPopup={showPopup} />} />
               <Route path="/video/:id" element={<Video showPopup={showPopup} />} />

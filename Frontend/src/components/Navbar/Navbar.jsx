@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Search from '../Search';
 import { HiMenu, HiX } from 'react-icons/hi';
 
-export default function Navbar() {
+export default function Navbar({onSearchResults, onSearching}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const authStatus = useSelector((state) => state.auth.status);
 
@@ -29,12 +29,13 @@ export default function Navbar() {
           </div>
 
           <div className="flex flex-1 max-w-md mx-4 relative">
-             <Search />
+            <Search onSearchResults={onSearchResults}
+              onSearching={onSearching} />
           </div>
 
           <ul className="hidden sm:flex items-center space-x-2 md:space-x-4  ">
             {!authStatus && (
-              <>
+              <>3
                 <Link to="/login">
                   <li>
                     <Button className="px-4 py-2 text-gray-300 hover:text-white transition-colors mb-7">

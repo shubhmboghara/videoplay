@@ -6,11 +6,6 @@ import ApiResponse from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { uploadOnCloudinary, deleteFromCloudinary, publicId, generateVideoThumbnail } from "../utils/cloudinaryvideo.js"
 import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime.js";
-
-dayjs.extend(relativeTime);
-
-const timeAgo = (date) => dayjs(date).fromNow();
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -21,10 +16,15 @@ const getAllVideos = asyncHandler(async (req, res) => {
         userId,
         page = 1,
         limit = 10,
+        minViews,
+        maxViews,
+        minDuration,
+        maxDuration,
+        fromDate,
+        toDate,
     } = req.query;
 
     const skip = (page - 1) * limit;
-
     const matchStage = { isPublished: true };
     const sortDir = sortType === "asc" ? 1 : -1;
 
@@ -39,6 +39,41 @@ const getAllVideos = asyncHandler(async (req, res) => {
         matchStage.owner = new mongoose.Types.ObjectId(userId);
     }
 
+    //$gte stands for "greater than or equal to ".
+
+    if (minViews) {
+        matchStage.views = { ...(matchStage.views || {}), $gte: Number(minViews) }
+    }
+
+    // $lte  Less Than or Equal To
+
+    if (maxViews) {
+        matchStage.views = { ...(matchStage.views || {}), $lte: Number(maxViews) }
+    }
+
+    if (minDuration) {
+        matchStage.duration = { ...(matchStage.duration || {}), $gte: Number(minDuration) }
+    }
+
+    if (maxDuration) {
+        matchStage.duration = { ...(matchStage.duration || {}), $lte: Number(maxDuration) }
+    }
+
+
+    if (fromDate) {
+        matchStage.createdAt = {
+            ...(matchStage.createdAt || {}),
+            $gte: new Date(fromDate)
+        };
+    }
+
+    if (toDate) {
+        matchStage.createdAt = {
+            ...(matchStage.createdAt || {}),
+            $lte: new Date(toDate)
+        };
+    }
+
     const sortStage = {};
     if (Array.isArray(sortBy)) {
         for (const field of sortBy) {
@@ -47,7 +82,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
     } else {
         sortStage[sortBy] = sortDir;
     }
-
     const pipeline = [
         { $match: matchStage },
         {
@@ -66,6 +100,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
                 views: 1,
                 duration: 1,
                 createdAt: 1,
+                description: 1,
                 "owner.username": 1,
                 "owner.avatar": 1,
             },
@@ -115,8 +150,8 @@ const publishAVideo = asyncHandler(async (req, res) => {
     const thumbnailFilePath = req.files?.thumbnail?.[0]?.path
 
     if (!videoPath) {
-    throw new ApiError(400, "A video file is required");
-  }
+        throw new ApiError(400, "A video file is required");
+    }
 
     if (!videoFilePath) {
         throw new ApiError(400, "video  are required ")

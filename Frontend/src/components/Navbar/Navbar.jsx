@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Container, LogoutBtn, Logo, Button, } from '../index';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { HiOutlineSearch, HiMenu, HiX } from 'react-icons/hi';
+import Search from '../Search';
+import { HiMenu, HiX } from 'react-icons/hi';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -28,13 +29,9 @@ export default function Navbar() {
           </div>
 
           <div className="flex flex-1 max-w-md mx-4 relative">
-            <HiOutlineSearch className="absolute left-3 top-5 transform -translate-y-1/2 text-gray-500 " />
-            <input
-              type="search"
-              placeholder="Search videos, channels, playlists..."
-              className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-3 text-white placeholder-[#] focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all h-10 mb-5"
-            />
+             <Search />
           </div>
+
           <ul className="hidden sm:flex items-center space-x-2 md:space-x-4  ">
             {!authStatus && (
               <>

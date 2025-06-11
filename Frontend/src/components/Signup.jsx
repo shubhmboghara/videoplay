@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import DefaultAvatar from '../assets/DefaultAvatar.png';
-import DefaultCover from '../assets/folder.png';
+import DefaultCover from '../assets/DefaultCoverImage.png';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
@@ -9,6 +9,11 @@ import { Input, Button } from './index';
 import { useForm } from 'react-hook-form';
 
 const steps = ['Account Information', 'Upload Profile Picture', 'Upload Cover Image', 'Review'];
+
+function validatePassword(password) {
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return strongPasswordRegex.test(password.trim());
+}
 
 export default function MultiStepSignup({ showPopup }) {
     const [step, setStep] = useState(1);
@@ -75,6 +80,11 @@ export default function MultiStepSignup({ showPopup }) {
             const { fullname, username, email, password, avatar, coverImage } = data;
             if (!fullname || !username || !email || !password) {
                 showPopup && showPopup('All fields are required', 'error');
+                setSubmitting(false);
+                return;
+            }
+            if (!validatePassword(password.trim())) {
+                showPopup && showPopup('Password must be at least 8 characters, include uppercase, lowercase, number, and special character.', 'error');
                 setSubmitting(false);
                 return;
             }
@@ -152,6 +162,12 @@ export default function MultiStepSignup({ showPopup }) {
                                 <div className="text-red-500 text-xs mt-1">{errors.email.message}</div>
                             )}
                             <Input label="Password" type="password" {...register('password', { required: 'Password is required' })} value={form.password} onChange={e => setValue('password', e.target.value)} placeholder="Choose a password" required error={errors.password} />
+                            {/* Show password strength error if password is not strong and user has typed something */}
+                            {form.password && !validatePassword(form.password.trim()) && (
+                                <div className="text-yellow-400 text-xs mt-1">
+                                    Password must be at least 8 characters, include uppercase, lowercase, number, and special character.
+                                </div>
+                            )}
                             {errors.password && (
                                 <div className="text-red-500 text-xs mt-1">{errors.password.message}</div>
                             )}

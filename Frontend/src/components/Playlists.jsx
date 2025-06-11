@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BsThreeDotsVertical } from 'react-icons/bs';
-import folderImg from '../assets/folder.png';
+import folderImg from '../assets/DefaultCoverImage.png'
 import VideoCard from './VideoCard';
 import Loader from './Loader';
 import {Button,Input} from './index';

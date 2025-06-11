@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import axios from 'axios'
 import { HiOutlineSearch } from "react-icons/hi";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 
 const Search = ({ onSearchResults, onSearching }) => {
     const [searchTerm, setSearchTerm] = useState("")
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
 
   const handleSubmit = async (e) => {
@@ -21,6 +24,9 @@ const Search = ({ onSearchResults, onSearching }) => {
     try {
       const { data } = await axios.get(`/api/video?query=${encodeURIComponent(searchTerm)}`)
       onSearchResults(data?.data?.videos || []);
+      if (location.pathname !== "/") {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Search error:", error);
       onSearchResults([]);

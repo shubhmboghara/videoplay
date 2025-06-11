@@ -18,7 +18,7 @@ const getVideoLikeCount = asyncHandler(async (req, res) => {
     const likeCount = await Like.countDocuments({ video: videoId });
     return res
         .status(200)
-        .json(new ApiResponse(200, { likeCount }, "Fetched like count successfully"));
+        .json(new ApiResponse(200, { likeCount }, "Fetched like count of videos successfully"));
 });
 
 const getCommentLikeCount = asyncHandler(async (req, res) => {
@@ -31,7 +31,7 @@ const getCommentLikeCount = asyncHandler(async (req, res) => {
     const likeCount = await Like.countDocuments({ comment: commentId });
     return res
         .status(200)
-        .json(new ApiResponse(200, { likeCount }, "Fetched like count successfully"));
+        .json(new ApiResponse(200, { likeCount }, "Fetched like count of Comment successfully"));
 });
 
 const getPostsLikeCount = asyncHandler(async (req, res) => {
@@ -44,7 +44,7 @@ const getPostsLikeCount = asyncHandler(async (req, res) => {
     const likeCount = await Like.find({ posts: postsId }).countDocuments();
     return res
         .status(200)
-        .json(new ApiResponse(200, { likeCount }, "Fetched like count successfully"));
+        .json(new ApiResponse(200, { likeCount }, "Fetched like count of post successfully"));
 });
 
 const toggleVideoLike = asyncHandler(async (req, res) => {

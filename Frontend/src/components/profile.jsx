@@ -4,6 +4,7 @@ import { useProfileApi } from "../hooks/profile";
 import { DefaultAvatar, Button, Input, VideoCard, DefaultCoverImage, Loader, SubscribeButton } from "./index";
 import { Tab } from "@headlessui/react";
 import { toggleLike } from "../hooks/toggleLike";
+import { getLikeCount } from "../hooks/getCount";
 
 export default function Profile({ username: propUsername, loggedInUser }) {
   const { id: routeUsername } = useParams();
@@ -17,10 +18,26 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   const [activeTab, setActiveTab] = useState(0);
   const [editingPostId, setEditingPostId] = useState(null);
   const [editText, setEditText] = useState("");
+  const [likeCounts, setLikeCounts] = useState({});
 
   useEffect(() => {
     api.getProfile(username).then(setProfile);
   }, [username]);
+
+  useEffect(() => {
+    const fetchLikeCounts = async () => {
+      if (posts.length > 0) {
+        const counts = {};
+        await Promise.all(posts.map(async (post) => {
+          counts[post._id] = await getLikeCount('post', post._id);
+        }));
+        setLikeCounts(counts);
+      } else {
+        setLikeCounts({});
+      }
+    };
+    fetchLikeCounts();
+  }, [posts]);
 
   const isOwner = loggedInUser?.username === profile?.username;
 
@@ -103,6 +120,8 @@ export default function Profile({ username: propUsername, loggedInUser }) {
       });
     }
   }, [profile?._id]);
+
+
 
   if (!profile) {
     return (
@@ -271,7 +290,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
                         </>
                       )}
                       <div className="flex items-center gap-4 text-sm text-gray-400 mt-2">
-                        <span>Likes: {(post.likeby || []).length}</span>
+                        <span>Likes: {likeCounts[post._id] ?? (post.likeby ? post.likeby.length : 0)}</span>
                         <Button
                           onClick={() => handleLikePost(post._id)}
                           className={`flex items-center gap-1 px-3 py-1 rounded-full font-semibold transition-all duration-200 shadow-sm border border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 ${Array.isArray(post.likeby) && post.likeby.includes(loggedInUser?._id) ? 'bg-purple-600 text-white' : 'bg-gray-800 text-purple-400 hover:bg-purple-700 hover:text-white'}`}

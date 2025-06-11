@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import DefaultAvatar from '../assets/DefaultAvatar.png';
-import DefaultCover from '../assets/DefaultCoverImage.png';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { login as loginAction } from '../redux/slices/authSlice';
-import { Input, Button } from './index';
+import { Input, Button,DefaultCoverImage,DefaultAvatar } from './index';
 import { useForm } from 'react-hook-form';
 
 const steps = ['Account Information', 'Upload Profile Picture', 'Upload Cover Image', 'Review'];
@@ -31,7 +29,7 @@ export default function MultiStepSignup({ showPopup }) {
             avatarPreview: DefaultAvatar,
             avatarIsDefault: true,
             coverImage: null,
-            coverPreview: DefaultCover,
+            coverPreview: DefaultCoverImage,
             coverIsDefault: true,
         }
     });

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import SubscribeButton from './SubscribeButton';
+import {DefaultAvatar,SubscribeButton,Loader} from "./index"
 import { getsubscriptions } from '../hooks/getsubscriptions';
-import Loader from './Loader';
 import { Link } from 'react-router-dom';
-import DefaultAvatar from "../assets/DefaultAvatar.png";
 
 export default function Subscriptionss() {
   const [subscriptions, setSubscriptions] = useState([]);

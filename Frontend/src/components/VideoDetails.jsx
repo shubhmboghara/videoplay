@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback ,useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -7,17 +7,14 @@ import {
   HiThumbUp,
   HiFolderAdd
 } from 'react-icons/hi';
-import SubscribeButton from './SubscribeButton';
-import { Button, VideoCard } from './index';
-import Loader from './Loader';
+
+import { Button, VideoCard,SubscribeButton,Loader,DefaultAvatar,PlaylistManager} from './index';
 import { timeAgo } from '../utils';
 import { useVideo } from '../hooks/useVideos';
 import CommentSection from './CommentSection';
 import { toggleLike } from '../hooks/toggleLike';
-import { getLikeCount,getsubscribercount } from '../hooks/getCount';
+import { getLikeCount, getsubscribercount } from '../hooks/getCount';
 import { addVideoLike, removeVideoLike } from '../redux/slices/likesSlice';
-import PlaylistManager from './PlaylistManager';
-import DefaultAvatar from "../assets/DefaultAvatar.png";
 
 export default function VideoDetails({ showPopup }) {
   const { id } = useParams();
@@ -34,7 +31,7 @@ export default function VideoDetails({ showPopup }) {
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
 
   const playlistDropdownRef = useRef(null);
- 
+
 
 
   useEffect(() => {
@@ -110,17 +107,19 @@ export default function VideoDetails({ showPopup }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#18181b] relative">
-      <main className="flex-1 p-6 text-white">
+    <div className="flex min-h-screen bg-[#18181b] relative right-7">
+      <main className="flex-1 p-6 text-white relative left-10 ">
         <div className="max-w-4xl mx-auto space-y-6">
-          <div className="aspect-video w-full rounded-xl overflow-hidden bg-black">
-            <iframe
+          <div className="relative w-full pb-[56.25%] rounded-xl overflow-hidden bg-black">
+            <video
               src={video.VideoFile}
-              title={video.title}
-              allowFullScreen
-              className="w-full h-full"
+              controls
+              poster={video.thumbnail}
+              className="absolute top-0 left-0 w-full h-full object-cover"
             />
           </div>
+
+
 
           <div className="p-6 rounded-xl border border-gray-800">
             <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
@@ -206,6 +205,7 @@ export default function VideoDetails({ showPopup }) {
           {videos?.length ? (
             videos.map((sugg) => (
               <VideoCard
+                className="w-full"
                 key={sugg._id}
                 id={sugg._id}
                 thumbnail={sugg.thumbnail}
@@ -223,7 +223,7 @@ export default function VideoDetails({ showPopup }) {
         </aside>
       </main>
 
-      <aside className="hidden lg:block p-4 space-y-4 bg-[#18181b] w-80 mr-15">
+      <aside className="hidden lg:block p-4 space-y-4 bg-[#18181b] w-96 mr-15 relative right-4 ">
         {videos?.length ? (
           videos.map((sugg) => (
             <VideoCard

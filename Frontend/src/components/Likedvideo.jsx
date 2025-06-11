@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getlikedvideos } from '../hooks/getlikedvideos';
-import Loader from "./Loader";
-import VideoCard from "./VideoCard";
+import {Loader,VideoCard} from "./index"
 
 function likedvideo() {
 

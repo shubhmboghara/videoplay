@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getChannelStats, getChannelVideos, togglePublishStatus } from '../hooks/getdashboard';
 import { deleteVideo, updateVideo } from '../hooks/video';
 import Loader from './Loader';
-import UploadVideoModal from './UploadVideoModal';
-import EditVideoModal from './EditVideoModal';
-import DeleteConfirmationModal from './DeleteConfirmationModal';
+import {DeleteConfirmationModal,EditVideoModal,UploadVideoModal} from "./index"
 import {TrashIcon,PencilSquareIcon} from "@heroicons/react/24/outline";
 import { AiOutlineEye, AiOutlineLike } from 'react-icons/ai';
 import { HiUserGroup } from 'react-icons/hi';

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { HiFolderAdd } from 'react-icons/hi';
-import Button from './Button';
-import Input from './Input';
+import {Button,Input}  from "./index"
 import axios from 'axios';
 
 const PlaylistManager = ({ videoId, authStatus, onPlaylistSelected, onClose }) => {

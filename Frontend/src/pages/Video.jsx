@@ -5,7 +5,7 @@ import { VideoDetails } from '../components/index'
 function Video({ showPopup }) {
   return (
 
-    <div  className=''>
+    <div>
       <VideoDetails showPopup={showPopup} />
     </div>
   )

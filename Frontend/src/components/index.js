@@ -9,6 +9,18 @@ import Sidebar from "./Sidebar";
 import VideoCard from "./VideoCard";
 import VideoDetails from "./VideoDetails";
 import likedvideo from "./likedvideo";
+import DefaultAvatar from "../assets/DefaultAvatar.png";
+import SubscribeButton from "./SubscribeButton";
+import DefaultCoverImage  from "../assets/DefaultCoverImage.png"
+import PlaylistManager from './PlaylistManager';
+import folderImg from '../assets/DefaultCoverImage.png'
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import UploadVideoModal from './UploadVideoModal';
+import EditVideoModal from './EditVideoModal'
+import Search from "./Search";
+
+
+import Loader from "./Loader";
 export{
     Container,
     Logo,
@@ -20,6 +32,16 @@ export{
     Sidebar,
     VideoCard,
     VideoDetails,
-    likedvideo
+    likedvideo,
+    Loader,
+    DefaultCoverImage,
+    DefaultAvatar,
+    folderImg,
+    SubscribeButton,
+    PlaylistManager,
+    DeleteConfirmationModal,
+    UploadVideoModal,
+    EditVideoModal,
+    Search
     
 }

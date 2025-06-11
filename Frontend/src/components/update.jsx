@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react'
 import axios from 'axios'
-import { Button, Input } from './index'
-import DefaultAvatar from '../assets/DefaultAvatar.png'
+import { Button, Input,DefaultAvatar } from './index'
 import { useSelector, useDispatch } from 'react-redux'
 import { login } from '../redux/slices/authSlice'
 

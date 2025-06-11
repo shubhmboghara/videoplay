@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserVideosHistory } from "../hooks/getuserVideosHistory";
-import Loader from "./Loader";
-import VideoCard from "./VideoCard";
+import {Loader,VideoCard}  from "./index"
 
 const UserWatchHistory = ({ showPopup }) => {
   const userId = useSelector((state) => state.auth.user?._id);

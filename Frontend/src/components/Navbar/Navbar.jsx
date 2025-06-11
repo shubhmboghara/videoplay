@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Container, LogoutBtn, Logo, Button, } from '../index';
+import { Container, LogoutBtn,  Button,Search } from '../index';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import Search from '../Search';
 import { HiMenu, HiX } from 'react-icons/hi';
 
-export default function Navbar({onSearchResults, onSearching}) {
+export default function Navbar({ onSearchResults, onSearching }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const authStatus = useSelector((state) => state.auth.status);
 
@@ -60,7 +59,7 @@ export default function Navbar({onSearchResults, onSearching}) {
 
             {authStatus && (
               <div>
-                <LogoutBtn className=" px-4 py-2 rounded-full text-white mt-12 bg-red-500 hover:bg-red-700 mb-5 w-5 mb-8 " />
+                <LogoutBtn className=" px-4 py-2 rounded-full text-white mt-12 bg-red-500 hover:bg-red-700  w-5 mb-10 " />
               </div>
             )}
 
@@ -111,7 +110,7 @@ export default function Navbar({onSearchResults, onSearching}) {
 
                   {authStatus && (
                     <li className="pt-2">
-                      <LogoutBtn />
+                      <LogoutBtn className=" px-40 py-2 rounded-full text-white mt-12 bg-red-500 hover:bg-red-700  w-5 mb-8  font-semibold transition-all  relative bottom-10 text-center" />
                     </li>
                   )}
                 </div>

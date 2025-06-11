@@ -7,8 +7,7 @@ import {
 } from '../hooks/comments';
 import { HiTrash, HiPencil, HiCheck, HiX, HiOutlineThumbUp, HiThumbUp } from 'react-icons/hi';
 import { toggleLike } from '../hooks/toggleLike';
-import DefaultAvatar from "../assets/DefaultAvatar.png"
-import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import {DefaultAvatar,DeleteConfirmationModal} from "./index"
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 

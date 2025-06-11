@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useProfileApi } from "../hooks/profile";
-import DefaultAvatar from "../assets/DefaultAvatar.png";
-import Button from "./Button";
-import Input from "./Input";
-import VideoCard from "./VideoCard";
-import SubscribeButton from "./SubscribeButton";
-import DefaultCoverImage  from "../assets/DefaultCoverImage.png"
+import {DefaultAvatar,Button,Input,VideoCard,DefaultCoverImage ,Loader,SubscribeButton} from "./index"
 import { Tab } from "@headlessui/react";
 
 export default function Profile({ username: propUsername, loggedInUser }) {
@@ -81,7 +76,8 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   if (!profile) {
     return (
       <div className="flex justify-center items-center h-96 text-xl text-gray-400">
-        Loading profile...
+          <Loader message="Loading profile..." />
+        
       </div>
     );
   }

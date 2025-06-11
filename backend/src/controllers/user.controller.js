@@ -318,7 +318,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         },
         { new: true }
 
-    ).select("-password")
+    ).select("-password -createdAt -updatedAt -__v  -refreshToken    -watchHistory")
 
     return res
         .status(200)
@@ -368,7 +368,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(200, user, "avatar image is updated successfully")
+            new ApiResponse(200, {}, "avatar image is updated successfully")
         )
 })
 
@@ -406,7 +406,7 @@ const updatecoverImage = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(200, user, "Cover image is updated successfully")
+            new ApiResponse(200, {},"Cover image is updated successfully")
         )
 })
 

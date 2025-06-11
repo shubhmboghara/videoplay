@@ -121,10 +121,10 @@ function DashboardChannel({ showPopup }) {
     }
 
     return (
-        <div className="min-h-screen bg-[#18181b] text-white p-8 relative lg:left-68 lg:w-300">
+        <div className="min-h-screen bg-[#18181b] text-white p-8 relative lg:left-68 lg:w-350">
             <h1 className="text-3xl font-bold mb-8">Welcome bac   </h1>
             <p className="text-gray-400 mb-8">Track, manage and forecast your channel.</p>
-
+        
             {error && <p className="text-red-500 mb-4">{error}</p>}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">

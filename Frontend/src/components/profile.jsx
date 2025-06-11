@@ -90,7 +90,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   const socialLinks = profile?.socialLinks || [];
 
   return (
-    <div className="max-w-356 mx-auto mt-10  rounded-xl shadow-xl overflow-hidden   relative lg:left-33 ">
+    <div className="max-w-356 mx-auto mt-10  rounded-xl shadow-xl overflow-hidden   relative xl:left-33  ">
       <div className="relative h-52 bg-gradient-to-r from-[#23232b] to-[#1f1f25]">
         <img
           src={profile.coverImage || "https://via.placeholder.com/800x200.png?text=No+Cover"}
@@ -104,7 +104,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
                 <img
                   src={profile.avatar || DefaultAvatar}
                   alt="avatar"
-                  className="w-42 h-30 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-xl cursor-pointer group-hover:brightness-90 transition"
+                  className="w-42 h-32 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-xl cursor-pointer group-hover:brightness-90 transition"
                   title="Click to change avatar"
                 />
                 <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-purple-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">Change</span>

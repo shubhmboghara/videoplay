@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useProfileApi } from "../hooks/profile";
 import {DefaultAvatar,Button,Input,VideoCard,DefaultCoverImage ,Loader,SubscribeButton} from "./index"
 import { Tab } from "@headlessui/react";
+import { toggleLike } from "../hooks/toggleLike"; 
 
 export default function Profile({ username: propUsername, loggedInUser }) {
   const { id: routeUsername } = useParams();
@@ -21,16 +22,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
     api.getProfile(username).then(setProfile);
   }, [username]);
 
-  useEffect(() => {
-    if (profile?._id) {
-      api.getUserPosts(profile._id).then(setPosts);
-      api.getideoByuser(profile._id).then((res = {}) => {
-        const videos = res.videos || [];
-        setVideos(videos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
-      });
-    }
-  }, [profile?._id]);
-
+  
   const isOwner = loggedInUser?.username === profile?.username;
 
   const handleCreatePost = async () => {
@@ -51,8 +43,12 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   };
 
   const handleLikePost = async (id) => {
-    const updated = await api.likePost(id);
-    setPosts(posts.map((p) => (p._id === id ? updated : p)));
+    try {
+      const updated = await toggleLike('post', id);
+      setPosts(posts.map((p) => (p._id === id ? updated : p)));
+    } catch (error) {
+      console.error('Failed to like post:', error);
+    }
   };
 
   const handleAvatarChange = async (e) => {
@@ -73,6 +69,42 @@ export default function Profile({ username: propUsername, loggedInUser }) {
     setProfile({ ...profile, coverImage: updated.coverImage });
   };
 
+  const handleEditClick = (post) => {
+    setEditingPostId(post._id);
+    setEditText(post.content);
+  };
+
+  const handleEditCancel = () => {
+    setEditingPostId(null);
+    setEditText("");
+  };
+
+  const handleEditSave = async (id) => {
+    if (!editText.trim()) return;
+    await handleUpdatePost(id, editText);
+    setEditingPostId(null);
+    setEditText("");
+    getUserPosts();
+  };
+
+  // Move getUserPosts above all handlers so it's in scope
+  const getUserPosts = () => {
+    if (profile?._id) {
+      api.getUserPosts(profile._id).then(setPosts);
+    }
+  };
+
+  useEffect(() => {
+    if (profile?._id) {
+      getUserPosts();
+      api.getideoByuser(profile._id).then((res = {}) => {
+        const videos = res.videos || [];
+        setVideos(videos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      });
+    }
+  }, [profile?._id ]);
+
+
   if (!profile) {
     return (
       <div className="flex justify-center items-center h-96 text-xl text-gray-400">
@@ -89,7 +121,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
     <div className="max-w-356 mx-auto mt-10  rounded-xl shadow-xl overflow-hidden   relative xl:left-33  ">
       <div className="relative h-52 bg-gradient-to-r from-[#23232b] to-[#1f1f25]">
         <img
-          src={profile.coverImage || "https://via.placeholder.com/800x200.png?text=No+Cover"}
+          src={profile.coverImage || DefaultCoverImage}
           alt="cover"
           className="w-full h-full object-cover opacity-70"
         />
@@ -130,7 +162,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
             {socialLinks.length > 0 && (
               <div className="flex gap-3 mt-2">
                 {socialLinks.map((link, i) => (
-                  <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
+                  <a key={link.url || i} href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
                     <span>{link.icon ? <img src={link.icon} alt="" className="w-4 h-4 inline" /> : null}</span>
                     {link.label || link.url}
                   </a>
@@ -226,16 +258,32 @@ export default function Profile({ username: propUsername, loggedInUser }) {
                       key={post._id}
                       className="bg-[#292932] rounded-lg p-4 border border-purple-900/20 hover:shadow-md transition"
                     >
-                      <p className="text-white mb-3 whitespace-pre-line">{post.content}</p>
+                      {editingPostId === post._id ? (
+                        <>
+                          <Input
+                            as="textarea"
+                            rows={3}
+                            value={editText}
+                            maxLength={500}
+                            onChange={e => setEditText(e.target.value)}
+                            className="w-full bg-[#23232b] text-white border-2 border-purple-700 focus:ring-2 focus:ring-purple-500 p-3 rounded-lg resize-none placeholder-gray-400 shadow-md focus:shadow-lg mb-2"
+                          />
+                          <div className="flex gap-2 justify-end mb-2">
+                            <Button onClick={() => handleEditSave(post._id)} className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">Save</Button>
+                            <Button onClick={handleEditCancel} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1 rounded">Cancel</Button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-white mb-3 whitespace-pre-line">{post.content}</p>
+                        </>
+                      )}
                       <div className="flex items-center gap-4 text-sm text-gray-400">
-                        <span>Likes: {post.likeby.length}</span>
+                        {/* <span>Likes: {post.likeby.length}</span> */}
                         <Button onClick={() => handleLikePost(post._id)} className="text-purple-400 hover:text-purple-600">Like</Button>
-                        {isOwner && (
+                        {isOwner && editingPostId !== post._id && (
                           <>
-                            <Button onClick={() => {
-                              const updated = prompt("Edit post:", post.content);
-                              if (updated) handleUpdatePost(post._id, updated);
-                            }} className="text-blue-400 hover:text-blue-600">Edit</Button>
+                            <Button onClick={() => handleEditClick(post)} className="text-blue-400 hover:text-blue-600">Edit</Button>
                             <Button onClick={() => handleDeletePost(post._id)} className="text-red-400 hover:text-red-600">Delete</Button>
                           </>
                         )}

@@ -16,6 +16,7 @@ import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import PlaylistsPage from './pages/PlaylistsPage'
 import Profilepage from './pages/Profilepage'
+import Settings from './pages/settings'
 import { useSelector } from 'react-redux'
 
 
@@ -58,6 +59,7 @@ function App() {
               <Route path="/my-content" element={<ProtectedRoute>  <Dashboard showPopup={showPopup} /></ProtectedRoute>} />
               <Route path="/playlists" element={<ProtectedRoute>  <PlaylistsPage showPopup={showPopup} /></ProtectedRoute>} />
               <Route path="/profile/:id" element={<ProtectedRoute>  <Profilepage showPopup={showPopup} /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute>  <Settings showPopup={showPopup} /></ProtectedRoute>} />
 
 
             </Routes>

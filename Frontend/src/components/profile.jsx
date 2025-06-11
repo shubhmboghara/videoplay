@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useProfileApi } from "../hooks/profile";
-import {DefaultAvatar,Button,Input,VideoCard,DefaultCoverImage ,Loader,SubscribeButton} from "./index"
+import { DefaultAvatar, Button, Input, VideoCard, DefaultCoverImage, Loader, SubscribeButton } from "./index";
 import { Tab } from "@headlessui/react";
-import { toggleLike } from "../hooks/toggleLike"; 
+import { toggleLike } from "../hooks/toggleLike";
 
 export default function Profile({ username: propUsername, loggedInUser }) {
   const { id: routeUsername } = useParams();
@@ -22,7 +22,6 @@ export default function Profile({ username: propUsername, loggedInUser }) {
     api.getProfile(username).then(setProfile);
   }, [username]);
 
-  
   const isOwner = loggedInUser?.username === profile?.username;
 
   const handleCreatePost = async () => {
@@ -45,7 +44,9 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   const handleLikePost = async (id) => {
     try {
       const updated = await toggleLike('post', id);
-      setPosts(posts.map((p) => (p._id === id ? updated : p)));
+      setPosts(posts.map((p) =>
+        p._id === id ? { ...p, ...updated, content: p.content } : p
+      ));
     } catch (error) {
       console.error('Failed to like post:', error);
     }
@@ -87,7 +88,6 @@ export default function Profile({ username: propUsername, loggedInUser }) {
     getUserPosts();
   };
 
-  // Move getUserPosts above all handlers so it's in scope
   const getUserPosts = () => {
     if (profile?._id) {
       api.getUserPosts(profile._id).then(setPosts);
@@ -102,14 +102,12 @@ export default function Profile({ username: propUsername, loggedInUser }) {
         setVideos(videos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
       });
     }
-  }, [profile?._id ]);
-
+  }, [profile?._id]);
 
   if (!profile) {
     return (
       <div className="flex justify-center items-center h-96 text-xl text-gray-400">
-          <Loader message="Loading profile..." />
-        
+        <Loader message="Loading profile..." />
       </div>
     );
   }
@@ -118,7 +116,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   const socialLinks = profile?.socialLinks || [];
 
   return (
-    <div className="max-w-356 mx-auto mt-10  rounded-xl shadow-xl overflow-hidden   relative xl:left-33  ">
+    <div className="max-w-356 mx-auto mt-10 rounded-xl shadow-xl overflow-hidden relative xl:left-33">
       <div className="relative h-52 bg-gradient-to-r from-[#23232b] to-[#1f1f25]">
         <img
           src={profile.coverImage || DefaultCoverImage}
@@ -149,9 +147,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
           <div className="mt-20 text-white flex flex-col gap-2 w-full">
             <div className="flex items-center gap-3 flex-wrap">
               <h2 className="text-2xl font-bold break-all">{profile.fullname || profile.username}</h2>
-              {isOwner && (
-                <span className="bg-green-600 text-white text-xs px-2 py-1 rounded shadow-lg">You</span>
-              )}
+              {isOwner && <span className="bg-green-600 text-white text-xs px-2 py-1 rounded shadow-lg">You</span>}
             </div>
             <p className="text-purple-400 font-mono break-all">@{profile.username}</p>
             <div className="text-gray-400 text-sm flex gap-6 flex-wrap">
@@ -225,7 +221,6 @@ export default function Profile({ username: propUsername, loggedInUser }) {
               )}
             </Tab.Panel>
             <Tab.Panel>
-              {/* Posts Section */}
               {isOwner && (
                 <div className="mb-6">
                   <Input
@@ -254,10 +249,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
               ) : (
                 <div className="space-y-6">
                   {posts.map((post) => (
-                    <div
-                      key={post._id}
-                      className="bg-[#292932] rounded-lg p-4 border border-purple-900/20 hover:shadow-md transition"
-                    >
+                    <div key={post._id} className="bg-[#292932] rounded-lg p-4 border border-purple-900/20 hover:shadow-md transition">
                       {editingPostId === post._id ? (
                         <>
                           <Input
@@ -278,14 +270,19 @@ export default function Profile({ username: propUsername, loggedInUser }) {
                           <p className="text-white mb-3 whitespace-pre-line">{post.content}</p>
                         </>
                       )}
-                      <div className="flex items-center gap-4 text-sm text-gray-400">
-                        {/* <span>Likes: {post.likeby.length}</span> */}
-                        <Button onClick={() => handleLikePost(post._id)} className="text-purple-400 hover:text-purple-600">Like</Button>
+                      <div className="flex items-center gap-4 text-sm text-gray-400 mt-2">
+                        <span>Likes: {(post.likeby || []).length}</span>
+                        <Button
+                          onClick={() => handleLikePost(post._id)}
+                          className={`flex items-center gap-1 px-3 py-1 rounded-full font-semibold transition-all duration-200 shadow-sm border border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 ${Array.isArray(post.likeby) && post.likeby.includes(loggedInUser?._id) ? 'bg-purple-600 text-white' : 'bg-gray-800 text-purple-400 hover:bg-purple-700 hover:text-white'}`}
+                        >
+                          {Array.isArray(post.likeby) && post.likeby.includes(loggedInUser?._id) ? '\u2665 Liked' : '\u2661 Like'}
+                        </Button>
                         {isOwner && editingPostId !== post._id && (
-                          <>
+                          <div className="flex gap-2">
                             <Button onClick={() => handleEditClick(post)} className="text-blue-400 hover:text-blue-600">Edit</Button>
                             <Button onClick={() => handleDeletePost(post._id)} className="text-red-400 hover:text-red-600">Delete</Button>
-                          </>
+                          </div>
                         )}
                       </div>
                     </div>

@@ -9,9 +9,7 @@ export default function Home({ showPopup, videosFromSearch = [], searching = fal
   const { id } = useParams();
   const { video, videos, loading, error } = useVideo(id);
 
-  // Show loader if main videos are loading and not searching
   if (!searching && loading) return <Loader message="Loading videos..." />;
-  // Show loader if searching and search is loading
   if (searching && searchLoading) return <Loader message="Searching..." />;
   if (error) return <p className="text-red-500 p-4">{error.message}</p>;
 
@@ -20,7 +18,7 @@ export default function Home({ showPopup, videosFromSearch = [], searching = fal
   return (
     <div className="flex ">
       <div className="flex-1 p-4">
-        {/* Optionally, add a clear search button if searching */}
+
         {searching && !searchLoading && (
           <button
             className="mb-4 text-xs text-purple-400 hover:underline"

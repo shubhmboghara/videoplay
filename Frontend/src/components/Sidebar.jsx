@@ -19,13 +19,13 @@ const Sidebar = ({ className, loggedInUser }) => {
     const Width = hideLabels ? 'w-25' : 'w-64';
 
     const navItems = [
-        { label: "Home", icon: <HiHome size={25} />, slug: "/" },
-        { label: "Liked Videos", icon: <HiThumbUp size={25} />, slug: "/likedvideos" },
-        { label: "History", icon: <HiClock size={25} />, slug: "/history" },
-        { label: "My content", icon: <HiVideoCamera size={25} />, slug: "/my-content" },
-        { label: "playlists", icon: <HiFolder size={25} />, slug: "/playlists" },
-        { label: "Subscriptions", icon: <HiUsers size={25} />, slug: "/subscriptions" },
-        { label: "Settings", icon: <HiCog size={25} />, slug: "/settings" }
+        { label: "Home", icon: <HiHome size={30} />, slug: "/" },
+        { label: "Liked Videos", icon: <HiThumbUp size={30}  />, slug: "/likedvideos" },
+        { label: "History", icon: <HiClock size={30}  />, slug: "/history" },
+        { label: "My content", icon: <HiVideoCamera size={30} />, slug: "/my-content" },
+        { label: "playlists", icon: <HiFolder size={30} />, slug: "/playlists" },
+        { label: "Subscriptions", icon: <HiUsers size={30} />, slug: "/subscriptions" },
+        { label: "Settings", icon: <HiCog size={30} />, slug: "/settings" }
     ];
 
     const smItems = [
@@ -40,18 +40,18 @@ const Sidebar = ({ className, loggedInUser }) => {
 
     return (
         <div className={className}>
-            <div className="hidden lg:block border-r fixed border-gray-700 bg-[#18181b] z-200">
-                <div className={`h-screen text-white flex flex-col ${Width} z-50 p-4`}>
+            <div className="hidden lg:block border-r fixed border-gray-700 bg-[#18181b] z-200 ">
+                <div className={`h-screen text-white flex flex-col ${Width} z-50 pl-3 mr-2`}>
                     {loggedInUser && (
-                        <Link to={`/profile/${loggedInUser.username}`}>
-                            <div className="flex items-center mb-6 cursor-pointer">
+                        <Link to={`/profile/${loggedInUser.username}`} >
+                            <div className="flex items-center mb-6 cursor-pointer p-5 pt-8">
                             <img
                                 src={loggedInUser.avatar}
                                 alt={loggedInUser.fullname}
                                 className="w-12 h-12 rounded-full border-2 border-purple-400"
                             />
                             {!hideLabels && (
-                                <div className="ml-3">
+                                <div className="ml-3 ">
                                     <div className="font-semibold">{loggedInUser.fullname}</div>
                                     <div className="text-xs text-gray-400">@{loggedInUser.username}</div>
                                 </div>
@@ -61,7 +61,7 @@ const Sidebar = ({ className, loggedInUser }) => {
                         
                     )}
 
-                    <div className="space-y-2 my-4">
+                    <div className="space-y-2  my-4 flex-col flex gap-3">
                         {navItems.map((item) => {
                             const isActive = location.pathname === item.slug;
                             return (
@@ -70,11 +70,11 @@ const Sidebar = ({ className, loggedInUser }) => {
                                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg mb-2
                                               ${isActive
                                                 ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-300 font-semibold"
-                                                : "hover:bg-gray-700 text-gray-300"
+                                                : "hover:bg-gray-700 text-gray-300 relative  "
                                             }`}
                                     >
                                         {item.icon}
-                                        {!hideLabels && <span>{item.label}</span>}
+                                        {!hideLabels && <span className='text-[19px]' >{item.label}</span>}
                                     </Button>
                                 </Link>
                             );

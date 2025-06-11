@@ -28,7 +28,7 @@ export default function Navbar({onSearchResults, onSearching}) {
             </Link>
           </div>
 
-          <div className="flex flex-1 max-w-md mx-4 relative">
+          <div className="flex flex-1 max-w-md mx-4 relative mb-7">
             <Search onSearchResults={onSearchResults}
               onSearching={onSearching} />
           </div>

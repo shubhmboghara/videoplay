@@ -32,7 +32,7 @@ const getUserPosts = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Invalid user ID");
     }
 
-    const posts = await Posts.aggregate([
+    const pipeline = [
         {
             $match: {
                 owner: new mongoose.Types.ObjectId(userId),
@@ -57,26 +57,56 @@ const getUserPosts = asyncHandler(async (req, res) => {
         {
             $addFields: {
                 owner: { $first: "$owner" },
-                isLiked: {
-                    $cond: {
-                        if: req.user && req.user._id,
-                        then: {
-                            $in: [
-                                new mongoose.Types.ObjectId(req.user._id),
-                                { $ifNull: ["$likes", []] },
-                            ],
+            },
+        }
+    ];
+
+
+    // Conditionally add lookup for isLiked if user is logged in
+    if (req.user) {
+        pipeline.push(
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "posts",
+                    as: "userLikes",
+                    pipeline: [
+                        {
+                            $match: {
+                                likedBy: new mongoose.Types.ObjectId(req.user._id),
+                            },
                         },
-                        else: false,
-                    },
+                    ],
                 },
             },
-        },
-        {
-            $sort: {
-                createdAt: -1,
+            {
+                $addFields: {
+                    isLiked: { $gt: [{ $size: "$userLikes" }, 0] },
+                },
             },
+            {
+                $project: {
+                    userLikes: 0,
+                },
+            }
+        );
+    } else {
+        // If user is not logged in, set isLiked to false for all posts
+        pipeline.push({
+            $addFields: {
+                isLiked: false,
+            },
+        });
+    }
+
+    pipeline.push({
+        $sort: {
+            createdAt: -1,
         },
-    ]);
+    });
+
+    const posts = await Posts.aggregate(pipeline);
 
     if (!posts || posts.length === 0) {
         throw new ApiError(404, "No posts found for this user");

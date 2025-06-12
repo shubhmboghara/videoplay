@@ -5,6 +5,7 @@ import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/AppError.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
+import { Like } from "../models/like.model.js";
 
 const createPosts = asyncHandler(async (req, res) => {
     const { content } = req.body;
@@ -23,7 +24,6 @@ const createPosts = asyncHandler(async (req, res) => {
         )
 })
 
-import { Like } from "../models/like.model.js";
 
 const getUserPosts = asyncHandler(async (req, res) => {
     const { userId } = req.params;
@@ -32,7 +32,8 @@ const getUserPosts = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Invalid user ID");
     }
 
-    const posts = await Posts.aggregate([
+    console.log("req.user in getUserPosts:", req.user);
+    const pipeline = [
         {
             $match: {
                 owner: new mongoose.Types.ObjectId(userId),
@@ -57,26 +58,57 @@ const getUserPosts = asyncHandler(async (req, res) => {
         {
             $addFields: {
                 owner: { $first: "$owner" },
-                isLiked: {
-                    $cond: {
-                        if: req.user && req.user._id,
-                        then: {
-                            $in: [
-                                new mongoose.Types.ObjectId(req.user._id),
-                                "$likes",
-                            ],
+            },
+        }
+    ];
+
+
+    // Conditionally add lookup for isLiked if user is logged in
+    if (req.user) {
+        pipeline.push(
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "posts",
+                    as: "userLikes",
+                    pipeline: [
+                        {
+                            $match: {
+                                likedBy: new mongoose.Types.ObjectId(req.user._id),
+                            },
                         },
-                        else: false,
-                    },
+                    ],
                 },
             },
-        },
-        {
-            $sort: {
-                createdAt: -1,
+            {
+                $addFields: {
+                    isLiked: { $gt: [{ $size: "$userLikes" }, 0] },
+                },
             },
+            {
+                $project: {
+                    userLikes: 0,
+                },
+            }
+        );
+    } else {
+        // If user is not logged in, set isLiked to false for all posts
+        pipeline.push({
+            $addFields: {
+                isLiked: false,
+            },
+        });
+    }
+
+    pipeline.push({
+        $sort: {
+            createdAt: -1,
         },
-    ]);
+    });
+
+    console.log("Aggregation pipeline:", JSON.stringify(pipeline, null, 2));
+    const posts = await Posts.aggregate(pipeline);
 
     if (!posts || posts.length === 0) {
         throw new ApiError(404, "No posts found for this user");

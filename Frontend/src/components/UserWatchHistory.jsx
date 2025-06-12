@@ -44,8 +44,8 @@ const UserWatchHistory = ({ showPopup }) => {
                 id={video._id}
                 thumbnail={video.thumbnail}
                 title={video.title}
-                channel={video.owner[0].username}
-                avatar={video.owner[0].avatar }
+                channel={video.owner.username}
+                avatar={video.owner.avatar }
                 views={video.views}
                 time={video.createdAt}
                 duration={video.duration}

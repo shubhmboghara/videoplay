@@ -5,6 +5,7 @@ import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/AppError.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
+import { Like } from "../models/like.model.js";
 
 const createPosts = asyncHandler(async (req, res) => {
     const { content } = req.body;
@@ -23,29 +24,70 @@ const createPosts = asyncHandler(async (req, res) => {
         )
 })
 
-const getUserPosts = asyncHandler(async (req, res) => {
 
-    const { userId } = req.params
+const getUserPosts = asyncHandler(async (req, res) => {
+    const { userId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-        throw new ApiError(404, "invalid post id ")
+        throw new ApiError(404, "Invalid user ID");
     }
 
-    const posts = await Posts.find({ owner: userId })
-        .sort({ createdAt: -1 })
-        .populate("owner", "username ")
+    const posts = await Posts.aggregate([
+        {
+            $match: {
+                owner: new mongoose.Types.ObjectId(userId),
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            username: 1,
+                            avatar: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                owner: { $first: "$owner" },
+                isLiked: {
+                    $cond: {
+                        if: req.user && req.user._id,
+                        then: {
+                            $in: [
+                                new mongoose.Types.ObjectId(req.user._id),
+                                { $ifNull: ["$likes", []] },
+                            ],
+                        },
+                        else: false,
+                    },
+                },
+            },
+        },
+        {
+            $sort: {
+                createdAt: -1,
+            },
+        },
+    ]);
 
-    if (!posts) {
-        throw new ApiError(404, "No posts found for this user ")
+    if (!posts || posts.length === 0) {
+        throw new ApiError(404, "No posts found for this user");
     }
 
     return res
         .status(200)
-        .json(
-            new ApiResponse(200, posts, " Posts  found  successfully")
-        )
+        .json(new ApiResponse(200, posts, "Posts found successfully"));
+});
 
-})
+
 
 const updatePosts = asyncHandler(async (req, res) => {
     const { id } = req.params

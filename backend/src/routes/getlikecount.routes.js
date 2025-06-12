@@ -3,9 +3,9 @@ import { Router } from 'express';
 const router = Router();
 
 
-router.get("/:videoId", getVideoLikeCount);
-router.get("/:commentId", getCommentLikeCount)
-router.get("/:postsId", getPostsLikeCount)
+router.get("/video/:videoId", getVideoLikeCount);
+router.get("/comment/:commentId", getCommentLikeCount);
+router.get("/post/:postsId", getPostsLikeCount);
 
 
 

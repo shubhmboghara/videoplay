@@ -60,9 +60,9 @@ export default function Profile({ username: propUsername, loggedInUser }) {
 
   const handleLikePost = async (id) => {
     try {
-      const updated = await toggleLike('post', id);
+      const { isLiked } = await toggleLike('post', id);
       setPosts(posts.map((p) =>
-        p._id === id ? { ...p, ...updated, content: p.content } : p
+        p._id === id ? { ...p, isLiked: isLiked } : p
       ));
     } catch (error) {
       console.error('Failed to like post:', error);
@@ -107,7 +107,12 @@ export default function Profile({ username: propUsername, loggedInUser }) {
 
   const getUserPosts = () => {
     if (profile?._id) {
-      api.getUserPosts(profile._id).then(setPosts);
+      api.getUserPosts(profile._id).then(fetchedPosts => {
+        setPosts(fetchedPosts.map(post => ({
+          ...post,
+          isLiked: post.isLiked || false // Ensure isLiked is always a boolean
+        })));
+      });
     }
   };
 
@@ -293,9 +298,9 @@ export default function Profile({ username: propUsername, loggedInUser }) {
                         <span>Likes: {likeCounts[post._id] ?? (post.likeby ? post.likeby.length : 0)}</span>
                         <Button
                           onClick={() => handleLikePost(post._id)}
-                          className={`flex items-center gap-1 px-3 py-1 rounded-full font-semibold transition-all duration-200 shadow-sm border border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 ${Array.isArray(post.likeby) && post.likeby.includes(loggedInUser?._id) ? 'bg-purple-600 text-white' : 'bg-gray-800 text-purple-400 hover:bg-purple-700 hover:text-white'}`}
+                          className={`flex items-center gap-1 px-3 py-1 rounded-full font-semibold transition-all duration-200 shadow-sm border border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 ${post.isLiked ? 'bg-red-600 text-white transform scale-105' : 'bg-gray-800 text-purple-400 hover:bg-purple-700 hover:text-white'}`}
                         >
-                          {Array.isArray(post.likeby) && post.likeby.includes(loggedInUser?._id) ? '\u2665 Liked' : '\u2661 Like'}
+                          {post.isLiked ? '❤️ Liked' : '♡ Like'}
                         </Button>
                         {isOwner && editingPostId !== post._id && (
                           <div className="flex gap-2">

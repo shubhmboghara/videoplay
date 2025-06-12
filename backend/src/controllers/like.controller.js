@@ -99,7 +99,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
         await Like.deleteOne({ _id: alreadyLiked._id });
         return res
             .status(200)
-            .json(new ApiResponse(200, null, "Unliked successfully"));
+            .json(new ApiResponse(200, { isLiked: false }, "Unliked successfully"));
     }
 
     const newLike = await Like.create({
@@ -131,7 +131,7 @@ const togglePostsLike = asyncHandler(async (req, res) => {
         await Like.deleteOne({ _id: alreadyLiked._id });
         return res
             .status(200)
-            .json(new ApiResponse(200, null, "Unliked successfully"))
+            .json(new ApiResponse(200, { isLiked: false }, "Unliked successfully"))
     }
 
     const newLike = await Like.create({
@@ -142,9 +142,9 @@ const togglePostsLike = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(
-            new ApiResponse(200, { newLike }, " successfully")
-        )
+            .json(
+                new ApiResponse(200, { isLiked: true }, "Liked successfully")
+            )
 }
 )
 

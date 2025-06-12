@@ -37,7 +37,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
       }
     };
     fetchLikeCounts();
-  }, [posts]);
+  }, [posts,SubscribeButton]);
 
   const isOwner = loggedInUser?.username === profile?.username;
 

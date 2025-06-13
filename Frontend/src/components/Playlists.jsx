@@ -142,7 +142,7 @@ function PlaylistsComponent({ onPlaylistSelected }) {
 
   return (
     <div className="min-h-screen text-white w-full ">
-      <div className="ml-0 lg:ml-64 px-4 sm:px-8 pt-10 pb-4">
+      <div className="ml-0 lg:ml-64  sm:px-8  pb-4">
         <h2 className="text-2xl font-bold mb-6">Your Playlists</h2>
       </div>
       <div className="ml-0 lg:ml-64 px-4 sm:px-8 pb-16">

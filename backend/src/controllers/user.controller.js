@@ -14,10 +14,10 @@ const generateAccessAndRefreshTokens = async (userId) => {
         }
         const accessToken = user.generateAccessToken();
         const refreshToken = user.generateRefreshToken();
-        
+
         user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false });
-        
+
         return { accessToken, refreshToken };
     } catch (error) {
         throw new ApiError(500, "Something went wrong while generating tokens");
@@ -26,7 +26,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
     const { fullname, email, username, password } = req.body;
-    
+
     if ([fullname, email, username, password].some(field => !field?.trim())) {
         throw new ApiError(400, "All fields are required");
     }
@@ -37,17 +37,21 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     const avatarLocalPath = req.files?.avatar?.[0]?.path;
-    if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is required");
+    let avatar = null
+
+    if (avatarLocalPath) {
+        avatar = await uploadOnCloudinary(avatarLocalPath);
+
+        if (!avatar?.url) {
+            throw new ApiError(500, "Failed to upload avatar");
+        }
+
     }
-    
+
     const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
     let coverImage = null;
 
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-    if (!avatar?.url) {
-        throw new ApiError(500, "Failed to upload avatar");
-    }
+
 
     if (coverImageLocalPath) {
         coverImage = await uploadOnCloudinary(coverImageLocalPath);
@@ -58,7 +62,7 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
         username: username.toLowerCase(),
         password,
-        avatar: avatar.url,
+        avatar: avatar?.url || "",
         coverImage: coverImage?.url || ""
     });
 
@@ -71,7 +75,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production" 
+        secure: process.env.NODE_ENV === "production"
     };
 
     return res
@@ -189,7 +193,7 @@ const changePassword = asyncHandler(async (req, res) => {
     }
 
     user.password = newPassword;
-    await user.save(); 
+    await user.save();
 
     return res
         .status(200)
@@ -317,7 +321,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         },
         {
             $lookup: {
-                from: "subscriptions",  
+                from: "subscriptions",
                 localField: "_id",
                 foreignField: "subscriber",
                 as: "subscribedTo"

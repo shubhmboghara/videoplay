@@ -50,7 +50,7 @@ export default function Subscriptionss() {
   }
 
   return (
-    <div className="min-h-screen relative  bg-[#18181b]  max-w-screen-2xl mx-auto xl:pl-60  ">
+    <div className="min-h-screen relative  bg-[#18181b]  max-w-screen-2xl mx-auto xl:pl-65  ">
       <h1 className="text-3xl font-bold text-white mb-6 p-4">My Subscriptions</h1>
       {subscriptions.length === 0 ? (
         <p className="text-gray-400">No subscriptions found.</p>

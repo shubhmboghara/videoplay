@@ -59,10 +59,10 @@ const getUserPosts = asyncHandler(async (req, res) => {
                 owner: { $first: "$owner" },
                 isLiked: {
                     $cond: {
-                        if: req.user && req.user._id,
+                        if: req.user,
                         then: {
                             $in: [
-                                new mongoose.Types.ObjectId(req.user._id),
+                                new mongoose.Types.ObjectId(req.user?._id),
                                 "$likes",
                             ],
                         },

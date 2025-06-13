@@ -46,7 +46,6 @@ export default function Profile({ username: propUsername, loggedInUser }) {
     };
     fetchLikeCounts();
 
-    getUserPosts()
   }, [posts]);
 
   const isOwner = loggedInUser?.username === profile?.username;
@@ -141,7 +140,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   const socialLinks = profile?.socialLinks || [];
 
   return (
-    <div className="max-w-356 mx-auto mt-10 rounded-xl shadow-xl overflow-hidden relative xl:left-33">
+    <div className="max-w-356 mx-auto mt-10 rounded-xl  overflow-hidden relative xl:left-33">
       <div className="relative h-52 bg-gradient-to-r from-[#23232b] to-[#1f1f25]">
         <img
           src={profile.coverImage || DefaultCoverImage}

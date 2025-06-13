@@ -14,7 +14,7 @@ const EditVideoModal = ({ isOpen, onClose, video, onVideoUpdated }) => {
         if (video) {
             setTitle(video.title || '');
             setDescription(video.description || '');
-            setThumbnail(null); // Reset thumbnail input
+            setThumbnail(null); 
         }
     }, [video]);
 

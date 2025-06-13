@@ -98,8 +98,10 @@ const UploadVideoModal = ({ isOpen, onClose, onVideoUploaded }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2">
-      <div className="bg-[#1a1a1a] w-full max-w-3xl rounded-lg p-6 relative top-10  xl:left-23">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-2 xl:left-50 ">
+
+
+      <div className="w-full max-w-3xl bg-[#1a1a1a] rounded-lg p-6 relative mx-4 sm:mx-6 md:mx-auto overflow-y-auto max-h-[85vh] modal-scroll mt-15 ">
         <button
           onClick={handleClose}
           className="absolute top-3 right-4 text-gray-400 hover:text-white text-2xl"

@@ -8,10 +8,7 @@ export default function Navbar({ onSearchResults, onSearching }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const authStatus = useSelector((state) => state.auth.status);
 
-  const navItems = [
-    { name: 'Login', slug: '/login', active: !authStatus },
-    { name: 'Signup', slug: '/signup', active: !authStatus },
-  ];
+ 
   return (
     <header className="fixed w-full   shadow z-9999   h-17   bg-[#18181b] border-b border-gray-700 p-4  text-[#020817]" >
       <Container>

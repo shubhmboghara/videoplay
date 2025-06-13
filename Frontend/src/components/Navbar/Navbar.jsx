@@ -14,7 +14,7 @@ export default function Navbar({ onSearchResults, onSearching }) {
       <Container>
         <div className="flex items-center justify-between h-16">
 
-          <div className=' pb-5'>
+          <div className=' pb-5 pl-12 '>
             <Link to="/" className="flex-shrink-0">
               <div className="flex items-center space-x-2 cursor-pointer">
                 <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">

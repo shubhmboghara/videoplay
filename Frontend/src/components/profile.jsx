@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useProfileApi } from "../hooks/profile";
-import { DefaultAvatar, Button, Input, VideoCard, DefaultCoverImage, Loader, SubscribeButton } from "./index";
+import {
+  DefaultAvatar,
+  Button,
+  Input,
+  VideoCard,
+  DefaultCoverImage,
+  Loader,
+  SubscribeButton,
+} from "./index";
 import { Tab } from "@headlessui/react";
 import { toggleLike } from "../hooks/toggleLike";
 import { getLikeCount } from "../hooks/getCount";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 
 export default function Profile({ username: propUsername, loggedInUser }) {
   const { id: routeUsername } = useParams();
@@ -19,10 +28,15 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   const [editingPostId, setEditingPostId] = useState(null);
   const [editText, setEditText] = useState("");
   const [likeCounts, setLikeCounts] = useState({});
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [postToDeleteId, setPostToDeleteId] = useState(null);
 
   useEffect(() => {
 
-    api.getProfile(username).then(setProfile);
+    api.getProfile(username).then(fetchedProfile => {
+      console.log("Fetched profile:", fetchedProfile);
+      setProfile(fetchedProfile);
+    });
   }, [username]);
 
   const getUserPosts = () => {
@@ -48,7 +62,7 @@ export default function Profile({ username: propUsername, loggedInUser }) {
 
   }, [posts]);
 
-  const isOwner = loggedInUser?.username === profile?.username;
+
 
   const handleCreatePost = async () => {
     if (!newPost.trim()) return;
@@ -58,8 +72,22 @@ export default function Profile({ username: propUsername, loggedInUser }) {
   };
 
   const handleDeletePost = async (id) => {
-    await api.deletePost(id);
-    setPosts(posts.filter((p) => p._id !== id));
+    setPostToDeleteId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeletePost = async () => {
+    if (postToDeleteId) {
+      await api.deletePost(postToDeleteId);
+      setPosts(posts.filter((p) => p._id !== postToDeleteId));
+      setIsDeleteModalOpen(false);
+      setPostToDeleteId(null);
+    }
+  };
+
+  const cancelDeletePost = () => {
+    setIsDeleteModalOpen(false);
+    setPostToDeleteId(null);
   };
 
   const handleUpdatePost = async (id, content) => {
@@ -136,114 +164,152 @@ export default function Profile({ username: propUsername, loggedInUser }) {
     );
   }
 
-  const channelDescription = profile?.bio || "This user hasn't added a channel description yet.";
-  const socialLinks = profile?.socialLinks || [];
+  const isOwner = loggedInUser && profile && loggedInUser.username === profile.username;
+
+
+  const bio = profile.bio || "This user hasn't added a channel description yet.";
+  const socials = profile.socialLinks || [];
+
 
   return (
-    <div className="max-w-356 mx-auto mt-10 rounded-xl  overflow-hidden relative xl:left-33">
-      <div className="relative h-52 bg-gradient-to-r from-[#23232b] to-[#1f1f25]">
+    <div className="relative w-full max-w-700 mx-auto   lg:pl-68 ">
+      <div className="relative h-60 sm:h-72 bg-gradient-to-r from-gray-700 to-gray-900">
         <img
           src={profile.coverImage || DefaultCoverImage}
-          alt="cover"
-          className="w-full h-full object-cover opacity-70"
+          alt="Cover"
+          className="w-full h-full object-cover opacity-80"
         />
-        <div className="absolute left-6 -bottom-14 flex items-end gap-6">
-          {isOwner ? (
-            <>
-              <label htmlFor="avatarUpload" className="relative group">
-                <img
-                  src={profile.avatar || DefaultAvatar}
-                  alt="avatar"
-                  className="w-42 h-32 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-xl cursor-pointer group-hover:brightness-90 transition"
-                  title="Click to change avatar"
-                />
-                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-purple-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">Change</span>
-              </label>
-              <input id="avatarUpload" type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
-            </>
-          ) : (
+        {isOwner && (
+          <label className="absolute top-4 right-4 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
+            Change Cover
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleCoverChange}
+              className="hidden"
+            />
+          </label>
+        )}
+        <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-1/2">
+          <label className="relative block group">
             <img
               src={profile.avatar || DefaultAvatar}
-              alt="avatar"
-              className="w-42 h-30 rounded-full border-4 border-purple-600 bg-[#23232b] object-cover shadow-xl"
+              alt="Avatar"
+              className="w-32 h-32 rounded-full border-4 border-purple-600 bg-gray-800 object-cover shadow-lg"
             />
-          )}
-          <div className="mt-20 text-white flex flex-col gap-2 w-full">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-2xl font-bold break-all">{profile.fullname || profile.username}</h2>
-              {isOwner && <span className="bg-green-600 text-white text-xs px-2 py-1 rounded shadow-lg">You</span>}
-            </div>
-            <p className="text-purple-400 font-mono break-all">@{profile.username}</p>
-            <div className="text-gray-400 text-sm flex gap-6 flex-wrap">
-              <span><strong>{profile.subscribersCount}</strong> Subscribers</span>
-              <span><strong>{profile.channelsSubscribedToCount}</strong> Subscribed</span>
-            </div>
-            <div className="mt-2 text-gray-300 text-sm max-w-2xl break-words">{channelDescription}</div>
-            {socialLinks.length > 0 && (
-              <div className="flex gap-3 mt-2">
-                {socialLinks.map((link, i) => (
-                  <a key={link.url || i} href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline flex items-center gap-1">
-                    <span>{link.icon ? <img src={link.icon} alt="" className="w-4 h-4 inline" /> : null}</span>
-                    {link.label || link.url}
-                  </a>
-                ))}
-              </div>
+            <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-purple-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">Change</span>
+
+            {isOwner && (
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className="absolute inset-0 opacity-0 cursor-pointer rounded-full"
+              />
             )}
-            {!isOwner && (
-              <div className="mt-2">
-                <SubscribeButton
-                  channelId={profile._id}
-                  isSubscribed={profile.isSubscribed}
-                  loggedInUser={loggedInUser}
-                  onSubscribeChange={() => api.getProfile(username).then(setProfile)}
-                />
-              </div>
-            )}
-          </div>
+          </label>
         </div>
       </div>
 
-      {isOwner && (
-        <div className="flex justify-end px-6 pt-20">
-          <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded cursor-pointer">
-            Update Cover
-            <input type="file" accept="image/*" onChange={handleCoverChange} className="hidden" />
-          </label>
+      <div className="mt-16 text-center sm:text-left ml-10">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white break-words">
+          {profile.fullname || profile.username}
+          {isOwner && (
+            <span className="ml-2 inline-block bg-green-600 text-white text-xs px-2 py-1 rounded">
+              You
+            </span>
+          )}
+        </h1>
+        <p className="text-purple-400 font-mono mt-1 break-words">
+          @{profile.username}
+        </p>
+        <div className="flex flex-wrap justify-center sm:justify-start gap-4 text-gray-400 mt-2">
+          <span>
+            <strong>{profile.subscribersCount}</strong> Subscribers
+          </span>
+          <span>
+            <strong>{profile.channelsSubscribedToCount}</strong> Subscribed
+          </span>
         </div>
-      )}
+        <p className="mt-4 text-gray-300 max-w-3xl mx-auto sm:mx-0 break-words">
+          {bio}
+        </p>
+        {socials.length > 0 && (
+          <div className="flex flex-wrap gap-3 mt-3 justify-center sm:justify-start">
+            {socials.map((s, i) => (
+              <a
+                key={i}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-1 text-blue-400 hover:underline text-sm"
+              >
+                {s.icon && <img src={s.icon} alt="" className="w-4 h-4" />}
+                <span>{s.label || s.url}</span>
+              </a>
+            ))}
+          </div>
+        )}
 
-      <div className="px-6 pt-8">
+        {!isOwner && (
+          <div className="mt-4">
+            <SubscribeButton
+              channelId={profile._id}
+              isSubscribed={profile.isSubscribed}
+              loggedInUser={loggedInUser}
+              onSubscribeChange={() => api.getProfile(username).then(setProfile)}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="mt-8">
         <Tab.Group selectedIndex={activeTab} onChange={setActiveTab}>
-          <Tab.List className="flex gap-4 border-b border-gray-700 mb-6">
-            <Tab className={({ selected }) =>
-              `px-4 py-2 text-lg font-semibold focus:outline-none transition border-b-2 ${selected ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-400 hover:text-white'}`
-            }>Videos</Tab>
-            <Tab className={({ selected }) =>
-              `px-4 py-2 text-lg font-semibold focus:outline-none transition border-b-2 ${selected ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-400 hover:text-white'}`
-            }>Posts</Tab>
+          <Tab.List className="flex justify-center sm:justify-start space-x-4 border-b border-gray-700">
+            <Tab
+              className={({ selected }) =>
+                `px-4 py-2 text-lg font-semibold transition border-b-2 ${{
+                  true: 'border-purple-500 text-purple-300',
+                  false: 'border-transparent text-gray-400 hover:text-white',
+                }[selected]}`
+              }
+            >
+              Videos
+            </Tab>
+            <Tab
+              className={({ selected }) =>
+                `px-4 py-2 text-lg font-semibold transition border-b-2 ${{
+                  true: 'border-purple-500 text-purple-300',
+                  false: 'border-transparent text-gray-400 hover:text-white',
+                }[selected]}`
+              }
+            >
+              Posts
+            </Tab>
           </Tab.List>
-          <Tab.Panels>
+          <Tab.Panels className="mt-6">
             <Tab.Panel>
-              {Array.isArray(videos) && videos.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {videos.map((video) => (
+              {videos.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {videos.map((v) => (
                     <VideoCard
-                      key={video._id}
-                      id={video._id}
-                      thumbnail={video.thumbnail}
-                      title={video.title}
+                      key={v._id}
+                      id={v._id}
+                      thumbnail={v.thumbnail}
+                      title={v.title}
                       channel={profile.username}
                       avatar={profile.avatar}
-                      views={video.views}
-                      time={video.createdAt}
-                      duration={video.duration || 0}
+                      views={v.views}
+                      time={v.createdAt}
+                      duration={v.duration}
                     />
                   ))}
                 </div>
               ) : (
-                <p className="text-center text-gray-400 py-6">No videos found.</p>
+                <p className="text-center text-gray-500">No videos found.</p>
               )}
             </Tab.Panel>
+
             <Tab.Panel>
               {isOwner && (
                 <div className="mb-6">
@@ -305,7 +371,12 @@ export default function Profile({ username: propUsername, loggedInUser }) {
                         {isOwner && editingPostId !== post._id && (
                           <div className="flex gap-2">
                             <Button onClick={() => handleEditClick(post)} className="text-blue-400 hover:text-blue-600">Edit</Button>
-                            <Button onClick={() => handleDeletePost(post._id)} className="text-red-400 hover:text-red-600">Delete</Button>
+                            <button
+                              onClick={() => handleDeletePost(post._id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              Delete
+                            </button>
                           </div>
                         )}
                       </div>
@@ -317,6 +388,13 @@ export default function Profile({ username: propUsername, loggedInUser }) {
           </Tab.Panels>
         </Tab.Group>
       </div>
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={cancelDeletePost}
+        onDelete={confirmDeletePost}
+        itemName="post"
+        itemType="post"
+      />
     </div>
   );
 }

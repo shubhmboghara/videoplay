@@ -202,13 +202,12 @@ function DashboardChannel({ showPopup }) {
 
                                         <button onClick={() => handleRequestDeleteVideo(video)} className="text-purple-400 hover:text-purple-500 mr-3">
                                             <TrashIcon className="w-5 h-5  text-gray-420" />
-
                                         </button>
 
                                         <button onClick={() => handleEditVideo(video)} className="text-purple-400 hover:text-purple-600">
                                             <PencilSquareIcon className="w-5 h-5 text-blue-600 cursor-pointer" />
-
                                         </button>
+
                                     </td>
                                 </tr>
                             ))}

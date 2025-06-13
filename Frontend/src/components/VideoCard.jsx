@@ -26,7 +26,7 @@ export default function VideoCard({
         <Link to={`/video/${id}`}>
           <div className="relative ">
             <img
-              src={thumbnail} 
+              src={thumbnail}
               alt={title}
               className="w-full h-full object-cover"
             />
@@ -37,15 +37,28 @@ export default function VideoCard({
         </Link>
 
         <div className="p-3 flex gap-3">
-          <Link to={channel ? `/profile/${channel}` : "#"}>
-            <img  
-              src={avatar && avatar.trim() !== "" ? avatar : DefaultAvatar}
+          {channel ? (
+            <Link to={`/profile/${channel}`} className="shrink-0">
+              <img
+                src={avatar?.trim() ? avatar : DefaultAvatar}
+                alt="channel avatar"
+                className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  if (e.currentTarget.src !== DefaultAvatar) {
+                    e.currentTarget.src = DefaultAvatar;
+                  }
+                }}
+              />
+            </Link>
+          ) : (
+            <img
+              src={DefaultAvatar}
               alt="channel avatar"
-              className="w-10 h-10 rounded-full cursor-pointer bg-gray-800 border border-gray-700 object-cover"
-              style={{ backgroundColor: !avatar || avatar.trim() === "" ? '#23232b' : undefined }}
-              onError={e => { e.target.onerror = null; e.target.src = DefaultAvatar; }}
+              className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 object-cover"
             />
-          </Link>
+          )}
+
           <div className="flex-1">
             <h3 className="text-white font-semibold truncate">{title}</h3>
             <div className="flex items-center text-gray-400 text-sm mt-1">
@@ -55,7 +68,9 @@ export default function VideoCard({
               {views} views · {timeAgo(time)}
             </p>
           </div>
+
         </div>
+
       </div>
     </div>
   );

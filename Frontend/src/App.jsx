@@ -26,7 +26,7 @@ function App() {
   const [popupType, setPopupType] = useState('error');
   const [searchResults, setSearchResults] = useState([]); 
   const [searchLoading, setSearchLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // New state for sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
   const loggedInUser = useSelector((state) => state.auth.user);
 
   const showPopup = (message, type = 'error') => {
@@ -51,7 +51,7 @@ function App() {
           <Navbar
             onSearchResults={setSearchResults}
             onSearching={setSearchLoading}
-            onToggleSidebar={toggleSidebar} // Pass toggle function to Navbar
+            onToggleSidebar={toggleSidebar}
           />
 
           <div className="mb-20 mt-16">

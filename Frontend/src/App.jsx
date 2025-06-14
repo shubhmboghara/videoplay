@@ -26,6 +26,7 @@ function App() {
   const [popupType, setPopupType] = useState('error');
   const [searchResults, setSearchResults] = useState([]); 
   const [searchLoading, setSearchLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // New state for sidebar
   const loggedInUser = useSelector((state) => state.auth.user);
 
   const showPopup = (message, type = 'error') => {
@@ -37,19 +38,24 @@ function App() {
     setPopupMessage(null);
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
+
   return !loading ? (
     <AuthLoader>
 
-      <div className="min-h-screen flex flex-wrap content-between  items-center ">
+      <div className="min-h-screen flex flex-wrap content-between">
         <div className="w-full">
 
           <Navbar
             onSearchResults={setSearchResults}
             onSearching={setSearchLoading}
+            onToggleSidebar={toggleSidebar} // Pass toggle function to Navbar
           />
 
           <div className="mb-20 mt-16">
-            <Sidebar loggedInUser={loggedInUser} />
+            <Sidebar loggedInUser={loggedInUser} isOpen={isSidebarOpen} onClose={toggleSidebar} />
           </div>
           <main>
 

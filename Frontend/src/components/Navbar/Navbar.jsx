@@ -1,37 +1,43 @@
-import React, { useState } from 'react';
-import { Container, LogoutBtn,  Button,Search } from '../index';
+import React from 'react';
+import { Container, LogoutBtn, Button, Search } from '../index';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { HiMenu, HiX } from 'react-icons/hi';
+import { HiMenu } from 'react-icons/hi';
 
-export default function Navbar({ onSearchResults, onSearching }) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+export default function Navbar({ onSearchResults, onSearching, onToggleSidebar }) {
   const authStatus = useSelector((state) => state.auth.status);
 
- 
   return (
-    <header className="fixed w-full   shadow z-9999   h-17   bg-[#18181b] border-b border-gray-700 p-4  text-[#020817]" >
+    <header className="fixed w-full shadow z-9999 h-17 bg-[#18181b] border-b border-gray-700 p-4 text-[#020817]">
       <Container>
         <div className="flex items-center justify-between h-16">
-
-          <div className=' pb-5 pl-12 '>
+          <div className="lg:hidden flex items-center">
+            <button
+              onClick={onToggleSidebar}
+              className="rounded-full hover:bg-white transition pb-6 "
+              aria-label="Open menu"
+            >
+              <HiMenu size={24} className='text-white' />
+            </button>
+          </div>
+          <div className="pb-6 pl-5">
             <Link to="/" className="flex-shrink-0">
               <div className="flex items-center space-x-2 cursor-pointer">
                 <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">V</span>
                 </div>
-                <span className="text-white font-semibold text-xl hidden sm:block">VideoHub</span></div>
+                <span className="text-white font-semibold text-xl hidden sm:block">VideoHub</span>
+              </div>
             </Link>
           </div>
 
           <div className="flex flex-1 max-w-md mx-4 relative mb-7">
-            <Search onSearchResults={onSearchResults}
-              onSearching={onSearching} />
+            <Search onSearchResults={onSearchResults} onSearching={onSearching} />
           </div>
 
-          <ul className="hidden sm:flex items-center space-x-2 md:space-x-4  ">
-            {!authStatus && (
-              <>3
+          <ul className="hidden sm:flex items-center space-x-2 md:space-x-4">
+            {!authStatus ? (
+              <>
                 <Link to="/login">
                   <li>
                     <Button className="px-4 py-2 text-gray-300 hover:text-white transition-colors mb-7">
@@ -39,84 +45,24 @@ export default function Navbar({ onSearchResults, onSearching }) {
                     </Button>
                   </li>
                 </Link>
-
                 <Link to="/signup">
-
                   <li>
                     <Button className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg font-semibold transition-all text-white mb-7">
                       Sign Up
                     </Button>
-
                   </li>
                 </Link>
               </>
+            ) : (
+              <li className='pb-7'>
+                <LogoutBtn showLabel={true} className="p-2 bg-red-500 hover:bg-red-600 rounded-full " />
+              </li>
             )}
-
-
-
-            {authStatus && (
-              <div>
-                <LogoutBtn className=" px-4 py-2 rounded-full text-white mt-12 bg-red-500 hover:bg-red-700  w-5 mb-10 " />
-              </div>
-            )}
-
           </ul>
 
-          <div className="sm:hidden flex items-center">
-            <button
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="p-2 rounded-full hover:bg-white transition bg-white mb-6"
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-            >
-              {mobileMenuOpen ? <HiX size={24} /> : <HiMenu size={24} className='' />}
-            </button>
-          </div>
+
         </div>
-
-        {mobileMenuOpen && (
-          <nav className="sm:hidden bg-[#27272a] border-t border-zinc-700 relative w-full h-35 ">
-            <Container>
-              <ul className="flex flex-col pb-4 px-4 space-y-2 text-white">
-
-
-                <div className="pt-7 pb-3 relative bottom-5">
-                  {!authStatus && (
-                    <>
-                      <Link to="/login">
-
-                        <li>
-                          <Button className="px-27 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg font-semibold transition-all text-white mb-7"
-                          >
-                            Login
-                          </Button>
-                        </li>
-                      </Link>
-
-                      <Link to="/signup">
-                        <li>
-                          <Button
-                            className="px-25 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg font-semibold transition-all text-white mb-7"
-                          >
-                            Sign Up
-                          </Button>
-                        </li>
-                      </Link>
-                    </>
-                  )}
-
-
-                  {authStatus && (
-                    <li className="pt-2">
-                      <LogoutBtn className=" px-40 py-2 rounded-full text-white mt-12 bg-red-500 hover:bg-red-700  w-5 mb-8  font-semibold transition-all  relative bottom-10 text-center" />
-                    </li>
-                  )}
-                </div>
-              </ul>
-            </Container>
-          </nav>
-        )}
-
       </Container>
-    </header >
+    </header>
   );
 }
